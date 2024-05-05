@@ -3,7 +3,7 @@ module Day6 where
 import Control.Monad.RWS
 import Data.List
 import Data.List.Split
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 type Orbits = RWS () [String] Int String
@@ -18,7 +18,7 @@ countOrbits m _ x = do
 
 main' :: IO ()
 main' = do
-  contents <- map ((\[a, b] -> (b, a)) . splitOn ")") . lines <$> readFile "2019/inputs/Day6/input.txt"
+  contents <- map ((\[a, b] -> (b, a)) . splitOn ")") . lines <$> readFile "../inputs/2019/Day6/input.txt"
   let m = M.fromList contents
   -- part 1
   let orbits = map (\x -> (\(_, s, w) -> (x, (s, w))) $ runRWS (countOrbits m () x) () 0) $ M.keys m

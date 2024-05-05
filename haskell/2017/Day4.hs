@@ -23,6 +23,6 @@ hasPermutations xs = go [] xs
 
 main' :: IO ()
 main' = do
-  contents <- map words . lines <$> readFile "2017/inputs/Day4/input.txt"
+  contents <- map words . lines <$> readFile "../inputs/2017/Day4/input.txt"
   print $ length $ filter (not . hasDuplicates) contents
   print $ length $ filter (not . hasPermutations) contents

@@ -6,7 +6,7 @@ import Data.Ix
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Point
 
 type Cube = [Point3 Int]
@@ -71,7 +71,7 @@ lowerAll (k : ks) = do
 
 main' :: IO ()
 main' = do
-  contents <- sortByLowest . map parse . lines <$> readFile "2023/inputs/Day22/sample.txt"
+  contents <- sortByLowest . map parse . lines <$> readFile "../inputs/2023/Day22/sample.txt"
   let cubeMap = M.fromList $ zip ['A' ..] contents :: CubeMap
   let keyOrderList = M.keys cubeMap
   let numBlocks = length keyOrderList

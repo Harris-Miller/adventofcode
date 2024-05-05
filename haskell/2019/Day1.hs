@@ -9,7 +9,7 @@ calcFuel (x : xs) = if next == 0 then sum (x : xs) else calcFuel (next : x : xs)
 
 main' :: IO ()
 main' = do
-  contents <- map read . lines <$> readFile "2019/inputs/Day1/input.txt" :: IO [Int]
+  contents <- map read . lines <$> readFile "../inputs/2019/Day1/input.txt" :: IO [Int]
   let fuel = map (subtract 2 . (`div` 3)) contents
   let r = sum fuel
   print r

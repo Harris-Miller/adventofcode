@@ -3,10 +3,10 @@ module Day1 where
 import Control.Monad.State
 import Data.Bifunctor
 import Data.IntSet (IntSet)
-import qualified Data.IntSet as S
+import Data.IntSet qualified as S
 import Data.List
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 
 parse :: String -> Int
 parse ('+' : xs) = read xs
@@ -21,7 +21,7 @@ findFirstDuplicate list = go S.empty sums
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2018/inputs/Day1/input.txt" :: IO [Int]
+  contents <- map parse . lines <$> readFile "../inputs/2018/Day1/input.txt" :: IO [Int]
   -- part 1
   print $ sum contents
   -- part 2

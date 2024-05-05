@@ -3,7 +3,7 @@ module Day8 where
 import Control.Arrow
 import Data.List.Split
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Tuple.Common
 
 parse :: String -> (String, Map String (String, String))
@@ -38,7 +38,7 @@ process2 m found start is = go 0 start is
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day8/input.txt"
+  contents <- readFile "../inputs/2023/Day8/input.txt"
   let (is, m) = parse contents
   -- part 1
   print $ process1 m is

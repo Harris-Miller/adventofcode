@@ -4,7 +4,7 @@ import Algorithm.Search
 import Control.Arrow
 import Data.Char
 import Data.Grid.Map
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 data Direction = North | East | South | West
@@ -44,7 +44,7 @@ process min max grid end@(endR, endC) = aStar genNeighbors cost heuristic isAtEn
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day17/input.txt"
+  contents <- readFile "../inputs/2023/Day17/input.txt"
   let grid = parseGrid (const True) digitToInt contents
   let start = Move (0, 0) East 0
   let end = fst $ M.findMax grid

@@ -15,7 +15,7 @@ process (b : t : xs) = process (processLayer b t : xs)
 
 main' :: IO ()
 main' = do
-  contents <- map digitToInt . head . lines <$> readFile "2019/inputs/Day8/input.txt" :: IO [Int]
+  contents <- map digitToInt . head . lines <$> readFile "../inputs/2019/Day8/input.txt" :: IO [Int]
   let rows = chunksOf (25 * 6) contents
 
   -- part 1

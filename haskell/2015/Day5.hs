@@ -43,7 +43,7 @@ tests2 = [matchingPairs, hasAba]
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2015/inputs/Day5/input.txt"
+  contents <- lines <$> readFile "../inputs/2015/Day5/input.txt"
   -- part 1
   print $ length $ filter (and . sequence tests) contents
   -- part 2

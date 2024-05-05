@@ -4,9 +4,9 @@ import Control.Monad
 import Control.Monad.RWS.Strict
 import Data.List
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Set (Set)
-import qualified Data.Set as S
+import Data.Set qualified as S
 
 type Edge = (String, String)
 
@@ -55,7 +55,7 @@ getAllChildren m s = m ! s <> concatMap (getAllChildren m) cs
 
 main' :: IO ()
 main' = do
-  edges <- map parse . lines <$> readFile "2018/inputs/Day7/input.txt"
+  edges <- map parse . lines <$> readFile "../inputs/2018/Day7/input.txt"
   let edgesSet = S.fromList edges
   let nodeToNodes = toMap edges
   let starts = sort $ collectStarts nodeToNodes

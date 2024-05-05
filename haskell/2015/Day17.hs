@@ -7,7 +7,7 @@ liters = 150 :: Int
 
 main' :: IO ()
 main' = do
-  contents <- map read . lines <$> readFile "2015/inputs/Day17/input.txt" :: IO [Int]
+  contents <- map read . lines <$> readFile "../inputs/2015/Day17/input.txt" :: IO [Int]
   -- part 1
   let fillCombos = filter ((== liters) . sum) $ subsequences contents
   print $ length fillCombos

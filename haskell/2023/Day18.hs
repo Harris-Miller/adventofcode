@@ -41,7 +41,7 @@ polygonArea ps = abs (polygonInnerArea path) + perimeter `quot` 2 + 1
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day18/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day18/input.txt"
   let plans = map parse contents
   -- part 1
   let points = map (fromOrigin . fst) plans

@@ -455,6 +455,6 @@ soln2 contents =
 -- When called with the argument '?t#', runs a trace.
 main' :: IO ()
 main' = do
-  contents <- readFile "2015/inputs/Day22/input.txt"
+  contents <- readFile "../inputs/2015/Day22/input.txt"
   print $ soln1 contents
   print $ soln2 contents

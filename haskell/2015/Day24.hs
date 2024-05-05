@@ -12,6 +12,6 @@ go num xs = head $ sortOn snd $ map (\x -> (x, product x)) groups'
 
 main' :: IO ()
 main' = do
-  contents <- map read . lines <$> readFile "2015/inputs/Day24/input.txt" :: IO [Int]
+  contents <- map read . lines <$> readFile "../inputs/2015/Day24/input.txt" :: IO [Int]
   print $ snd $ go 3 contents
   print $ snd $ go 4 contents

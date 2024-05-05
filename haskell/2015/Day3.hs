@@ -12,7 +12,7 @@ move p _ = p
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2015/inputs/Day3/input.txt"
+  contents <- readFile "../inputs/2015/Day3/input.txt"
   let contents' = scanl move (0, 0) contents
   -- part 1
   let results = foldr (\x -> M.insertWith (+) x 1) (M.singleton (0, 0) 1) contents'

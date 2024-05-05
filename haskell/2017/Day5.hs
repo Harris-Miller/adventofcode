@@ -3,7 +3,7 @@ module Day5 where
 import Control.Lens
 import Control.Monad.RWS.Strict
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 
 process :: Map Int Int -> RWS () [Int] Int (Map Int Int)
 process m = do
@@ -29,7 +29,7 @@ process2 m = do
 
 main' :: IO ()
 main' = do
-  contents <- M.fromList . zip [0 ..] . map read . lines <$> readFile "2017/inputs/Day5/input.txt" :: IO (Map Int Int)
+  contents <- M.fromList . zip [0 ..] . map read . lines <$> readFile "../inputs/2017/Day5/input.txt" :: IO (Map Int Int)
   -- part 1
   let (a, s, w) = runRWS (process contents) () 0
   print $ length w

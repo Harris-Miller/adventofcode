@@ -27,6 +27,6 @@ calc2 s = foldl go 0 iRange
 
 main' :: IO ()
 main' = do
-  content <- head . lines <$> readFile "2017/inputs/Day1/input.txt"
+  content <- head . lines <$> readFile "../inputs/2017/Day1/input.txt"
   print $ calculate content
   print $ calc2 content

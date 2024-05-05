@@ -4,7 +4,7 @@ import Data.Bifunctor
 import Data.List
 import Data.List.Split
 import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as M
+import Data.Map.Strict qualified as M
 import Data.Maybe
 import Data.Tuple.Common
 
@@ -24,7 +24,7 @@ processCards m = go $ M.keys m
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day4/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day4/input.txt"
   let cards = M.fromList $ map parseCard contents
   -- part 1
   let winners = determineWinners $ M.elems cards

@@ -61,7 +61,7 @@ move2 moves = go moves North (M.singleton (0, 0) 1, (0, 0))
 
 main' :: IO ()
 main' = do
-  contents <- map parse . splitOn ", " <$> readFile "2016/inputs/Day1/input.txt"
+  contents <- map parse . splitOn ", " <$> readFile "../inputs/2016/Day1/input.txt"
   -- part 1
   let result = foldl' move (North, (0, 0)) contents
   print $ (abs . fst . snd) result + (abs . snd . snd) result

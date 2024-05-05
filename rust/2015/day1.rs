@@ -9,7 +9,7 @@ fn parse(c: char) -> i32 {
 }
 
 pub fn main() {
-    let file_path = "2015/inputs/Day1/input.txt";
+    let file_path = "../../inputs/2015/Day1/input.txt";
     let contents = fs::read_to_string(file_path).unwrap();
     let values = contents.chars().map(parse);
 

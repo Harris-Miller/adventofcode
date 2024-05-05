@@ -28,7 +28,7 @@ calcHappiness xs ps = go (findP (head ps) (last ps) + findP (last ps) (head ps))
 
 main' :: IO ()
 main' = do
-  contents <- map (parse . init) . lines <$> readFile "2015/inputs/Day13/input.txt"
+  contents <- map (parse . init) . lines <$> readFile "../inputs/2015/Day13/input.txt"
   let people = nub $ map sel1 contents
 
   -- part 1

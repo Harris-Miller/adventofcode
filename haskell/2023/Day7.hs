@@ -106,7 +106,7 @@ parse dh s = Hand {hand = hand, hType = dh hand, bid = bid}
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day7/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day7/input.txt"
   -- part 1
   let part1 = map ((\h -> h {hand = map Suit (hand h)}) . parse determineHType) contents :: [Hand Suit]
   let sorted1 = sort part1

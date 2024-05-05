@@ -84,7 +84,7 @@ eval circuit target =
 
 main' :: IO ()
 main' = do
-  circuit <- parseGates . lines <$> readFile "2015/inputs/Day7/input.txt"
+  circuit <- parseGates . lines <$> readFile "../inputs/2015/Day7/input.txt"
   -- part 1
   print $ snd $ eval circuit "a"
   -- part 2

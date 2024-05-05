@@ -24,9 +24,9 @@ applyItems c items = c {damage = damage c + (sum . map damage') items, armour = 
 
 main' :: IO ()
 main' = do
-  weapons <- map parseItem . lines <$> readFile "2015/inputs/Day21/weapons.txt"
-  armour <- ([Item "" 0 0 0] <>) . (map parseItem . lines) <$> readFile "2015/inputs/Day21/armour.txt"
-  rings <- ([Item "" 0 0 0, Item "" 0 0 0] <>) . map parseItem . lines <$> readFile "2015/inputs/Day21/rings.txt"
+  weapons <- map parseItem . lines <$> readFile "../inputs/2015/Day21/weapons.txt"
+  armour <- ([Item "" 0 0 0] <>) . (map parseItem . lines) <$> readFile "../inputs/2015/Day21/armour.txt"
+  rings <- ([Item "" 0 0 0, Item "" 0 0 0] <>) . map parseItem . lines <$> readFile "../inputs/2015/Day21/rings.txt"
   let player = Character 100 0 0 []
   let boss = Character 100 8 2 []
   let purchaseCombos = nub $ [[w, a, r1, r2] | w <- weapons, a <- armour, r1 <- rings, r2 <- rings, r1 /= r2]

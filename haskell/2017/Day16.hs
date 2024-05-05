@@ -36,7 +36,7 @@ doOp s (Partner a b) = swapElementsAt i1 i2 s
 
 main' :: IO ()
 main' = do
-  contents <- map parse . splitOn "," . head . lines <$> readFile "2017/inputs/Day16/input.txt"
+  contents <- map parse . splitOn "," . head . lines <$> readFile "../inputs/2017/Day16/input.txt"
   -- part 1
   print $ foldl doOp startingPosition contents
   -- part 2

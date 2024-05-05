@@ -4,7 +4,7 @@ type Cube = { color: string; num: number };
 type Group = Cube[];
 type Game = { gameNum: number; groups: Group[] };
 
-const content = (await Bun.file('2023/inputs/Day2/input.txt').text()).split('\n').filter(Boolean);
+const content = (await Bun.file('../../inputs/2023/Day2/input.txt').text()).split('\n').filter(Boolean);
 
 // console.log(content);
 

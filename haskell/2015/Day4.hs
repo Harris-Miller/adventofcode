@@ -15,7 +15,7 @@ process prefix s n
 
 main' :: IO ()
 main' = do
-  contents <- head . lines <$> readFile "2015/inputs/Day4/input.txt"
+  contents <- head . lines <$> readFile "../inputs/2015/Day4/input.txt"
   -- part 1
   print $ process "00000" contents 1
   -- part 2

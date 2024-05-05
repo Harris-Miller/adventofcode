@@ -4,7 +4,7 @@ import Control.Arrow
 import Data.Grid.Map
 import Data.List
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 
 moveRocks ::
   (Int, Int) -> -- maxes
@@ -70,7 +70,7 @@ doXTimes maxes i grid = if next == grid then grid else doXTimes maxes (i - 1) ne
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day14/sample.txt"
+  contents <- readFile "../inputs/2023/Day14/sample.txt"
   let grid = parseGridAsIs contents
   let (maxR, maxC) = fst $ M.findMax grid
 

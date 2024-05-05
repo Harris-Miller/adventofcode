@@ -6,7 +6,7 @@ import Control.Monad.RWS
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Tuple.Common
 
@@ -62,7 +62,7 @@ runPulses mb = execRWS (tell (map ("broadcaster",False,) (broadcaster mb)) >> go
 
 main' :: IO ()
 main' = do
-  contents <- updateConjunction . foldl' parse emptyModuleBroadcaster . lines <$> readFile "2023/inputs/Day20/sample2.txt"
+  contents <- updateConjunction . foldl' parse emptyModuleBroadcaster . lines <$> readFile "../inputs/2023/Day20/sample2.txt"
   print contents
   let (s, w) = runPulses contents
   mapM_ print w

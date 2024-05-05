@@ -42,7 +42,7 @@ tick' reindeer = execState (go $ transpose reindeer) arr
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2015/inputs/Day14/input.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2015/Day14/input.txt"
   let seconds = 2503
 
   -- part 1

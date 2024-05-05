@@ -33,7 +33,7 @@ isSue ops mySue (other, xs) = if go [] xs then Just other else Nothing
 
 main' :: IO ()
 main' = do
-  contents <- zip [1 ..] . map parse . lines <$> readFile "2015/inputs/Day16/input.txt"
+  contents <- zip [1 ..] . map parse . lines <$> readFile "../inputs/2015/Day16/input.txt"
   -- part 1
   let result1 = fromJust $ find (isJust . isSue part1ops sueToFind) contents
   print $ fst result1

@@ -3,9 +3,9 @@ module Day21 where
 import Data.Grid.Map
 import Data.List
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Set (Set)
-import qualified Data.Set as S
+import Data.Set qualified as S
 
 enclose :: (Int, Int) -> (Int, Int) -> Set (Int, Int)
 enclose (minR, minC) (maxR, maxC) = S.fromList $ top <> right <> bottom <> left
@@ -30,7 +30,7 @@ takeSteps canGo = S.fromList . concatMap (filter canGo . getNeighbors4) . S.toLi
 
 main' :: IO ()
 main' = do
-  contents <- parseGridAsIs <$> readFile "2023/inputs/Day21/input.txt"
+  contents <- parseGridAsIs <$> readFile "../inputs/2023/Day21/input.txt"
   let maxes = fst $ M.findMax contents
   let start = (fst . head . M.toList . M.filter (== 'S')) contents -- extract S point
   let grid = S.fromList $ M.keys $ M.filter (== '#') contents -- only need points that are '#'

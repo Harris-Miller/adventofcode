@@ -22,5 +22,5 @@ parsePatterns = (id &&& transpose) . lines
 
 main' :: IO ()
 main' = do
-  contents <- map parsePatterns . splitOn "\n\n" <$> readFile "2023/inputs/Day13/input.txt"
+  contents <- map parsePatterns . splitOn "\n\n" <$> readFile "../inputs/2023/Day13/input.txt"
   print $ sum $ map (fromJust . uncurry (<|>) . first (fmap (* 100)) . tmap findReflectionPoint) contents

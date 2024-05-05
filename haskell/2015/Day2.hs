@@ -17,7 +17,7 @@ determineLengthNeeded xs = product xs + length' xs
 
 main' :: IO ()
 main' = do
-  contents <- map (map read . splitOn "x") . lines <$> readFile "2015/inputs/Day2/input.txt" :: IO [[Int]]
+  contents <- map (map read . splitOn "x") . lines <$> readFile "../inputs/2015/Day2/input.txt" :: IO [[Int]]
   -- part 1
   print $ sum $ map determineAreaNeeded contents
   -- part 2

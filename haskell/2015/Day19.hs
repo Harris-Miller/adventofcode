@@ -24,7 +24,7 @@ replace (from, to) mol = go "" ss
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2015/inputs/Day19/input.txt"
+  contents <- readFile "../inputs/2015/Day19/input.txt"
   let (mol, rs) = parse contents
   -- part 1 -- why is it giving me one more than it should?
   print $ length $ nub $ concatMap (`replace` mol) rs

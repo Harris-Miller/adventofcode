@@ -44,7 +44,7 @@ findNextPassword s = if and $ sequence tests s then s else findNextPassword $ co
 
 main' :: IO ()
 main' = do
-  content <- head . lines <$> readFile "2015/inputs/Day11/input.txt"
+  content <- head . lines <$> readFile "../inputs/2015/Day11/input.txt"
   let results1 = findNextPassword content
   print results1
   print $ findNextPassword $ countWordUp results1

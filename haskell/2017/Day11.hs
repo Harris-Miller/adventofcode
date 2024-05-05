@@ -30,7 +30,7 @@ process start (longest, current) cube = (max longest distance, next)
 
 main' :: IO ()
 main' = do
-  contents <- splitOn "," . head . lines <$> readFile "2017/inputs/Day11/input.txt"
+  contents <- splitOn "," . head . lines <$> readFile "../inputs/2017/Day11/input.txt"
   let start = Cube 0 0 0 :: Cube Int
   let final = mconcat (start : map readMove contents)
   print final

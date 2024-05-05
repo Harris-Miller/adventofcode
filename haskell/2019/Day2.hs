@@ -2,7 +2,7 @@ module Day2 where
 
 import Control.Monad.RWS
 import Data.List.Split
-import qualified Data.Map.Strict as M
+import Data.Map.Strict qualified as M
 import Data.Maybe
 import IntCode
 
@@ -18,7 +18,7 @@ findExpectedOutput ((noun, verb) : pairs) m = do
 
 main' :: IO ()
 main' = do
-  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "2019/inputs/Day2/input.txt" :: IO [(Int, Int)]
+  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "../inputs/2019/Day2/input.txt" :: IO [(Int, Int)]
   -- part 1
   let m = M.fromList contents
   let m' = M.insert 2 2 $ M.insert 1 12 m

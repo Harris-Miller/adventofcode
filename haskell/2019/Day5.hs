@@ -2,12 +2,12 @@ module Day5 where
 
 import Control.Monad.RWS
 import Data.List.Split
-import qualified Data.Map.Strict as M
+import Data.Map.Strict qualified as M
 import IntCode
 
 main' :: IO ()
 main' = do
-  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "2019/inputs/Day5/input.txt" :: IO [(Int, Int)]
+  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "../inputs/2019/Day5/input.txt" :: IO [(Int, Int)]
   let m = M.fromList contents
   let theM = processIntCode m
   -- part 1

@@ -31,7 +31,7 @@ cornersOn grid = accum (\_ x -> x) grid $ map (,True) [(0, 0), (0, c), (r, 0), (
 
 main' :: IO ()
 main' = do
-  grid <- parse <$> readFile "2015/inputs/Day18/input.txt"
+  grid <- parse <$> readFile "../inputs/2015/Day18/input.txt"
   -- part 1
   print $ length $ filter id $ elems (iterate tick grid !! 100)
   -- part 2

@@ -57,7 +57,7 @@ run instructions stateIO = do
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2015/inputs/Day23/input.txt"
+  contents <- lines <$> readFile "../inputs/2015/Day23/input.txt"
   result1 <- run contents (pure (0, 0, 0))
   print $ sel2 result1
   result2 <- run contents (pure (1, 0, 0))

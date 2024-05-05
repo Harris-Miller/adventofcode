@@ -6,7 +6,7 @@ import Data.List
 import Data.List.Index
 import Data.List.Split
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Tuple.Common
 
@@ -49,7 +49,7 @@ process2 = go (M.fromList $ map (,[]) [0 .. 255])
 
 main' :: IO ()
 main' = do
-  contents <- splitOn "," . init <$> readFile "2023/inputs/Day15/input.txt"
+  contents <- splitOn "," . init <$> readFile "../inputs/2023/Day15/input.txt"
   -- part 1
   print $ sum $ map process contents
   -- part 2

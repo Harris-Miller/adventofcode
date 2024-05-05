@@ -1,6 +1,6 @@
 import { head, last, range, sum } from 'ramda';
 
-const content = await Bun.file('2023/inputs/Day3/input.txt').text();
+const content = await Bun.file('../../inputs/2023/Day3/input.txt').text();
 
 type Pos = { col: number; line: number };
 

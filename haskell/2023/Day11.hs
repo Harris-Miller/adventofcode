@@ -1,7 +1,7 @@
 module Day11 where
 
 import Data.Grid.Map
-import qualified Data.Map as M
+import Data.Map qualified as M
 
 expandSpace :: (Int -> Int) -> [(Int, Int)] -> [(Int, Int)]
 expandSpace expander grid = map (\(l, c) -> (l + expander (length $ filter (< l) ls'), c + expander (length $ filter (< c) cs'))) grid
@@ -20,7 +20,7 @@ findShortestToOthers grid = sum $ go grid
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day11/input.txt"
+  contents <- readFile "../inputs/2023/Day11/input.txt"
   let grid = M.keys $ parseGrid (== '#') id contents
   -- part 1
   let gridExpanded = expandSpace (* 1) grid

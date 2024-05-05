@@ -3,7 +3,7 @@ module Day7 where
 import Data.List
 import Data.List.Split
 import Data.Map (Map, (!))
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Tuple.Select
 
@@ -46,7 +46,7 @@ allTheSame xs = all (== head xs) (tail xs)
 
 main' :: IO ()
 main' = do
-  contents <- map parseProgram . lines <$> readFile "2017/inputs/Day7/input.txt"
+  contents <- map parseProgram . lines <$> readFile "../inputs/2017/Day7/input.txt"
   -- part 1
   print $ findBottomProgram contents
   -- part 2

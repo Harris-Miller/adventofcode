@@ -24,7 +24,7 @@ process2 = foldr1 (-) . go []
 
 main' :: IO ()
 main' = do
-  contents <- map (map read . splitOn " ") . lines <$> readFile "2023/inputs/Day9/input.txt" :: IO [[Int]]
+  contents <- map (map read . splitOn " ") . lines <$> readFile "../inputs/2023/Day9/input.txt" :: IO [[Int]]
   -- part 1
   print $ sum $ map process1 contents
   -- part 2

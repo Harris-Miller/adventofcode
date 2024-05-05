@@ -30,7 +30,7 @@ process amounts ingredients = (score, calories)
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2015/inputs/Day15/input.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2015/Day15/input.txt"
   mapM_ print contents
   -- part 1
   print $ maximum $ map (fst . flip process contents) combos4

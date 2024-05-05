@@ -26,7 +26,7 @@ collectDigits s@(x : xs) = do
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day1/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day1/input.txt"
   -- print contents
   let part1 = (sum . map (read . (\s -> [getFirstDigit s, getLastDigit s]))) contents
   print part1

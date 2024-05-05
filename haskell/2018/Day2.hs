@@ -27,7 +27,7 @@ process2 = concatMap (\(s, xs) -> map (checkSimilarities s) xs)
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2018/inputs/Day2/input.txt"
+  contents <- lines <$> readFile "../inputs/2018/Day2/input.txt"
   print $ process contents
   -- part 2
   let r = process2 $ listsAgainstOthers contents

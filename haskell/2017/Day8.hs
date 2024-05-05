@@ -2,7 +2,7 @@ module Day8 where
 
 import Control.Monad.State
 import Data.List
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 data Operation = Operation
@@ -51,7 +51,7 @@ processM xs rs (x : rest) = do
 
 main' :: IO ()
 main' = do
-  xs <- map parse . lines <$> readFile "2017/inputs/Day8/input.txt"
+  xs <- map parse . lines <$> readFile "../inputs/2017/Day8/input.txt"
   let rs = M.fromList $ map (\x -> (name x, 0)) xs :: M.Map String Int
   let r = foldl (process xs) rs xs
   let largest = maximum $ map snd $ M.toList r

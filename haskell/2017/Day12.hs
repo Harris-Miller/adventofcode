@@ -2,7 +2,7 @@ module Day12 where
 
 import Algorithm.Search
 import Data.List.Split
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 parse :: String -> (Int, [Int])
@@ -12,7 +12,7 @@ parse s = (read program, map read $ splitOn ", " others)
 
 main' :: IO ()
 main' = do
-  contents <- M.fromList . map parse . lines <$> readFile "2017/inputs/Day12/input.txt"
+  contents <- M.fromList . map parse . lines <$> readFile "../inputs/2017/Day12/input.txt"
   let programs = M.keys contents
   let nextStates = fromJust . flip M.lookup contents
   let isFound = (== 0)

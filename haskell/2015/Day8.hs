@@ -33,7 +33,7 @@ countEscapesString = envelop countEscapes 2
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2015/inputs/Day8/input.txt"
+  contents <- lines <$> readFile "../inputs/2015/Day8/input.txt"
   -- part 1
   let diff s = length s - countStringEscaped s
   print $ sum $ map diff contents

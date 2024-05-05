@@ -27,7 +27,7 @@ calcCost locs getCost acc (from : to : xs) = calcCost locs getCost next (to : xs
 
 main' :: IO ()
 main' = do
-  travels <- flipAndConcat . map parse . lines <$> readFile "2015/inputs/Day9/input.txt"
+  travels <- flipAndConcat . map parse . lines <$> readFile "../inputs/2015/Day9/input.txt"
   let routes = permutations $ nub $ map (fst . fst) travels
   let distances = map (calcCost travels getCost 0) routes
   -- part 1

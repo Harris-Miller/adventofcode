@@ -89,7 +89,7 @@ part2 (ns, ss) = sum $ map (product . map partNumNum) gearPartNums
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day3/input.txt"
+  contents <- readFile "../inputs/2023/Day3/input.txt"
   -- part 1
   -- filtering on the newLine '\n' char is because of how I couldn't get skipping it in the `collect` function defined above
   let r = second (filter (\(Symbol n _) -> n /= '\n')) . partitionEithers <$> parse collect "" contents

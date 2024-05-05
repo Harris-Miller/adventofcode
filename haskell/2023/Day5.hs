@@ -3,10 +3,10 @@ module Day5 where
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Range
-import qualified Data.Set as S
+import Data.Set qualified as S
 import Data.Tuple.Common
 
 parseInput :: [String] -> ([Int], [[(Int, Int, Int)]])
@@ -36,7 +36,7 @@ seedToLocation groups seed = foldl' (\input f -> f input) seed groupFuncs
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day5/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day5/input.txt"
   -- part 1
   let (seeds, groups) = parseInput contents
   print $ minimum $ map (seedToLocation groups) seeds

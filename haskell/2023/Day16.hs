@@ -3,10 +3,10 @@ module Day16 where
 import Control.Monad.RWS
 import Data.Array.Base
 import Data.Grid.Array
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Set (Set)
-import qualified Data.Set as S
+import Data.Set qualified as S
 import GHC.Ix (Ix (inRange, unsafeIndex))
 
 data Direction = North | East | South | West
@@ -76,7 +76,7 @@ process beams = do
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day16/input.txt"
+  contents <- readFile "../inputs/2023/Day16/input.txt"
   let grid = parseGridAsIs contents :: UArray (Int, Int) Char
   let is = S.fromList $ indices grid
   -- part 1

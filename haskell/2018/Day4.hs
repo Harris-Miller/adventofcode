@@ -5,7 +5,7 @@ import Data.Function
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Ratio
 import Data.Time
 import Data.Tuple.Common
@@ -51,7 +51,7 @@ parseSleepRanges rest = keyed
 
 main' :: IO ()
 main' = do
-  content <- lines <$> readFile "2018/inputs/Day4/input.txt"
+  content <- lines <$> readFile "../inputs/2018/Day4/input.txt"
   let (shiftStarts, rest) = partShiftStarts content
   let dayToGuardL = map (bimap (getShiftDay . parseDatetime) parseGuardId . splitTimestampAndAction) shiftStarts
   -- map of day to Guard

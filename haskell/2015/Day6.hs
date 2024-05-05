@@ -58,7 +58,7 @@ processOp2 arr ((op, p1, p2) : xs) = processOp2 (accum (\e f -> f e) arr list) x
 
 main' :: IO ()
 main' = do
-  ops <- map parse . lines <$> readFile "2015/inputs/Day6/input.txt"
+  ops <- map parse . lines <$> readFile "../inputs/2015/Day6/input.txt"
   let points = expandPoints (0, 0) (999, 999)
   -- part 1
   let arr = array ((0, 0), (999, 999)) $ map (,False) points

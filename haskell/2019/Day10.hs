@@ -4,7 +4,7 @@ import Data.Char
 import Data.Function
 import Data.List
 import Data.List.Split
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 move :: (Int, Int) -> (Int, Int) -> (Int, Int)
@@ -45,7 +45,7 @@ lookInDirection grid look start = thing >>= go
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2019/inputs/Day10/sample.txt"
+  contents <- lines <$> readFile "../inputs/2019/Day10/sample.txt"
   let grid = parse contents
   let as = M.filter (== '#') grid
   let found = length $ mapMaybe (\a -> lookInDirection grid a (3, 4)) angles

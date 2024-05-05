@@ -13,7 +13,7 @@ filterBy c = filter (\x -> x /= c && x /= toUpper c)
 
 main' :: IO ()
 main' = do
-  content <- head . lines <$> readFile "2018/inputs/Day5/input.txt"
+  content <- head . lines <$> readFile "../inputs/2018/Day5/input.txt"
   -- part 1
   print $ react content
   -- part 2

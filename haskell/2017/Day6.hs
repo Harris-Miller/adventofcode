@@ -20,7 +20,7 @@ process xs acc = go acc (0, xs)
 
 main' :: IO ()
 main' = do
-  contents <- map read . words <$> readFile "2017/inputs/Day6/input.txt" :: IO [Int]
+  contents <- map read . words <$> readFile "../inputs/2017/Day6/input.txt" :: IO [Int]
   let r1 = process contents []
   print r1
   let r2 = process (snd r1) [snd r1]

@@ -22,7 +22,7 @@ gameParser = do
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day2/sample.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day2/sample.txt"
   let r = parse gameParser "" (head contents)
   print r
   return ()

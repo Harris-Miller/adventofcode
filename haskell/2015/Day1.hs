@@ -16,7 +16,7 @@ findPosition xs = go $ zip [0 ..] $ scanl' (+) 0 $ map parse xs
 
 main' :: IO ()
 main' = do
-  contents <- head . lines <$> readFile "2015/inputs/Day1/input.txt"
+  contents <- head . lines <$> readFile "../inputs/2015/Day1/input.txt"
   -- part 1
   print $ sum $ map parse contents
   -- part 2

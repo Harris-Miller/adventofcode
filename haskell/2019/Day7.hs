@@ -3,7 +3,7 @@ module Day7 where
 import Control.Monad.RWS
 import Data.List
 import Data.List.Split
-import qualified Data.Map.Strict as M
+import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust)
 import Data.Tuple.Select
 import Data.Tuple.Update
@@ -86,7 +86,7 @@ doTheThing3 loc (in1, in2, in3, in4, in5) = doTheThing2 loc ins'
 
 main' :: IO ()
 main' = do
-  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "2019/inputs/Day7/input.txt" :: IO [(Int, Int)]
+  contents <- zip [0 ..] . map read . splitOn "," . head . lines <$> readFile "../inputs/2019/Day7/input.txt" :: IO [(Int, Int)]
   let m = M.fromList contents
   let theM = processIntCode m
   -- part 1

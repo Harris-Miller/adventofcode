@@ -17,7 +17,7 @@ parse skipReds = addJson
 
 main' :: IO ()
 main' = do
-  contents <- decodeFileStrict "2015/inputs/Day12/input.txt" :: IO (Maybe Value)
+  contents <- decodeFileStrict "../inputs/2015/Day12/input.txt" :: IO (Maybe Value)
   -- part 1
   print $ parse False $ fromJust contents
   -- part 2

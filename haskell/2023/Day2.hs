@@ -4,7 +4,7 @@ import Data.Bifunctor
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 type Cube = (String, Int)
@@ -46,7 +46,7 @@ calcGamePower = product . M.elems . foldr (uncurry $ M.insertWith max) M.empty .
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2023/inputs/Day2/input.txt"
+  contents <- lines <$> readFile "../inputs/2023/Day2/input.txt"
   let games = map parseGame contents
   -- part 1
   let toCheckAgainst = [("red", 12), ("green", 13), ("blue", 14)]

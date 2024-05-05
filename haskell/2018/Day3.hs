@@ -18,7 +18,7 @@ parse s = Claim {idNum = tail id, x = read x, y = read (init y), w = read w, h =
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2018/inputs/Day3/input.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2018/Day3/input.txt"
   -- part 1
   let overlaps = map head $ filter ((> 1) . length) $ group $ sort $ concatMap toGrids contents
   print $ length overlaps

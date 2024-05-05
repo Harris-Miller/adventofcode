@@ -32,7 +32,7 @@ const gridReader = (pred: (v: string) => boolean, input: string) => {
   return grid;
 };
 
-const content = await Bun.file('2023/inputs/Day21/sample.txt').text();
+const content = await Bun.file('../../inputs/2023/Day21/sample.txt').text();
 const grid = gridReader(v => v === '#' || v === 'S', content);
 
 const maxes = Array.from(grid.keys())

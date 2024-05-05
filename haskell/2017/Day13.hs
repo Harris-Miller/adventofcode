@@ -3,7 +3,7 @@ module Day13 where
 import Control.Monad.Writer
 import Data.Bifunctor
 import Data.List.Split
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Tuple.Common
 
@@ -43,7 +43,7 @@ day13b input = head [i | i <- [0 ..], not $ caught i]
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2017/inputs/Day13/input.txt" :: IO [(Int, Int)]
+  contents <- map parse . lines <$> readFile "../inputs/2017/Day13/input.txt" :: IO [(Int, Int)]
   let fws = (M.fromList . map (second (,0))) contents :: M.Map Int (Int, Int)
   let lastFirewall = (fst . M.findMax) fws
   let path = [0 .. lastFirewall]

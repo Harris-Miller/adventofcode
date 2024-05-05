@@ -11,5 +11,5 @@ parse s = (read x, read y)
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2018/inputs/Day6/input.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2018/Day6/input.txt"
   mapM_ print contents

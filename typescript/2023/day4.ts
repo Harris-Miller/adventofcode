@@ -1,6 +1,6 @@
 import { drop, intersection, isEmpty, isNotNil, range, sum } from 'ramda';
 
-const content = (await Bun.file('2023/inputs/Day4/input.txt').text()).split('\n').filter(s => !isEmpty(s));
+const content = (await Bun.file('../../inputs/2023/Day4/input.txt').text()).split('\n').filter(s => !isEmpty(s));
 
 const parseNumbers = (str: string) =>
   str

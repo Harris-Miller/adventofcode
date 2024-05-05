@@ -41,7 +41,7 @@ getDistances (_ : xs) = map (\(x, y) -> abs x + abs y) xs
 
 main' :: IO ()
 main' = do
-  contents <- map (map parse . splitOn ",") . lines <$> readFile "2019/inputs/Day3/input.txt"
+  contents <- map (map parse . splitOn ",") . lines <$> readFile "../inputs/2019/Day3/input.txt"
   let wires = map draw contents
   let crosses = let [a, b] = wires in intersect a b
   print crosses

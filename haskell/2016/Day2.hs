@@ -48,7 +48,7 @@ showKey a
 
 main' :: IO ()
 main' = do
-  contents <- lines <$> readFile "2016/inputs/Day2/input.txt"
+  contents <- lines <$> readFile "../inputs/2016/Day2/input.txt"
   -- part 1
   let r = scanl (flip (process move)) 5 contents
   print $ intercalate "" $ map show $ tail r

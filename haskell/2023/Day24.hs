@@ -43,7 +43,7 @@ getPointOfIntersectionXYOnly (Point3 lx ly _, Point3 lvx lvy _) (Point3 rx ry _,
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "2023/inputs/Day24/sample.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2023/Day24/sample.txt"
   let (h1 : h2 : _) = contents
   print h1
   print h2

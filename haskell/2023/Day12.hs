@@ -41,7 +41,7 @@ process contents = r2
 
 main' :: IO ()
 main' = do
-  contents <- map parseLine . lines <$> readFile "2023/inputs/Day12/sample.txt"
+  contents <- map parseLine . lines <$> readFile "../inputs/2023/Day12/sample.txt"
   -- part 1
   -- print $ process contents
 

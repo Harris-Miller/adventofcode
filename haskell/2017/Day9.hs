@@ -4,7 +4,7 @@ import Control.Monad
 import Control.Monad.RWS
 import Data.List
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Monoid
 
 removeCancelledChars :: String -> RWS () String Bool String
@@ -67,7 +67,7 @@ collectGarbage (x : xs) = do
 
 main' :: IO ()
 main' = do
-  content <- head . lines <$> readFile "2017/inputs/Day9/input.txt"
+  content <- head . lines <$> readFile "../inputs/2017/Day9/input.txt"
   -- part 1
   let (_, _, s) = runRWS (removeCancelledChars content) () False
   let (_, _, s') = runRWS (removeGarbage s) () False

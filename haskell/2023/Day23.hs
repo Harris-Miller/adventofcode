@@ -5,7 +5,7 @@ import Control.Arrow
 import Data.Grid.Map
 import Data.List
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 
 nextFromHill :: Char -> (Int, Int) -> [(Int, Int)]
 nextFromHill '^' (r, c) = [(r - 1, c)]
@@ -23,7 +23,7 @@ next grid p = if c == '.' then nextFromFlat grid p else nextFromHill c p
 
 main' :: IO ()
 main' = do
-  contents <- parseGridAsIs <$> readFile "2023/inputs/Day23/sample.txt"
+  contents <- parseGridAsIs <$> readFile "../inputs/2023/Day23/sample.txt"
   let grid = M.filter (/= '#') contents
   let start = (0, 1)
   print $ M.findMax contents

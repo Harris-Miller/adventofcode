@@ -21,7 +21,7 @@ go (s, i, acc) l = (s + 1, i + l + s, next')
 
 main' :: IO ()
 main' = do
-  lengths <- map read . splitOn "," . head . lines <$> readFile "2017/inputs/Day10/input.txt" :: IO [Int]
+  lengths <- map read . splitOn "," . head . lines <$> readFile "../inputs/2017/Day10/input.txt" :: IO [Int]
   let rope = [0 .. 255]
   let r = foldl go (0, 0, rope) lengths
   print $ (product . take 2 . sel3) r

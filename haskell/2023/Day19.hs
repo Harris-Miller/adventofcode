@@ -5,7 +5,7 @@ import Data.Either
 import Data.List
 import Data.List.Split
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 import Data.Range
 import Data.Tuple.Common
@@ -97,7 +97,7 @@ determineAllPaths wfs = map snd $ go (["in"], M.empty) $ wfs M.! "in"
 
 main' :: IO ()
 main' = do
-  (workflows, parts) <- parseInput <$> readFile "2023/inputs/Day19/sample.txt"
+  (workflows, parts) <- parseInput <$> readFile "../inputs/2023/Day19/sample.txt"
   -- part 1
   print $ sum $ map (sum . map snd) $ filter (runEm workflows) parts
 

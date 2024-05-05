@@ -3,7 +3,7 @@ module Day10 where
 import Control.Monad.RWS
 import Data.Grid.Map
 import Data.List
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe
 
 filterStartOptions :: GridM Char -> (Int, Int) -> [(Int, Int)]
@@ -41,7 +41,7 @@ processTheLoop grid isFound pos = do
 
 main' :: IO ()
 main' = do
-  contents <- readFile "2023/inputs/Day10/input.txt"
+  contents <- readFile "../inputs/2023/Day10/input.txt"
   let grid = parseGrid (const True) id contents
   let start = fst $ head $ M.toList $ M.filter (== 'S') grid
   let startNeighbors = filterStartOptions grid start

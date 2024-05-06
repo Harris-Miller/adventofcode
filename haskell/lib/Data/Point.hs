@@ -1,7 +1,10 @@
 module Data.Point where
 
 data Point a = Point a a
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
+
+instance Functor Point where
+  fmap f (Point a b) = Point (f a) (f b)
 
 instance (Num a) => Semigroup (Point a) where
   (Point rx ry) <> (Point lx ly) = Point (lx + ly) (rx + ry)
@@ -14,6 +17,9 @@ fromTuple (x, y) = Point x y
 
 data Point3 a = Point3 a a a
   deriving (Show, Eq)
+
+instance Functor Point3 where
+  fmap f (Point3 a b c) = Point3 (f a) (f b) (f c)
 
 instance (Num a) => Semigroup (Point3 a) where
   (Point3 rx ry rz) <> (Point3 lx ly lz) = Point3 (rx + lx) (ry + ly) (rz + lz)

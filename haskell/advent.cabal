@@ -58,17 +58,22 @@ common defaults
                       , TemplateHaskell
                       , TupleSections
     -- Base language which the package is written in.
-    default-language: Haskell2010
+    default-language: GHC2021
 
 library
     -- Import common configs
     import:           defaults
 
     -- Modules exported by the library.
-    exposed-modules:  Data.Grid.Array, Data.Grid.Map, Data.Int.Factors, Data.List.Common, Data.Point, Data.Tuple.Common, Data.Tuple.GetSet
+    exposed-modules:  Data.Grid.Array, Data.Grid.Map
+                    , Data.Grid3.Map
+                    , Data.Int.Factors
+                    , Data.List.Common
+                    , Data.Point
+                    , Data.Tuple.Common, Data.Tuple.GetSet
 
     -- Modules included in this library but not exported.
-    other-modules:    Data.Grid.Common
+    other-modules:    Data.Grid.Common, Data.Grid3.Common
 
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.17.2.0
@@ -216,6 +221,38 @@ executable advent2019
 
     -- Directories containing source files.
     hs-source-dirs:   2019
+
+executable advent2020
+    -- Import common configs
+    import:           defaults
+                    
+    -- .hs or .lhs file containing the Main module.
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    other-modules:    Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10
+                    , Day11, Day12, Day13, Day14, Day15, Day16, Day17, Day18
+
+    -- LANGUAGE extensions used by modules in this package.
+    default-extensions: DuplicateRecordFields
+                      , OverloadedRecordDot
+
+    -- Other library packages from which modules are imported.
+    build-depends:    base ^>=4.17.2.0
+                    , advent
+                    , cond
+                    , containers
+                    , groups
+                    , mtl
+                    , range
+                    , search-algorithms
+                    , split
+                    , text
+                    , transformers
+                    , tuple
+
+    -- Directories containing source files.
+    hs-source-dirs:   2020
 
 executable advent2023
     -- Import common warning fla-- Import common configs

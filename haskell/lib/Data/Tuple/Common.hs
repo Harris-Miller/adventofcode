@@ -14,3 +14,6 @@ tmap f (a, b) = (f a, f b)
 
 tmap3 :: (a -> b) -> (a, a, a) -> (b, b, b)
 tmap3 f (a, b, c) = (f a, f b, f c)
+
+toList :: (a, a) -> [a]
+toList (a, b) = [a, b]

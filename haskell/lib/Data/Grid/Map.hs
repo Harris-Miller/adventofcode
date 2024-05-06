@@ -7,8 +7,11 @@ where
 import Control.Arrow
 import Control.Monad.RWS
 import Data.Grid.Common
+import Data.List
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
+import Data.Maybe
+import Prelude hiding (pred)
 
 type GridM a = Map (Int, Int) a
 
@@ -35,3 +38,20 @@ gridToStr (maxR, maxC) fillWith toChar grid = go (0, 0)
 
 gridCharToStr :: GridM Char -> String
 gridCharToStr grid = gridToStr (fst $ M.findMax grid) (const ' ') id grid
+
+genNeighbors8First :: ((Int, Int) -> Maybe Bool) -> (Int, Int) -> GridM a -> [(Int, Int)]
+genNeighbors8First pred k grid = mapMaybe (find (fromMaybe False . pred)) $ filter (not . null) (genNeighbors8All k grid)
+
+-- get neighbors continuously in 8 directions
+genNeighbors8All :: (Int, Int) -> GridM a -> [[(Int, Int)]]
+genNeighbors8All (c, r) grid = map (filter (/= (c, r))) [up, upRight, right, downRight, down, downLeft, left, upLeft]
+  where
+    (cMax, rMax) = (fst . M.findMax) grid
+    up = map (,r) (reverse [0 .. c])
+    upRight = zip (reverse [0 .. c]) [r .. rMax]
+    right = map (c,) [r .. rMax]
+    downRight = zip [c .. cMax] [r .. rMax]
+    down = map (,r) [c .. cMax]
+    downLeft = zip [c .. cMax] (reverse [0 .. r])
+    left = map (c,) (reverse [0 .. r])
+    upLeft = zip (reverse [0 .. c]) (reverse [0 .. r])

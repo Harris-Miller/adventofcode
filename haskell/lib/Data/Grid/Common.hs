@@ -17,5 +17,13 @@ collectGrid filterChar parseChar s = snd $ execRWS (go filterChar parseChar s) (
 getNeighbors4 :: (Int, Int) -> [(Int, Int)]
 getNeighbors4 (r, c) = [(r - 1, c), (r, c + 1), (r + 1, c), (r, c - 1)]
 
+get4DirsFromPoint :: Int -> Int -> (Int, Int) -> [[(Int, Int)]]
+get4DirsFromPoint rMax cMax (r, c) = [up, down, left, right]
+  where
+    up = if c == 0 then [] else [(r, c') | c' <- [0 .. c - 1]]
+    down = if c == cMax then [] else [(r, c') | c' <- [c + 1 .. cMax]]
+    left = if r == 0 then [] else [(r', c) | r' <- [0 .. r - 1]]
+    right = if r == rMax then [] else [(r', c) | r' <- [r + 1 .. rMax]]
+
 getNeighbors8 :: (Int, Int) -> [(Int, Int)]
 getNeighbors8 (r, c) = [(r', c') | r' <- [r - 1, r, r + 1], c' <- [c - 1, c, c + 1], (r', c') /= (r, c)]

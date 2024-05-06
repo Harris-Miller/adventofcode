@@ -254,6 +254,39 @@ executable advent2020
     -- Directories containing source files.
     hs-source-dirs:   2020
 
+executable advent2022
+    -- Import common configs
+    import:           defaults
+                    
+    -- .hs or .lhs file containing the Main module.
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    other-modules:    ParseFS
+                    , Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9
+                    , Day10, Day11, Day12, Day13, Day14, Day15, Day16
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- default-extensions: DuplicateRecordFields
+    --                   , OverloadedRecordDot
+
+    -- Other library packages from which modules are imported.
+    build-depends:    base ^>=4.17.2.0
+                    , advent
+                    , containers
+                    , bifunctors
+                    , lens
+                    , mtl
+                    , search-algorithms
+                    , split
+                    , Stack
+                    , tuple
+                    , Unique
+                    , yjtools
+
+    -- Directories containing source files.
+    hs-source-dirs:   2022
+
 executable advent2023
     -- Import common warning fla-- Import common configs
     import:           defaults

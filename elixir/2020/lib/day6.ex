@@ -8,22 +8,26 @@ defmodule Day6 do
 
     part1 =
       content
-      |> Enum.map(&Enum.reduce(&1, fn x, acc -> acc <> x end))
-      |> Enum.map(&String.to_charlist(&1))
-      |> Enum.map(&Enum.uniq(&1))
-      |> Enum.map(&length(&1))
+      |> Stream.map(fn xs ->
+        xs
+        |> Enum.reduce(&(&1 <> &2))
+        |> String.to_charlist()
+        |> Enum.uniq()
+        |> length()
+      end)
       |> Enum.sum()
 
     IO.inspect(part1)
 
     part2 =
       content
-      |> Enum.map(fn xs ->
-        Enum.map(xs, &String.split(&1, "", trim: true))
-        |> Enum.map(&MapSet.new(&1))
+      |> Stream.map(fn xs ->
+        xs
+        |> Stream.map(&String.split(&1, "", trim: true))
+        |> Stream.map(&MapSet.new/1)
         |> Enum.reduce(&MapSet.intersection/2)
       end)
-      |> Enum.map(&MapSet.size/1)
+      |> Stream.map(&MapSet.size/1)
       |> Enum.sum()
 
     IO.inspect(part2)

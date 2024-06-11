@@ -1,11 +1,12 @@
 defmodule Day5 do
+  @spec parseInt(String.t()) :: integer()
+  defp parseInt(s), do: s |> Integer.parse() |> elem(0)
+
+  @spec parse_move(String.t()) :: {integer(), integer(), integer()}
   defp parse_move(str) do
     str
     |> String.split(" ", trim: true)
-    |> then(fn [_, x, _, from, _, to] -> [x, from, to] end)
-    |> Enum.map(&Integer.parse/1)
-    |> Enum.map(&elem(&1, 0))
-    |> List.to_tuple()
+    |> then(fn [_, x, _, from, _, to] -> {parseInt(x), parseInt(from), parseInt(to)} end)
   end
 
   # sample starting stack
@@ -46,7 +47,7 @@ defmodule Day5 do
   end
 
   defp set_stack(stacks, i, s) do
-    List.update_at(stacks, i - 1, fn _ -> s end)
+    List.replace_at(stacks, i - 1, s)
   end
 
   defp go(0, fromStack, toStack), do: {fromStack, toStack}

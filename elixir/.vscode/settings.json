@@ -1,0 +1,12 @@
+{
+  "elixirLS.dialyzerWarnOpts": [
+    "error_handling",
+    "extra_return",
+    "missing_return",
+    "underspecs",
+    "unknown",
+    "unmatched_returns",
+    "overspecs",
+    "specdiffs"
+  ]
+}

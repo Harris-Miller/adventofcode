@@ -26,7 +26,7 @@ defmodule Advent2015.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:witchcraft, "~> 1.0"}
+      # {:witchcraft, "~> 1.0"}
     ]
   end
 end

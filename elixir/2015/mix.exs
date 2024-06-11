@@ -11,7 +11,8 @@ defmodule Advent2015.MixProject do
       lockfile: "../mix.lock",
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [flags: [:error_handling, :extra_return, :missing_return, :unknown, :unmatched_returns]]
     ]
   end
 
@@ -26,6 +27,7 @@ defmodule Advent2015.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
       # {:witchcraft, "~> 1.0"}
     ]
   end

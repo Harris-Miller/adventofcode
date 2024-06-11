@@ -1,5 +1,5 @@
 defmodule Day4 do
-  @spec process(String.t(), String.t(), integer()) :: integer()
+  @spec process(binary(), binary(), integer()) :: integer()
   defp process(prefix, secret, num) do
     result = :crypto.hash(:md5, "#{secret}#{num}") |> Base.encode16()
 
@@ -10,7 +10,7 @@ defmodule Day4 do
     end
   end
 
-  @spec main() :: nil
+  @spec main() :: any()
   def main() do
     secret =
       File.read!("../../inputs/2015/Day4/input.txt") |> String.trim_trailing("\n")

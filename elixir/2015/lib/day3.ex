@@ -12,7 +12,7 @@ defmodule Day3 do
     end
   end
 
-  @spec main() :: nil
+  @spec main() :: any()
   def main() do
     contents =
       File.read!("../../inputs/2015/Day3/input.txt")

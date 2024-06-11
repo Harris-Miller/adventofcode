@@ -1,12 +1,9 @@
 defmodule Day5 do
-  @spec parseInt(String.t()) :: integer()
-  defp parseInt(s), do: s |> Integer.parse() |> elem(0)
-
   @spec parse_move(String.t()) :: {integer(), integer(), integer()}
   defp parse_move(str) do
     str
     |> String.split(" ", trim: true)
-    |> then(fn [_, x, _, from, _, to] -> {parseInt(x), parseInt(from), parseInt(to)} end)
+    |> then(fn [_, x, _, from, _, to] -> {String.to_integer(x), String.to_integer(from), String.to_integer(to)} end)
   end
 
   # sample starting stack

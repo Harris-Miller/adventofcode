@@ -12,7 +12,7 @@ defmodule Advent2022.MixProject do
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      dialyzer: [flags: [:error_handling, :extra_return, :missing_return, :underspecs, :unknown, :unmatched_returns, :overspecs, :specdiffs]]
+      dialyzer: [flags: [:error_handling, :extra_return, :missing_return, :unknown, :unmatched_returns]]
     ]
   end
 

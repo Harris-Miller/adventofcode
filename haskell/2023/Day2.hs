@@ -1,7 +1,6 @@
 module Day2 where
 
 import Data.Bifunctor
-import Data.List
 import Data.List.Split
 import Data.Map (Map)
 import Data.Map qualified as M
@@ -14,7 +13,7 @@ type Group = [Cube]
 type Game = [Group]
 
 -- parsing
-parseCube :: String -> (String, Int)
+parseCube :: String -> Cube
 parseCube s = (color, read num)
   where
     [num, color] = splitOn " " s

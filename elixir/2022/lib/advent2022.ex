@@ -3,7 +3,7 @@ defmodule Advent2022 do
 
   @impl true
   def start(_type, _args) do
-    Day5.main()
+    Day1.main()
 
     # Application.start just return a Task, so return it a noop
     Task.start(fn -> nil end)

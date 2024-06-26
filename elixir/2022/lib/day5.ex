@@ -3,7 +3,9 @@ defmodule Day5 do
   defp parse_move(str) do
     str
     |> String.split(" ", trim: true)
-    |> then(fn [_, x, _, from, _, to] -> {String.to_integer(x), String.to_integer(from), String.to_integer(to)} end)
+    |> then(fn [_, x, _, from, _, to] ->
+      {String.to_integer(x), String.to_integer(from), String.to_integer(to)}
+    end)
   end
 
   # sample starting stack
@@ -11,11 +13,11 @@ defmodule Day5 do
   # [N] [C]
   # [Z] [M] [P]
   #  1   2   3
-  @stacks_samples [
-    [?Z, ?N],
-    [?M, ?C, ?D],
-    [?P]
-  ]
+  # @stacks_samples [
+  #   [?Z, ?N],
+  #   [?M, ?C, ?D],
+  #   [?P]
+  # ]
 
   # this is part of the input, it is the visualized stacks initial value
   #     [C]             [L]         [T]
@@ -75,7 +77,7 @@ defmodule Day5 do
     go2(n - 1, fromStack_, temp_)
   end
 
-  defp transfer2(xs, {n, from, to}) do
+  defp transfer2(xs, {n, from, _to}) do
     go2(n, view_stack(xs, from), [])
   end
 

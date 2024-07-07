@@ -1,15 +1,19 @@
 module Day6 where
 
 import Data.List.Split
+import Data.Point
+import Data.Tuple.Common
 
-type Point = (Int, Int)
-
-parse :: String -> Point
-parse s = (read x, read y)
+parse :: String -> Point Int
+parse s = Point x y
   where
-    [x, y] = splitOn ", " s
+    [x, y] = map read $ splitOn ", " s
+
+findEncapsulations :: [Point Int] -> [(Point Int, [Point Int])]
+findEncapsulations = undefined
 
 main' :: IO ()
 main' = do
-  contents <- map parse . lines <$> readFile "../inputs/2018/Day6/input.txt"
+  contents <- map parse . lines <$> readFile "../inputs/2018/Day6/sample.txt"
   mapM_ print contents
+  print "Day 6"

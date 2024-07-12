@@ -7,7 +7,9 @@ import gleam/option.{Some}
 import gleam/result
 import gleam/string
 import simplifile
-import utils/listutils
+import utils/list as list_utils
+import utils/option as option_utils
+import utils/result as result_utils
 
 pub type Inst {
   On
@@ -19,10 +21,8 @@ fn to_tuple(s: String) -> #(Int, Int) {
   let assert [x, y] =
     s
     |> string.split(",")
-    |> list.map(fn(s) {
-      let assert Ok(n) = int.parse(s)
-      n
-    })
+    |> list.map(int.parse)
+    |> list.map(result_utils.assert_unwrap)
   #(x, y)
 }
 
@@ -49,9 +49,9 @@ fn ranges_to_points(from: #(Int, Int), to: #(Int, Int)) {
   list.flat_map(rows, fn(row) { list.map(cols, fn(col) { #(col, row) }) })
 }
 
-fn make_grid() {
+fn make_grid(default: t) {
   ranges_to_points(#(0, 0), #(999, 999))
-  |> list.map(fn(a) { #(a, False) })
+  |> list.map(fn(a) { #(a, default) })
   |> dict.from_list
 }
 
@@ -75,11 +75,29 @@ fn process(
     Toggle ->
       list.fold(points, grid, fn(acc, p) {
         dict.upsert(acc, p, fn(v) {
-          let assert Some(v) = v
-          bool.negate(v)
+          v |> option_utils.assert_unwrap() |> bool.negate
         })
       })
   }
+}
+
+fn process2(
+  grid: Dict(#(Int, Int), Int),
+  line: #(Inst, #(Int, Int), #(Int, Int)),
+) {
+  let #(inst, from, to) = line
+  let points = ranges_to_points(from, to)
+  list.fold(points, grid, fn(acc, p) {
+    dict.upsert(acc, p, fn(v) {
+      let assert Some(v) = v
+      case inst {
+        On -> v + 1
+        Off if v == 0 -> 0
+        Off -> v - 1
+        Toggle -> v + 2
+      }
+    })
+  })
 }
 
 pub fn main() {
@@ -88,16 +106,25 @@ pub fn main() {
     |> result.nil_error()
     |> result.then(fn(file) {
       string.split(file, "\n")
-      |> listutils.init
+      |> list_utils.init
       |> result.map(list.map(_, parse))
     })
 
-  let grid = make_grid()
+  let grid = make_grid(False)
 
   let r =
     contents
     |> list.fold(grid, process)
     |> dict.filter(fn(_, v) { v })
     |> dict.size
+  io.debug(r)
+
+  let grid = make_grid(0)
+
+  let r =
+    contents
+    |> list.fold(grid, process2)
+    |> dict.values()
+    |> int.sum
   io.debug(r)
 }

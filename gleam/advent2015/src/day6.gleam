@@ -10,6 +10,7 @@ import simplifile
 import utils/list as list_utils
 import utils/option as option_utils
 import utils/result as result_utils
+import utils/tuple
 
 pub type Inst {
   On
@@ -18,12 +19,11 @@ pub type Inst {
 }
 
 fn to_tuple(s: String) -> #(Int, Int) {
-  let assert [x, y] =
-    s
-    |> string.split(",")
-    |> list.map(int.parse)
-    |> list.map(result_utils.assert_unwrap)
-  #(x, y)
+  s
+  |> string.split(",")
+  |> list.map(int.parse)
+  |> list.map(result_utils.assert_unwrap)
+  |> tuple.from_list2
 }
 
 fn parse(line: String) {

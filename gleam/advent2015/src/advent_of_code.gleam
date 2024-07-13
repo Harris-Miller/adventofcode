@@ -1,5 +1,5 @@
-import day16
+import day18
 
 pub fn main() {
-  day16.main()
+  day18.main()
 }

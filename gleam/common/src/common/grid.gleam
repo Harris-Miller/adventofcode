@@ -1,9 +1,23 @@
 import common/list as listc
 import common/tuple as tuplec
 import gleam/dict.{type Dict}
+import gleam/io
 import gleam/list
 import gleam/string
 import gleam/string_builder
+
+pub type Grid(a) =
+  Dict(#(Int, Int), a)
+
+pub fn make_empty(num_rows: Int, num_cols: Int, fill: a) -> Grid(a) {
+  let rows = list.range(0, num_rows - 1)
+  let cols = list.range(0, num_cols - 1)
+
+  list.flat_map(rows, fn(row) {
+    list.map(cols, fn(col) { #(#(row, col), fill) })
+  })
+  |> dict.from_list
+}
 
 pub fn parse(str: String, with parser: fn(String) -> b) {
   let assert Ok(lines) = str |> string.split("\n") |> listc.init
@@ -17,7 +31,7 @@ pub fn parse(str: String, with parser: fn(String) -> b) {
   |> dict.from_list
 }
 
-pub fn get_maxes(grid: Dict(#(Int, Int), a)) -> #(Int, Int) {
+pub fn get_maxes(grid: Grid(a)) -> #(Int, Int) {
   let row_max = grid |> dict.keys() |> list.map(tuplec.fst) |> listc.maximum()
   let col_max = grid |> dict.keys() |> list.map(tuplec.snd) |> listc.maximum()
   #(row_max, col_max)
@@ -42,10 +56,7 @@ pub fn get_neighbors8(point: #(Int, Int)) {
   ]
 }
 
-pub fn to_string(
-  from grid: Dict(#(Int, Int), a),
-  using fun: fn(a) -> String,
-) -> String {
+pub fn to_string(from grid: Grid(a), using fun: fn(a) -> String) -> String {
   let #(row_max, col_max) = get_maxes(grid)
   let rows = list.range(0, row_max)
   let cols = list.range(0, col_max)
@@ -58,4 +69,27 @@ pub fn to_string(
     |> string_builder.to_string()
   })
   |> string.join("\n")
+}
+
+pub fn debug(grid: Grid(a), using fun: fn(a) -> String) {
+  grid
+  |> to_string(fun)
+  |> string.split("\n")
+  |> list.each(io.println)
+  io.println("")
+}
+
+pub fn square_from_points(btm_left: #(Int, Int), top_right: #(Int, Int)) {
+  let #(r1, c1) = btm_left
+  let #(r2, c2) = top_right
+  let rows = list.range(r1, r2)
+  let cols = list.range(c1, c2)
+  list.flat_map(rows, fn(row) { list.map(cols, fn(col) { #(row, col) }) })
+}
+
+pub fn to_std_char(b: Bool) -> String {
+  case b {
+    False -> "."
+    True -> "#"
+  }
 }

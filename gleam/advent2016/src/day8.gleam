@@ -119,4 +119,6 @@ pub fn main() {
 
   let r = grid |> dict.values() |> list.filter(identity) |> list.length()
   io.debug(r)
+  io.println("")
+  grid.debug(grid, grid.to_std_char)
 }

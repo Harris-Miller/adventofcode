@@ -22,7 +22,7 @@ fn to_tuple(s: String) -> #(Int, Int) {
   s
   |> string.split(",")
   |> list.map(int.parse)
-  |> list.map(result_utils.assert_unwrap)
+  |> list.map(result_utils.upwrap_assert)
   |> tuple.from_list2
 }
 
@@ -75,7 +75,7 @@ fn process(
     Toggle ->
       list.fold(points, grid, fn(acc, p) {
         dict.upsert(acc, p, fn(v) {
-          v |> option_utils.assert_unwrap() |> bool.negate
+          v |> option_utils.upwrap_assert() |> bool.negate
         })
       })
   }

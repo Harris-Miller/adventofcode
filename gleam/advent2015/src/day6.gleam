@@ -1,3 +1,7 @@
+import common/list as list_utils
+import common/option as option_utils
+import common/result as result_utils
+import common/tuple
 import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/int
@@ -7,10 +11,6 @@ import gleam/option.{Some}
 import gleam/result
 import gleam/string
 import simplifile
-import utils/list as list_utils
-import utils/option as option_utils
-import utils/result as result_utils
-import utils/tuple
 
 pub type Inst {
   On

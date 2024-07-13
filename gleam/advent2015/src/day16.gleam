@@ -1,3 +1,5 @@
+import common/list as list_utils
+import common/tuple
 import gleam/dict
 import gleam/int
 import gleam/io
@@ -6,8 +8,6 @@ import gleam/order.{Eq, Gt, Lt}
 import gleam/result
 import gleam/string
 import simplifile
-import utils/list as list_utils
-import utils/tuple
 
 fn dict_of_things() {
   [

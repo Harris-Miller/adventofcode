@@ -1,12 +1,12 @@
+import common/list as listc
+import common/tuple as tuplec
 import gleam/dict.{type Dict}
 import gleam/list
 import gleam/string
 import gleam/string_builder
-import utils/list as list_utils
-import utils/tuple
 
 pub fn parse(str: String, with parser: fn(String) -> b) {
-  let assert Ok(lines) = str |> string.split("\n") |> list_utils.init
+  let assert Ok(lines) = str |> string.split("\n") |> listc.init
   lines
   |> list.index_map(fn(values, row) {
     values
@@ -18,10 +18,8 @@ pub fn parse(str: String, with parser: fn(String) -> b) {
 }
 
 pub fn get_maxes(grid: Dict(#(Int, Int), a)) -> #(Int, Int) {
-  let row_max =
-    grid |> dict.keys() |> list.map(tuple.fst) |> list_utils.maximum()
-  let col_max =
-    grid |> dict.keys() |> list.map(tuple.snd) |> list_utils.maximum()
+  let row_max = grid |> dict.keys() |> list.map(tuplec.fst) |> listc.maximum()
+  let col_max = grid |> dict.keys() |> list.map(tuplec.snd) |> listc.maximum()
   #(row_max, col_max)
 }
 

@@ -1,4 +1,4 @@
-name = "advent_of_code"
+name = "common"
 version = "1.0.0"
 
 # Fill out these fields if you intend to generate HTML documentation or publish
@@ -14,8 +14,6 @@ version = "1.0.0"
 
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
-simplifile = "~> 1.5"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
-common = { path = "../common" }

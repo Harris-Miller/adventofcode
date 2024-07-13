@@ -1,11 +1,10 @@
+import common/grid
 import gleam/dict.{type Dict}
 import gleam/function.{identity}
 import gleam/io
 import gleam/iterator.{iterate, take}
 import gleam/list
-import gleam/string
 import simplifile
-import utils/grid
 
 fn next_space(grid: Dict(#(Int, Int), Bool)) {
   fn(key: #(Int, Int), value: Bool) {

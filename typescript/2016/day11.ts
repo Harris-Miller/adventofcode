@@ -28,6 +28,9 @@ const sampleState: State = {
 // The second floor contains a cobalt generator, a curium generator, a ruthenium generator, and a plutonium generator.
 // The third floor contains a cobalt-compatible microchip, a curium-compatible microchip, a ruthenium-compatible microchip, and a plutonium-compatible microchip.
 // The fourth floor contains nothing relevant.
+//
+// Wrong, but accepted answers: Part1 = 33, Part2 = 57
+// See more here: https://www.reddit.com/r/adventofcode/comments/5hqxzq/2016_day_11_can_we_get_a_list_of_inputssolutions/db27t2c/
 const initialState: State = {
   e: 'f1',
   f1: ['promethiumG', 'promethiumM'],

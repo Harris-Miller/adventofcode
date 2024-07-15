@@ -13,3 +13,14 @@ export const unzip = <A, B>(tupleArray: [A, B][]): [A[], B[]] => {
 
   return [as, bs];
 };
+
+export const combinations2 = <T>(list: T[]): [T, T][] => {
+  const len = list.length;
+  const result: [T, T][] = [];
+  for (let i = 0; i < len - 1; i += 1) {
+    for (let j = i + 1; j < len; j += 1) {
+      result.push([list[i], list[j]]);
+    }
+  }
+  return result;
+};

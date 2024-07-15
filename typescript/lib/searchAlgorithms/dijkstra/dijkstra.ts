@@ -41,6 +41,8 @@ export function* dijkstraAssocTraversal<T>(
       }
     }
   }
+
+  return undefined;
 }
 
 export function* dijkstraTraversal<T>(
@@ -48,7 +50,7 @@ export function* dijkstraTraversal<T>(
   getCost: (from: T, to: T) => number,
   initial: T,
 ): Generator<[number, T[]]> {
-  const nextAssoc = (state: T) => getNextStates(state).map<[T, number]>(n => [n, getCost(state, n)]);
+  const nextAssoc = (state: T) => getNextStates(state).map(n => [n, getCost(state, n)] as [T, number]);
   yield* dijkstraAssocTraversal(nextAssoc, initial);
 }
 

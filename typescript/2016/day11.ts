@@ -102,7 +102,7 @@ const estimateRemainingCost = (state: State) => state.f1.length * 3 + state.f2.l
 const determineIfFound = (state: State) =>
   state.e === 'f4' && state.f1.length === 0 && state.f2.length === 0 && state.f3.length === 0;
 
-export const part1 = aStar(getNextStates, () => 1, estimateRemainingCost, determineIfFound, initialState);
+export const part1 = aStar(getNextStates, () => 1, estimateRemainingCost, determineIfFound, sampleState);
 
 console.log(part1?.[0]);
 console.log(part1?.[1]);

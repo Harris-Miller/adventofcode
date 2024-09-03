@@ -24,3 +24,8 @@ export const combinations2 = <T>(list: T[]): [T, T][] => {
   }
   return result;
 };
+
+export const reduce1 = <T>(fn: (acc: T, value: T) => T, list: T[]): T => {
+  const [h, ...t] = list;
+  return t.reduce(fn, h);
+};

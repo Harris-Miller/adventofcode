@@ -9,4 +9,4 @@ main' = do
   -- Part 1
   print $ sum $ map (length . nub . concat) content
   -- Part 2
-  print $ sum $ map (length . foldl1 intersect . map nub) content
+  print $ sum $ map (length . foldl1 intersect) content

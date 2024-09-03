@@ -1,8 +1,8 @@
+import { dijkstra } from 'fp-search-algorithms';
 import { add, assoc, assocPath, fromPairs, identity, modify, pipe, toPairs } from 'ramda';
 import { match } from 'ts-pattern';
 
 import { unzip } from '../lib/fp';
-import { dijkstra } from '../lib/searchAlgorithms';
 
 type InstantSpell = 'Drain' | 'MagicMissile';
 type EffectSpell = 'Poison' | 'Recharge' | 'Shield';

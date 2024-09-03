@@ -22,13 +22,6 @@ const eslintConfig = [
     },
   },
   {
-    files: ['lib/searchAlgorithms/**'],
-    rules: {
-      'func-style': 'off',
-      'no-continue': 'off',
-    },
-  },
-  {
     ignores: ['node_modules/'],
   },
 ];

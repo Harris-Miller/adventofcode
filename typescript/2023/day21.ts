@@ -1,6 +1,5 @@
+import { breadthFirstSearch } from 'fp-search-algorithms';
 import { find, max, pipe } from 'ramda';
-
-import { breadthFirstSearch } from '../lib/searchAlgorithms';
 
 type Point = [number, number];
 

@@ -1,7 +1,7 @@
+import { aStar } from 'fp-search-algorithms';
 import { difference, init, isNotNil } from 'ramda';
 
 import { combinations2 } from '../lib/fp';
-import { aStar } from '../lib/searchAlgorithms';
 
 type Floor = 'f1' | 'f2' | 'f3' | 'f4';
 type State = {

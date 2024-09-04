@@ -43,3 +43,5 @@ export const reduceRight1: {
   const l = R.last(list)!;
   return init.reduceRight(fn, l);
 });
+
+export const parseInt10 = (str: string) => Number.parseInt(str, 10);

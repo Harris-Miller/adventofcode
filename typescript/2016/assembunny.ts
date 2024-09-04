@@ -2,21 +2,25 @@ import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
 
-type Register = 'a' | 'b' | 'c' | 'd';
-
 const regs = ['a', 'b', 'c', 'd'];
 
+type RunOpts = {
+  noOptimization?: boolean;
+  steps?: number;
+};
+
 export class AssemBunny {
-  public regA: number;
-  public regB: number;
-  public regC: number;
-  public regD: number;
+  regA: number;
+  regB: number;
+  regC: number;
+  regD: number;
 
-  private instructions: string[];
-  private len: number;
-  private pointer = 0;
+  instructions: string[];
+  len: number;
+  pointer = 0;
+  indexToBeginOptimization: number | undefined;
 
-  constructor(instructions: string[], init: Partial<Record<Register, number>> = {}) {
+  constructor(instructions: string[], init: Partial<Record<'a' | 'b' | 'c' | 'd', number>> = {}) {
     this.instructions = instructions;
     this.len = instructions.length;
     this.regA = init.a ?? 0;
@@ -25,30 +29,85 @@ export class AssemBunny {
     this.regD = init.d ?? 0;
   }
 
-  public run() {
-    while (this.pointer < this.len) {
-      const { pointer } = this;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const inst = this.instructions[this.pointer];
-      this.processInst(this.instructions[pointer]);
-      // console.log(pointer, [this.regA, this.regB, this.regC, this.regD], inst);
+  run(opts: RunOpts = {}) {
+    const { noOptimization = false, steps = Infinity } = opts;
+
+    let counter = steps;
+    while (this.pointer < this.len && counter > 0) {
+      if (noOptimization) {
+        this.processInst();
+      } else if (this.pointer === this.indexToBeginOptimization) {
+        if (this.optimize()) {
+          this.processInst();
+        }
+      } else {
+        this.processInst();
+      }
+
+      counter -= 1;
     }
   }
 
-  private processInst(inst: string) {
-    const parsed = R.splitAt(4, inst);
-    const key = parsed[0].trim();
-    // eslint-disable-next-line @typescript-eslint/prefer-destructuring
-    const value = parsed[1];
+  optimize() {
+    // collect instructs between pointer and indexToBeginOptimization
+    const sub = this.instructions.slice(this.pointer, this.indexToBeginOptimization);
+    // the final instruction will always be a jnz
+    const jnz = R.last(sub)!;
+
+    const [, value] = this.parseInst(jnz);
+    const [, offset] = this.parseJnz(value);
+
+    if (offset === -2) {
+      // assume within sub is a `dec` is the same as jnz
+      // to optimize, get value at reg, then set to 0
+      // add to current reg value for the `inc` op
+      const regWithAddVal = R.drop(4, sub.find(s => s.startsWith('dec'))!);
+      const addVal = this.getReg(regWithAddVal);
+      const regToAddTo = R.drop(4, sub.find(s => s.startsWith('inc'))!);
+      const val = this.getReg(regToAddTo);
+      this.setReg(regToAddTo, val + addVal);
+      this.pointer = this.indexToBeginOptimization! + 1;
+      this.indexToBeginOptimization = undefined;
+      return true;
+    }
+
+    // return false to say no optimization happened
+    // this will trigger processInst()
+    return false;
+  }
+
+  lookupHead() {
+    const sub = this.instructions.slice(this.pointer);
+    const jnzIndex = sub.findIndex(inst => inst.startsWith('jnz'));
+    const parsed = R.drop(4, sub[jnzIndex]).split(' ');
+
+    const offset = (() => {
+      switch (parsed[1]) {
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+          return this.getReg(parsed[1]);
+        default:
+          return parseInt10(parsed[1]);
+      }
+    })();
+
+    this.indexToBeginOptimization = jnzIndex - offset;
+  }
+
+  processInst() {
+    const str = this.instructions[this.pointer];
+    const [inst, value] = this.parseInst(str);
 
     // since jnz moves the pointer, do job and return
-    if (key === 'jnz') {
+    if (inst === 'jnz') {
       this.jnz(value);
       return;
     }
 
     // else, process and increment pointer
-    switch (key.trim()) {
+    switch (inst) {
       case 'tgl':
         this.tgl(value);
         break;
@@ -67,14 +126,14 @@ export class AssemBunny {
     this.pointer += 1;
   }
 
-  private tgl(value: string) {
+  tgl(value: string) {
     const val = (() => {
       switch (value) {
         case 'a':
         case 'b':
         case 'c':
         case 'd':
-          return this.getReg(value as Register);
+          return this.getReg(value);
         default:
           return parseInt10(value);
       }
@@ -106,8 +165,8 @@ export class AssemBunny {
     }
   }
 
-  private cpy(value: string) {
-    const [val, reg] = value.split(' ') as [string, Register];
+  cpy(value: string) {
+    const [val, reg] = value.split(' ') as [string, string];
 
     // cpy may be invalid due to tgl, eg `cpy 1 2`
     // in this case, just bail
@@ -118,15 +177,15 @@ export class AssemBunny {
       case 'b':
       case 'c':
       case 'd':
-        this.setReg(reg, this.getReg(val as Register));
+        this.setReg(reg, this.getReg(val));
         break;
       default:
         this.setReg(reg, parseInt10(value));
     }
   }
 
-  private inc(value: string) {
-    const reg = value as Register;
+  inc(value: string) {
+    const reg = value;
 
     // cpy may be invalid due to tgl, eg `cpy 1 2`
     // in this case, just bail
@@ -135,35 +194,13 @@ export class AssemBunny {
     this.setReg(reg, this.getReg(reg) + 1);
   }
 
-  private dec(value: string) {
-    const reg = value as Register;
+  dec(value: string) {
+    const reg = value;
     this.setReg(reg, this.getReg(reg) - 1);
   }
 
-  private jnz(value: string) {
-    const parsed = value.split(' ') as [string, string];
-    const val = (() => {
-      switch (parsed[0]) {
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-          return this.getReg(parsed[0] as Register);
-        default:
-          return parseInt10(parsed[0]);
-      }
-    })();
-    const offset = (() => {
-      switch (parsed[1]) {
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-          return this.getReg(parsed[1] as Register);
-        default:
-          return parseInt10(parsed[1]);
-      }
-    })();
+  jnz(value: string) {
+    const [val, offset] = this.parseJnz(value);
 
     if (val === 0) {
       this.pointer += 1;
@@ -172,7 +209,7 @@ export class AssemBunny {
     }
   }
 
-  private getReg(reg: Register): number {
+  getReg(reg: string): number {
     switch (reg) {
       case 'a':
         return this.regA;
@@ -187,7 +224,7 @@ export class AssemBunny {
     }
   }
 
-  private setReg(reg: Register, value: number) {
+  setReg(reg: string, value: number) {
     switch (reg) {
       case 'a':
         this.regA = value;
@@ -205,4 +242,40 @@ export class AssemBunny {
         throw new Error('Exhaustive setReg invariant');
     }
   }
+
+  parseInst(str: string): [string, string] {
+    const parsed = R.splitAt(4, str);
+    const inst = parsed[0].trim();
+    // eslint-disable-next-line @typescript-eslint/prefer-destructuring
+    const value = parsed[1];
+    return [inst, value];
+  }
+
+  parseJnz = (value: string): [number, number] => {
+    const parsed = value.split(' ') as [string, string];
+    const val = (() => {
+      switch (parsed[0]) {
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+          return this.getReg(parsed[0]);
+        default:
+          return parseInt10(parsed[0]);
+      }
+    })();
+    const offset = (() => {
+      switch (parsed[1]) {
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+          return this.getReg(parsed[1]);
+        default:
+          return parseInt10(parsed[1]);
+      }
+    })();
+
+    return [val, offset];
+  };
 }

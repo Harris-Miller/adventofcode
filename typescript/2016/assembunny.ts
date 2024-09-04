@@ -10,9 +10,16 @@ export class AssemBunny {
   regC = 0;
   regD = 0;
 
+  private instructions: string[];
   private pointer = 0;
 
-  constructor(public instructions: string[]) {}
+  constructor(instructions: string[], init: Partial<Record<Register, number>> = {}) {
+    this.instructions = instructions;
+    this.regA = init.a ?? 0;
+    this.regB = init.b ?? 0;
+    this.regC = init.c ?? 0;
+    this.regD = init.d ?? 0;
+  }
 
   public run() {
     const len = this.instructions.length;

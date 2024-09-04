@@ -20,7 +20,8 @@ const createGrid = (c: number, r: number): [number, number][] => {
   return R.xprod(cs, rs);
 };
 
-const drawRect = ([c, r]: [number, number], grid: Grid): Grid => {
+const drawRect = (inst: string, grid: Grid): Grid => {
+  const [c, r] = R.drop(5, inst).split('x').map(parseInt10) as [number, number];
   const points = createGrid(c, r);
   return points.reduce((acc, p) => {
     acc[R.toString(p)] = true;
@@ -28,18 +29,23 @@ const drawRect = ([c, r]: [number, number], grid: Grid): Grid => {
   }, grid);
 };
 
-const rotateColumn = (col: number, by: number, grid: Grid): Grid => {
+const rotateColumn = (inst: string, grid: Grid): Grid => {
+  const parsed = R.drop(14, inst).split(' by ') as [string, string];
+  const col = parseInt10(R.drop(2, parsed[0]));
+  const by = parseInt10(parsed[1]);
   const pointFrom = R.range(0, height).map<[number, number]>(r => [col, r]);
   const pointTo = R.range(0, height).map<[number, number]>(r => [col, (r + by) % height]);
   const updatedCol = R.zip(pointFrom, pointTo).reduce<Record<string, boolean>>((acc, [f, t]) => {
     acc[R.toString(t)] = grid[R.toString(f)];
     return acc;
   }, {});
-  console.log(updatedCol);
   return Object.assign(grid, updatedCol);
 };
 
-const rotateRow = (row: number, by: number, grid: Grid): Grid => {
+const rotateRow = (inst: string, grid: Grid): Grid => {
+  const parsed = R.drop(11, inst).split(' by ') as [string, string];
+  const row = parseInt10(R.drop(2, parsed[0]));
+  const by = parseInt10(parsed[1]);
   const pointFrom = R.range(0, width).map<[number, number]>(c => [c, row]);
   const pointTo = R.range(0, width).map<[number, number]>(c => [(c + by) % width, row]);
   const updatedRow = R.zip(pointFrom, pointTo).reduce<Record<string, boolean>>((acc, [f, t]) => {
@@ -51,26 +57,16 @@ const rotateRow = (row: number, by: number, grid: Grid): Grid => {
 };
 
 const processInst = (grid: Grid, inst: string): Grid => {
-  if (inst.startsWith('rect')) {
-    const point = R.drop(5, inst).split('x').map(parseInt10) as [number, number];
-    return drawRect(point, grid);
+  switch (true) {
+    case inst.startsWith('rect'):
+      return drawRect(inst, grid);
+    case inst.startsWith('rotate column'):
+      return rotateColumn(inst, grid);
+    case inst.startsWith('rotate row'):
+      return rotateRow(inst, grid);
+    default:
+      throw new Error('inst not implemented');
   }
-
-  if (inst.startsWith('rotate column')) {
-    const [l, r] = R.drop(14, inst).split(' by ') as [string, string];
-    const col = parseInt10(R.drop(2, l));
-    const by = parseInt10(r);
-    return rotateColumn(col, by, grid);
-  }
-
-  if (inst.startsWith('rotate row')) {
-    const [l, r] = R.drop(11, inst).split(' by ') as [string, string];
-    const row = parseInt10(R.drop(2, l));
-    const by = parseInt10(r);
-    return rotateRow(row, by, grid);
-  }
-
-  throw new Error('inst not implemented');
 };
 
 const gridToString = (grid: Grid): string =>

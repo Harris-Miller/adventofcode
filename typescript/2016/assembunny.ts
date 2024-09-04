@@ -4,17 +4,21 @@ import { parseInt10 } from '../lib/fp';
 
 type Register = 'a' | 'b' | 'c' | 'd';
 
+const regs = ['a', 'b', 'c', 'd'];
+
 export class AssemBunny {
-  regA = 0;
-  regB = 0;
-  regC = 0;
-  regD = 0;
+  public regA: number;
+  public regB: number;
+  public regC: number;
+  public regD: number;
 
   private instructions: string[];
+  private len: number;
   private pointer = 0;
 
   constructor(instructions: string[], init: Partial<Record<Register, number>> = {}) {
     this.instructions = instructions;
+    this.len = instructions.length;
     this.regA = init.a ?? 0;
     this.regB = init.b ?? 0;
     this.regC = init.c ?? 0;
@@ -22,9 +26,12 @@ export class AssemBunny {
   }
 
   public run() {
-    const len = this.instructions.length;
-    while (this.pointer < len) {
-      this.processInst(this.instructions[this.pointer]);
+    while (this.pointer < this.len) {
+      const { pointer } = this;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const inst = this.instructions[this.pointer];
+      this.processInst(this.instructions[pointer]);
+      // console.log(pointer, [this.regA, this.regB, this.regC, this.regD], inst);
     }
   }
 
@@ -42,6 +49,9 @@ export class AssemBunny {
 
     // else, process and increment pointer
     switch (key.trim()) {
+      case 'tgl':
+        this.tgl(value);
+        break;
       case 'cpy':
         this.cpy(value);
         break;
@@ -57,8 +67,51 @@ export class AssemBunny {
     this.pointer += 1;
   }
 
+  private tgl(value: string) {
+    const val = (() => {
+      switch (value) {
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+          return this.getReg(value as Register);
+        default:
+          return parseInt10(value);
+      }
+    })();
+
+    const positionToUpdate = this.pointer + val;
+
+    // bail is position is out-of-range
+    if (positionToUpdate < 0 || positionToUpdate >= this.len) return;
+
+    const inst = this.instructions[positionToUpdate];
+
+    switch (R.take(3, inst)) {
+      case 'inc':
+        this.instructions[positionToUpdate] = `dec${R.drop(3, inst)}`;
+        break;
+      case 'dec':
+      case 'tgl':
+        this.instructions[positionToUpdate] = `inc${R.drop(3, inst)}`;
+        break;
+      case 'jnz':
+        this.instructions[positionToUpdate] = `cpy${R.drop(3, inst)}`;
+        break;
+      case 'cpy':
+        this.instructions[positionToUpdate] = `jnz${R.drop(3, inst)}`;
+        break;
+      default:
+        throw new Error('Exhaustive tgl invariant');
+    }
+  }
+
   private cpy(value: string) {
     const [val, reg] = value.split(' ') as [string, Register];
+
+    // cpy may be invalid due to tgl, eg `cpy 1 2`
+    // in this case, just bail
+    if (!regs.includes(reg)) return;
 
     switch (val) {
       case 'a':
@@ -74,6 +127,11 @@ export class AssemBunny {
 
   private inc(value: string) {
     const reg = value as Register;
+
+    // cpy may be invalid due to tgl, eg `cpy 1 2`
+    // in this case, just bail
+    if (!regs.includes(reg)) return;
+
     this.setReg(reg, this.getReg(reg) + 1);
   }
 
@@ -95,9 +153,19 @@ export class AssemBunny {
           return parseInt10(parsed[0]);
       }
     })();
-    const offset = parseInt10(parsed[1]);
+    const offset = (() => {
+      switch (parsed[1]) {
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+          return this.getReg(parsed[1] as Register);
+        default:
+          return parseInt10(parsed[1]);
+      }
+    })();
 
-    if (val <= 0) {
+    if (val === 0) {
       this.pointer += 1;
     } else {
       this.pointer += offset;

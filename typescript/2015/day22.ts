@@ -38,21 +38,7 @@ const sample: GameState = {
   playerArmour: 0,
   playerHp: 10,
   playerMp: 250,
-  spell: '',
-  totalMana: 0,
-};
-
-const input: GameState = {
-  bossHit: 10,
-  bossHp: 71,
-  effects: { Poison: 0, Recharge: 0, Shield: 0 },
-  playerArmour: 0,
-  playerHp: 50,
-  playerMp: 500,
-  spell: '',
-  totalMana: 0,
-};
-
+  spell: ''
 const setEffect = (spellName: EffectSpell) => (gameState: GameState) => {
   const timer = match(spellName)
     .with('Shield', 'Poison', () => 6)

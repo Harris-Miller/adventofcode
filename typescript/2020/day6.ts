@@ -1,5 +1,3 @@
-/* eslint-disable line-comment-position */
-
 const content = await Bun.file('../inputs/2020/Day6/input.txt').text();
 
 const groups = content

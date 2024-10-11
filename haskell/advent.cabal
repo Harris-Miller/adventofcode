@@ -65,7 +65,7 @@ library
     import:           defaults
 
     -- Modules exported by the library.
-    exposed-modules:  Data.Grid.Array, Data.Grid.Map
+    exposed-modules:  Data.Grid.Array, Data.Grid.HashMap, Data.Grid.Map
                     , Data.Grid3.Map
                     , Data.Int.Factors
                     , Data.List.Common
@@ -81,6 +81,7 @@ library
                     , containers
                     , mtl
                     , tuple
+                    , unordered-containers
 
     -- Directories containing source files.
     hs-source-dirs:   lib
@@ -286,6 +287,7 @@ executable advent2022
                     , Stack
                     , tuple
                     , Unique
+                    , unordered-containers
                     , yjtools
 
     -- Directories containing source files.

@@ -2,14 +2,17 @@ module Day24 where
 
 import Data.List
 import Data.List.Split
-import Data.Point
 import Data.Tuple.Common
 
-parse :: String -> (Point3 Float, Point3 Float)
-parse = tmap (fromTuple3 . toTuple3 . map read . splitOn ", ") . toTuple . splitOn " @ "
+type PointF = (Float, Float)
 
-move :: (Point3 Float, Point3 Float) -> (Point3 Float, Point3 Float)
-move (p, v) = (p <> v, v)
+type Point3F = (Float, Float, Float)
+
+parse :: String -> (Point3F, Point3F)
+parse = tmap (toTuple3 . map read . splitOn ", ") . toTuple . splitOn " @ "
+
+move :: (Point3F, Point3F) -> (Point3F, Point3F)
+move ((px, py, pz), v@(vx, vy, vz)) = ((px + vx, py + vy, pz + vz), v)
 
 sampleTestArea :: (Int, Float)
 sampleTestArea = (7, 27)
@@ -31,8 +34,8 @@ sampleTestArea = (7, 27)
 --     return new Point(px, py); // return statement
 -- }
 
-getPointOfIntersectionXYOnly :: (Point3 Float, Point3 Float) -> (Point3 Float, Point3 Float) -> Point Float
-getPointOfIntersectionXYOnly (Point3 lx ly _, Point3 lvx lvy _) (Point3 rx ry _, Point3 rvx rvy _) = Point px py
+getPointOfIntersectionXYOnly :: (Point3F, Point3F) -> (Point3F, Point3F) -> PointF
+getPointOfIntersectionXYOnly ((lx, ly, _), (lvx, lvy, _)) ((rx, ry, _), (rvx, rvy, _)) = (px, py)
   where
     lSlope = lvy / lvx
     rSlope = rvy / rvx

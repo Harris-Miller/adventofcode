@@ -53,6 +53,7 @@ build-type:         Simple
 common defaults
     -- ghc-options: -Wall
     default-extensions: NumericUnderscores
+                      , DisambiguateRecordFields
                       , OverloadedStrings
                         -- for Lenses
                       , TemplateHaskell
@@ -69,7 +70,7 @@ library
                     , Data.Grid3.Map
                     , Data.Int.Factors
                     , Data.List.Common
-                    , Data.Point
+                    , Data.Point, Data.Point3
                     , Data.Tuple.Common, Data.Tuple.GetSet
 
     -- Modules included in this library but not exported.
@@ -79,6 +80,7 @@ library
     build-depends:    base ^>=4.17.2.0
                     , array
                     , containers
+                    , hashable
                     , mtl
                     , tuple
                     , unordered-containers

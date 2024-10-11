@@ -1,31 +1,30 @@
 module Data.Point where
 
-data Point a = Point a a
-  deriving (Show, Eq, Ord)
+import Data.Hashable
+import GHC.Generics (Generic)
 
-instance Functor Point where
-  fmap f (Point a b) = Point (f a) (f b)
+data Point = Point {px, py :: Int}
+  deriving (Show, Eq, Ord, Generic)
 
-instance (Num a) => Semigroup (Point a) where
+instance Hashable Point
+
+instance Semigroup Point where
   (Point rx ry) <> (Point lx ly) = Point (lx + ly) (rx + ry)
 
-instance (Num a) => Monoid (Point a) where
+instance Monoid Point where
   mempty = Point 0 0
 
-fromTuple :: (a, a) -> Point a
+fromTuple :: (Int, Int) -> Point
 fromTuple (x, y) = Point x y
 
-data Point3 a = Point3 a a a
-  deriving (Show, Eq)
+instance Num Point where
+  (Point x1 y1) + (Point x2 y2) = Point (x1 + x2) (y1 + y2)
+  (Point x1 y1) - (Point x2 y2) = Point (x1 - x2) (y1 - y2)
+  abs (Point x y) = Point (abs x) (abs y)
+  negate (Point x y) = Point (negate x) (negate y)
+  signum (Point x y) = Point (signum x) (signum y)
+  fromInteger x = Point (fromInteger x) 0
+  (*) = error "tried to multiply two 2D vectors"
 
-instance Functor Point3 where
-  fmap f (Point3 a b c) = Point3 (f a) (f b) (f c)
-
-instance (Num a) => Semigroup (Point3 a) where
-  (Point3 rx ry rz) <> (Point3 lx ly lz) = Point3 (rx + lx) (ry + ly) (rz + lz)
-
-instance (Num a) => Monoid (Point3 a) where
-  mempty = Point3 0 0 0
-
-fromTuple3 :: (a, a, a) -> Point3 a
-fromTuple3 (x, y, z) = Point3 x y z
+manhattanRadius :: Point -> Int
+manhattanRadius (Point x y) = abs x + abs y

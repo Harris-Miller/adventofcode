@@ -1,60 +1,56 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Day15 where
 
+import Data.HashSet (HashSet)
 import Data.HashSet qualified as HS
 import Data.List
+import Data.Point
 
-type Point = (Int, Int)
+data ScanRange = ScanRange {c :: Point, r :: Int}
 
 parse :: String -> (Point, Point)
 parse s =
-  let [_, _, sx, sy, _, _, _, _, bx, by] = words s
-      sx' = (fst . head . reads . drop 2) sx :: Int
-      sy' = (fst . head . reads . drop 2) sy :: Int
-      bx' = (fst . head . reads . drop 2) bx :: Int
-      by' = (fst . head . reads . drop 2) by :: Int
-   in ((sx', sy'), (bx', by'))
+  let go = (fst . head . reads . drop 2) :: String -> Int
+      [_, _, sx, sy, _, _, _, _, bx, by] = words s
+      sx' = go sx
+      sy' = go sy
+      bx' = go bx
+      by' = go by
+   in (Point sx' sy', Point bx' by')
 
-determineQuadrant :: (Point, Point) -> Int
-determineQuadrant ((sx, sy), (bx, by))
-  | sx < bx && sy >= by = 1
-  | sx <= bx && sy < by = 2
-  | sx > bx && sy <= by = 3
-  | sx >= bx && sy > by = 4
+toScanRange :: (Point, Point) -> ScanRange
+toScanRange (sensor, beacon) =
+  let Point w h = abs $ beacon - sensor
+   in ScanRange {c = sensor, r = w + h}
 
-findR :: Int -> (Point, Point) -> Int
-findR q ((sx, sy), (bx, by)) =
-  let go 1 = (bx - sx) + (sy - by)
-      go 2 = (bx - sx) + (by - sy)
-      go 3 = (sx - bx) + (by - sy)
-      go 4 = (sx - bx) + (sy - by)
-   in abs $ go q
-
-getCorners :: Int -> Point -> (Point, Point, Point, Point)
-getCorners r (x, y) = ((x, y - r), (x + r, y), (x, y + r), (x - r, y))
-
-determineSensorDiamond :: (Point, Point) -> (Point, Point, Point, Point)
-determineSensorDiamond (sensor, beacon) =
-  let q = determineQuadrant (sensor, beacon)
-      r = findR q (sensor, beacon)
-   in getCorners r sensor
-
-pointsForRow :: Int -> (Point, (Point, Point, Point, Point)) -> [Point]
-pointsForRow row ((x, y), ((tx, ty), (rx, ry), (bx, by), (lx, ly)))
-  | row < ty || by < row = []
-  | row < y = let d = y - row in [(x', row) | x' <- [(lx + d) .. (rx - d)]]
-  | otherwise = let d = row - y in [(x', row) | x' <- [(lx + d) .. (rx - d)]]
+pointsForRow :: Int -> ScanRange -> [Point]
+pointsForRow row (ScanRange {..}) =
+  let v = abs $ row - py c
+      d = r - v
+      cx = px c
+   in [Point x' row | x' <- [(cx - d) .. (cx + d)]]
 
 main' :: IO ()
 main' = do
   content <- map parse . lines <$> readFile "../inputs/2022/Day15/input.txt"
   let (allSensors, allBeacons) = unzip content
-  let allCorners = zip allSensors $ map determineSensorDiamond content
+  -- let allCorners = zip allSensors $ map determineSensorDiamond content
 
   -- let magicRow = 10
   let magicRow = 2000000
 
-  let pointsForMagicRow = concatMap (pointsForRow magicRow) allCorners
-  let answer = length $ HS.fromList pointsForMagicRow `HS.difference` HS.fromList allBeacons
+  let pointsForMagicRow = HS.fromList $ concatMap (pointsForRow magicRow . toScanRange) content
+  let answer = length $ pointsForMagicRow `HS.difference` HS.fromList allBeacons
   print answer
+
+  -- part 2
+  -- let magicNumber2 = 20
+  -- let magicNumber2 = 4000000
+  -- let pointsForAllRows = HS.fromList $ concatMap (uncurry pointsForRow) [(r, c) | r <- [0 .. magicNumber2], c <- allCorners]
+  -- let allPossiblePoints = HS.fromList $ [(x, y) | x <- [0 .. magicNumber2], y <- [0 .. magicNumber2]] :: HashSet (Int, Int)
+  -- let (x, y) = head $ HS.toList $ allPossiblePoints `HS.difference` pointsForAllRows
+  -- let answer2 = (x * 4000000) + y
+  -- print answer2
 
   return ()

@@ -4,12 +4,12 @@ import Data.List.Split
 import Data.Point
 import Data.Tuple.Common
 
-parse :: String -> Point Int
+parse :: String -> Point
 parse s = Point x y
   where
     [x, y] = map read $ splitOn ", " s
 
-findEncapsulations :: [Point Int] -> [(Point Int, [Point Int])]
+findEncapsulations :: [Point] -> [(Point, [Point])]
 findEncapsulations = undefined
 
 main' :: IO ()

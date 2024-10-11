@@ -31,18 +31,18 @@ turn 'L' 90 = turn 'R' 270
 turn 'L' 180 = turn 'R' 180
 turn 'L' 270 = turn 'R' 90
 
-strafe :: Char -> Int -> Point Int -> Point Int
+strafe :: Char -> Int -> Point -> Point
 strafe 'N' n p = p <> Point 0 n
 strafe 'S' n p = p <> Point 0 (-n)
 strafe 'E' n p = p <> Point n 0
 strafe 'W' n p = p <> Point (-n) 0
 
-forward :: Int -> Point Int -> State Cardinal (Point Int)
+forward :: Int -> Point -> State Cardinal Point
 forward n pos = do
   d <- get
   pure (strafe (cardinalToChar d) n pos)
 
-parseAction :: String -> Point Int -> State Cardinal (Point Int)
+parseAction :: String -> Point -> State Cardinal Point
 parseAction [] _ = error "parseAction failed"
 parseAction [_] _ = error "parseAction failed"
 parseAction (a : n) pos
@@ -54,7 +54,7 @@ parseAction (a : n) pos
 
 -- Part 2
 
-type Ship2 a = RWS () [String] (Point Int) a
+type Ship2 a = RWS () [String] Point a
 
 pad4 :: String -> String
 pad4 s = s <> mconcat (replicate padBy " ")
@@ -62,10 +62,10 @@ pad4 s = s <> mconcat (replicate padBy " ")
     l = length s
     padBy = if l < 4 then 4 - l else 0
 
-rotate90 :: Point Int -> Point Int
+rotate90 :: Point -> Point
 rotate90 (Point a b) = Point (-b) a
 
-rotate :: Char -> Int -> Point Int -> Point Int
+rotate :: Char -> Int -> Point -> Point
 rotate 'L' 90 = rotate90
 rotate 'L' 180 = rotate90 . rotate90
 rotate 'L' 270 = rotate90 . rotate90 . rotate90
@@ -89,14 +89,14 @@ strafeWaypoint c n = do
   modify (strafe c n)
   tellNewWaypoint c n
 
-forwardWaypoint :: Int -> Point Int -> Ship2 (Point Int)
+forwardWaypoint :: Int -> Point -> Ship2 Point
 forwardWaypoint n pos = do
   wp <- get
   let pos' = mconcat (pos : replicate n wp)
   tell [pad4 ("F" ++ show n) ++ " :: New Position " ++ show pos']
   return pos'
 
-parseAction2 :: String -> Point Int -> Ship2 (Point Int)
+parseAction2 :: String -> Point -> Ship2 Point
 parseAction2 [] _ = error "parseAction2 failed"
 parseAction2 [_] _ = error "parseAction2 failed"
 parseAction2 (a : n) pos
@@ -106,11 +106,11 @@ parseAction2 (a : n) pos
   where
     n' = read n :: Int
 
-process :: [String] -> Point Int -> State Cardinal (Point Int)
+process :: [String] -> Point -> State Cardinal Point
 process [] pos = pure pos
 process (x : xs) pos = parseAction x pos >>= process xs
 
-process2 :: [String] -> Point Int -> Ship2 (Point Int)
+process2 :: [String] -> Point -> Ship2 Point
 process2 [] pos = pure pos
 process2 (x : xs) pos = parseAction2 x pos >>= process2 xs
 
@@ -119,9 +119,9 @@ main' = do
   content <- lines <$> readFile "../inputs/2020/Day12/input.txt"
   -- part 1
   let end = runState (process content (Point 0 0)) East
-  print $ (\(Point x y) -> x + y) $ fmap abs (fst end)
+  print $ (\(Point x y) -> x + y) $ abs (fst end)
   -- part 2
   putStrLn "Starting at (0,0) with waypoint at (0, 10)"
   let end2 = runRWS (process2 content (Point 0 0)) () (Point 10 1)
   -- mapM_ putStrLn (sel3 end2)
-  print $ (\(Point x y) -> x + y) $ fmap abs (sel1 end2)
+  print $ (\(Point x y) -> x + y) $ abs (sel1 end2)

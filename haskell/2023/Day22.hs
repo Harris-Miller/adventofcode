@@ -7,9 +7,9 @@ import Data.List
 import Data.List.Split
 import Data.Map (Map)
 import Data.Map qualified as M
-import Data.Point
+import Data.Point3
 
-type Cube = [Point3 Int]
+type Cube = [Point3]
 
 type CubeMap = Map Char Cube
 

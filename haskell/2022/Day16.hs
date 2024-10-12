@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Day16 where
 
 import Algorithm.Search

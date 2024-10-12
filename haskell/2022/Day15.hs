@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Day15 where
 
 import Data.HashSet (HashSet)

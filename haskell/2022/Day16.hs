@@ -1,64 +1,67 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Day16 where
 
-import Control.Monad.Writer
-import Data.List
+import Algorithm.Search
+import Control.Monad.IO.Class
+import Control.Monad.Reader
+import Data.Bifunctor
+import Data.HashMap.Strict (HashMap)
+import Data.HashMap.Strict qualified as HM
 import Data.List.Split
-import Data.Map qualified as M
-import Data.Maybe
 import Data.Tuple.Select
+import System.IO.Unsafe
 
-type Valves = M.Map String Bool
+-- (Value, Pressure, Connections)
+parse :: String -> (String, (Int, [String]))
+parse s =
+  let (_ : valve : _ : _ : rate : _ : _ : _ : _ : conns) = words s
+      rate' = fst $ head $ reads $ drop 5 rate :: Int
+      conns' = splitOn "," $ concat conns
+   in (valve, (rate', conns'))
 
-type Neighbors = M.Map String [String]
+type SearchRM a = ReaderT (Int, HashMap String (Int, [String])) IO a
 
-type Flows = M.Map String Int
+data DState = DState
+  { valve :: String,
+    vState :: HashMap String Bool,
+    releasing :: [Int]
+  }
+  deriving (Eq, Ord, Show)
 
-type PathWriter a = Writer [([String], Int)] a
+next :: DState -> SearchRM [DState]
+next dState@(DState {..}) = do
+  (_, table) <- ask
+  let (pressure, conns) = table HM.! valve
+  let isOpen = vState HM.! valve
+  let dState' = dState {releasing = head releasing : releasing}
+  let openValve = [dState {vState = HM.insert valve True vState, releasing = pressure + head releasing : releasing} | not isOpen]
+  return $ openValve <> [dState'] <> map (\c -> dState' {valve = c}) conns
 
-type State = ([String], Valves, String, Int, Int)
+cost :: DState -> DState -> SearchRM Int
+cost from to = do
+  (maxFlow, table) <- ask
+  let didOpenValve = (valve from == valve to) && (not (vState from HM.! valve from) && vState to HM.! valve to)
+  return $ maxFlow * length (releasing to) - sum (releasing to)
 
-parse :: String -> (String, Int, [String])
-parse s = (id, flow, connections)
-  where
-    xs = words s
-    id = xs !! 1
-    flow = (read . (!! 1) . splitOn "=" . init . (!! 4)) xs
-    connections = map (delete ',') $ drop 9 xs
-
-getValve :: String -> Valves -> Bool
-getValve p vs = fromJust $ M.lookup p vs
-
-getNeighbors :: String -> Neighbors -> [String]
-getNeighbors p ns = fromJust $ M.lookup p ns
-
-getFlow :: String -> Flows -> Int
-getFlow p fs = fromJust $ M.lookup p fs
-
-getNextRate :: String -> Flows -> Int -> Int
-getNextRate p fs r = r + getFlow p fs
-
-createMoves :: Flows -> Neighbors -> State -> [State]
-createMoves fs ns (ps, vs, p, r, c) = if c == 30 then [] else options
-  where
-    ns' = getNeighbors p ns
-    nextRate = getNextRate p fs r
-    self = [(ps, M.insert p False vs, p, nextRate, c + 1) | nextRate > 0]
-    options = map (\n -> (ps ++ [n], vs, n, r, c + 1)) ns' <> self
-
-process :: Flows -> Neighbors -> [([String], Int)] -> State -> [([String], Int)]
-process fs ns acc state = if sel5 state == 30 then acc' else next
-  where
-    acc' = acc <> [(sel1 state, sel4 state)]
-    moves = createMoves fs ns state
-    next = foldl (process fs ns) acc moves
+found :: DState -> SearchRM Bool
+found dState@(DState {..}) = do
+  -- lift $ print dState >> return dState
+  lift $ print $ length releasing
+  return $ length releasing == 30
 
 main' :: IO ()
 main' = do
   contents <- map parse . lines <$> readFile "../inputs/2022/Day16/sample.txt"
-  let valves = M.fromList $ map (\(name, _, _) -> (name, False)) contents :: Valves
-  let neighbors = M.fromList $ map (\(name, _, cs) -> (name, cs)) contents :: Neighbors
-  let flows = M.fromList $ map (\(name, flow, _) -> (name, flow)) contents :: Flows
-  let state = (["AA"], valves, "AA", 0, 0)
-  let r = process flows neighbors [] state
-  -- print a
+  mapM_ print contents
+  let maxFlow = sum $ map (fst . snd) contents
+  let valves = HM.fromList contents
+  let readonly = (maxFlow, valves)
+  let initialValveState = HM.fromList $ map (\t -> (fst t, False)) contents
+
+  let m = dijkstraM next cost found $ DState {valve = "AA", vState = initialValveState, releasing = [0]}
+  r <- runReaderT m readonly
+
   print r
+
+  return ()

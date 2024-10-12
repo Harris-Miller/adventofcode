@@ -8,6 +8,7 @@ import Data.List
 import Data.Point
 
 data ScanRange = ScanRange {c :: Point, r :: Int}
+  deriving (Eq, Show)
 
 parse :: String -> (Point, Point)
 parse s =
@@ -31,11 +32,27 @@ pointsForRow row (ScanRange {..}) =
       cx = px c
    in [Point x' row | x' <- [(cx - d) .. (cx + d)]]
 
+vonNeumannNeighborhood :: ScanRange -> [Point]
+vonNeumannNeighborhood ScanRange {..} =
+  let cx = px c
+      cy = py c
+      ps = [Point x y | x <- [cx - r .. cx + r], y <- [cy - r .. cy + r]]
+   in filter (\(Point x y) -> abs (x - cx) + abs (y - cy) <= r) ps
+
+createPerimeter :: Int -> Point -> [Point]
+createPerimeter r (Point cx cy) =
+  let s1 = [Point (cx + d) (cy + r - d) | d <- [0 .. r]]
+      s2 = [Point (cx + d) (cy - r + d) | d <- [0 .. r]]
+      s3 = [Point (cx - d) (cy + r - d) | d <- [0 .. r]]
+      s4 = [Point (cx - d) (cy - r + d) | d <- [0 .. r]]
+   in nub $ s1 <> s2 <> s3 <> s4
+
 main' :: IO ()
 main' = do
   content <- map parse . lines <$> readFile "../inputs/2022/Day15/input.txt"
   let (allSensors, allBeacons) = unzip content
-  -- let allCorners = zip allSensors $ map determineSensorDiamond content
+
+  -- part 1
 
   -- let magicRow = 10
   let magicRow = 2000000
@@ -45,12 +62,20 @@ main' = do
   print answer
 
   -- part 2
-  -- let magicNumber2 = 20
-  -- let magicNumber2 = 4000000
-  -- let pointsForAllRows = HS.fromList $ concatMap (uncurry pointsForRow) [(r, c) | r <- [0 .. magicNumber2], c <- allCorners]
-  -- let allPossiblePoints = HS.fromList $ [(x, y) | x <- [0 .. magicNumber2], y <- [0 .. magicNumber2]] :: HashSet (Int, Int)
-  -- let (x, y) = head $ HS.toList $ allPossiblePoints `HS.difference` pointsForAllRows
-  -- let answer2 = (x * 4000000) + y
-  -- print answer2
+
+  -- let max = 20
+  let max = 4000000
+
+  let filterInRange = HS.filter (\(Point x y) -> x >= 0 && y >= 0 && x <= max && y <= max)
+
+  let asScanRanges = map toScanRange content
+  let allScannedPoints = HS.fromList $ concatMap vonNeumannNeighborhood asScanRanges
+  let inRange = filterInRange allScannedPoints
+  let pointsToExamine = filterInRange $ HS.fromList $ concatMap (\(ScanRange {..}) -> createPerimeter (r + 1) c) asScanRanges
+
+  -- there has got to be a better way than calculating the taxicab circle and diffing against the perimeter
+  let thePoint = head $ HS.toList $ pointsToExamine `HS.difference` inRange
+  let answer2 = (\(Point x y) -> x * 4000000 + y) thePoint
+  print answer2
 
   return ()

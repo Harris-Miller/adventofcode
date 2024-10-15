@@ -144,6 +144,8 @@ executable advent2016
                     , containers
                     , extra
                     , hashable
+                    , mtl
+                    , search-algorithms
                     , split
                     , tuple
                     , unordered-containers

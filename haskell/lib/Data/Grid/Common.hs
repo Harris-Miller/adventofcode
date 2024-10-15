@@ -1,6 +1,7 @@
 module Data.Grid.Common where
 
 import Control.Monad.RWS
+import Data.Point (Point (Point))
 
 collectGrid :: (Char -> Bool) -> (Char -> a) -> String -> [((Int, Int), a)]
 collectGrid filterChar parseChar s = snd $ execRWS (go filterChar parseChar s) () (0, 0)
@@ -16,6 +17,9 @@ collectGrid filterChar parseChar s = snd $ execRWS (go filterChar parseChar s) (
 
 getNeighbors4 :: (Int, Int) -> [(Int, Int)]
 getNeighbors4 (r, c) = [(r - 1, c), (r, c + 1), (r + 1, c), (r, c - 1)]
+
+getNeighbors4P :: Point -> [Point]
+getNeighbors4P (Point r c) = [Point (r - 1) c, Point r (c + 1), Point (r + 1) c, Point r (c - 1)]
 
 get4DirsFromPoint :: Int -> Int -> (Int, Int) -> [[(Int, Int)]]
 get4DirsFromPoint rMax cMax (r, c) = [up, down, left, right]

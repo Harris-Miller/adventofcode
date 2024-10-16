@@ -1,74 +1,88 @@
 module Day4 where
 
 import Data.Bifunctor
-import Data.Function
+import Data.HashMap.Strict (HashMap)
+import Data.HashMap.Strict qualified as HM
 import Data.List
 import Data.List.Split
-import Data.Map (Map)
-import Data.Map qualified as M
-import Data.Ratio
+import Data.Maybe
+import Data.Ord
 import Data.Time
-import Data.Tuple.Common
+import Data.Tuple.Common (toTuple)
+
+data ShiftRecord = ShiftRecord {time :: UTCTime, action :: String}
+  deriving (Eq, Show)
+
+instance Ord ShiftRecord where
+  compare = comparing time
+
+toMinutes :: NominalDiffTime -> Int
+toMinutes = floor . (/ 60) . nominalDiffTimeToSeconds
+
+toShiftRecord :: (UTCTime, String) -> ShiftRecord
+toShiftRecord (t, a) = ShiftRecord {time = t, action = a}
 
 parseDatetime :: String -> UTCTime
 parseDatetime = parseTimeOrError True defaultTimeLocale "%Y-%m-%d %H:%M"
 
-getHour :: UTCTime -> String
-getHour = formatTime defaultTimeLocale "%H"
+splitTimeAndAction :: String -> ShiftRecord
+splitTimeAndAction = toShiftRecord . bimap (parseDatetime . drop 1) (drop 2) . splitAt 17
 
--- specific to our Shift-Logs, Guards may start their shift in the 24rd hour of the previous day
--- in this case, normalize their start time to be midnight of the next date
--- add a day and reset to midnight, this effectively just moves the clock forward to beginning of next day
-getShiftDay :: UTCTime -> Day
-getShiftDay dt = utctDay (if getHour dt == "23" then addUTCTime nominalDay dt else dt)
-
-data Shift = Shift {guardId :: Int, date :: String, sleepRanges :: [(String, String)]}
-
-splitTimestampAndAction :: String -> (String, String)
-splitTimestampAndAction = bimap (init . tail) tail . splitAt 18
-
-partShiftStarts :: [String] -> ([String], [String])
-partShiftStarts xs = (shiftStarts, rest)
+-- each group of ShiftRecords starts awake, then alternates with "falls asleep" and "wakes up"
+-- so just chunkBy 2 and do a time diff by minute and sum, to determine total sleep for that shift
+calculateSleepCycles :: [ShiftRecord] -> (String, [NominalDiffTime])
+calculateSleepCycles (x : xs) = (guardNum, sleepBy xs)
   where
-    (shiftStarts, rest) = partition ((== "Guard") . (!! 2) . words) xs
+    guardNum = ((!! 1) . words . action) x
+    sleepBy :: [ShiftRecord] -> [NominalDiffTime]
+    sleepBy = map (uncurry (flip diffUTCTime) . toTuple) . chunksOf 2 . map time
 
-parseGuardId :: String -> Int
-parseGuardId = read . tail . (!! 1) . words
-
-data Action = Awake | Asleep
-  deriving (Eq, Ord, Show)
-
-parseAction :: String -> Action
-parseAction "falls asleep" = Asleep
-parseAction "wakes up" = Awake
-
-parseSleepRanges :: [String] -> [(Day, [(DiffTime, DiffTime)])]
-parseSleepRanges rest = keyed
+-- each group of ShiftRecords starts awake, then alternates with "falls asleep" and "wakes up"
+-- so just chunkBy 2 and do a time diff by minute and sum, to determine total sleep for that shift
+sleepBy :: [ShiftRecord] -> (String, [NominalDiffTime])
+sleepBy (x : xs) = (guardNum, sleepBy xs)
   where
-    ordered = map (parseDatetime . fst . splitTimestampAndAction) rest
-    grouped = groupBy ((==) `on` utctDay) ordered
-    keyed = map (\xs -> ((utctDay . head) xs, map toTuple $ chunksOf 2 $ map utctDayTime xs)) grouped
+    guardNum = ((!! 1) . words . action) x
+    sleepBy :: [ShiftRecord] -> [NominalDiffTime]
+    sleepBy = map (uncurry (flip diffUTCTime) . toTuple) . chunksOf 2 . map time
+
+minuteByMinute :: (UTCTime, UTCTime) -> [DiffTime]
+minuteByMinute (from, to) = map utctDayTime $ go from
+  where
+    go :: UTCTime -> [UTCTime]
+    go t | t == to = []
+    go t = t : go t'
+      where
+        t' = addUTCTime 60 t
+
+breakdownSleepByMinute :: [ShiftRecord] -> (Int, [DiffTime])
+breakdownSleepByMinute (x : xs) = (read $ drop 1 guardNum, ranges)
+  where
+    guardNum = ((!! 1) . words . action) x
+    ranges = concatMap (minuteByMinute . toTuple) $ chunksOf 2 $ map time xs
+
+collectBy :: [(Int, [DiffTime])] -> HashMap Int [DiffTime]
+collectBy = foldr (\(k, v) acc -> HM.insertWith (<>) k v acc) HM.empty
 
 main' :: IO ()
 main' = do
-  content <- lines <$> readFile "../inputs/2018/Day4/input.txt"
-  let (shiftStarts, rest) = partShiftStarts content
-  let dayToGuardL = map (bimap (getShiftDay . parseDatetime) parseGuardId . splitTimestampAndAction) shiftStarts
-  -- map of day to Guard
-  let dayToGuard = M.fromList dayToGuardL
-  -- map of guard to days they are on shift
-  let guardToDays = foldr (\(d, gId) -> M.insertWith (<>) gId [d]) M.empty dayToGuardL
-  -- map of day to list of sleep ranges
-  let daySleepRanges = M.fromList $ parseSleepRanges rest
+  content <- sortBy (comparing Down) . map splitTimeAndAction . lines <$> readFile "../inputs/2018/Day4/input.txt"
+  let grouped = map concat $ chunksOf 2 $ drop 1 $ reverse $ map reverse $ (split . whenElt) (isPrefixOf "Guard" . action) content
 
-  let totalSleptMinutes = M.toList $ M.map (sum . map (\(a, b) -> (`div` 60) $ numerator $ toRational (b - a)) . concatMap (daySleepRanges M.!)) guardToDays
-  let guardAsleepTheMost = fst $ maximumBy (compare `on` snd) totalSleptMinutes
-  print guardAsleepTheMost
+  -- test
+  let sleepByGuard = map calculateSleepCycles grouped
+  let sleepGrouped = HM.toList $ HM.map sum $ foldr (\(k, v) acc -> HM.insertWith (<>) k v acc) HM.empty sleepByGuard
+  let guardWhoSleepsTheMost = read $ drop 1 $ fst $ maximumBy (comparing snd) sleepGrouped :: Int
+  print guardWhoSleepsTheMost
 
-  let daysForGuardThatSleptTheMost = guardToDays M.! guardAsleepTheMost
-  let minuteMostSlept = head $ maximumBy (compare `on` length) $ group $ sort $ concatMap ((\(l, h) -> [l .. h - 1]) . tmap ((`div` 60) . numerator . toRational)) $ concatMap (daySleepRanges M.!) daysForGuardThatSleptTheMost
-  print minuteMostSlept
+  -- test2
+  let sleepByMinute = collectBy $ map breakdownSleepByMinute grouped
+  let sleepByMinute2 = HM.filter (not . null) $ HM.map (map (\ts -> (head ts, length ts)) . group . sort) sleepByMinute
+  let sleepByMinute3 = HM.toList $ HM.map (fst . maximumBy (comparing snd)) sleepByMinute2
 
-  print $ guardAsleepTheMost * fromIntegral minuteMostSlept
+  let minuteSleptMost = fromInteger $ (`div` 60) $ (`div` 1_000_000_000_000) $ diffTimeToPicoseconds $ fromJust $ lookup guardWhoSleepsTheMost sleepByMinute3
+  print minuteSleptMost
+
+  print $ guardWhoSleepsTheMost * minuteSleptMost
 
   return ()

@@ -193,6 +193,7 @@ executable advent2018
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.17.2.0
                     , advent
+                    , array
                     , containers
                     , lens
                     , groups

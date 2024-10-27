@@ -1,10 +1,8 @@
 module Day11 where
 
+import Data.Array.Unboxed
 import Data.Char
 import Data.Foldable (maximumBy)
-import Data.Grid.HashMap
-import Data.HashMap.Strict (HashMap)
-import Data.HashMap.Strict qualified as HM
 import Data.Ord
 
 puzzleInput :: Int
@@ -17,18 +15,28 @@ calcPower (x, y) =
       powerLevel' = if length powerLevel < 3 then 0 else (digitToInt . last . take 3 . reverse) powerLevel
    in powerLevel' - 5
 
-get3x3Power :: HashMap (Int, Int) Int -> (Int, Int) -> Int
-get3x3Power grid (x, y) =
-  let i3x3 = (x + 1, y + 1) : getNeighbors8 (x + 1, y + 1)
-   in sum $ map (grid HM.!) i3x3
+getSizePower :: UArray (Int, Int) Int -> Int -> (Int, Int) -> Int
+getSizePower grid size (x, y) =
+  let square = [(x', y') | x' <- [x .. (x + size - 1)], y' <- [y .. (y + size - 1)]]
+   in sum $ map (grid !) square
+
+findMaxForGridSize :: UArray (Int, Int) Int -> Int -> (((Int, Int), Int), Int)
+findMaxForGridSize grid size =
+  let toCheck = [(x, y) | x <- [1 .. (300 - size + 1)], y <- [1 .. (300 - size + 1)]]
+      powerLevel9000 = maximumBy (comparing snd) $ map (\c -> (c, getSizePower grid size c)) toCheck
+   in (powerLevel9000, size)
 
 main' :: IO ()
 main' = do
   let coords = [(x, y) | x <- [1 .. 300], y <- [1 .. 300]]
   let powerLevels = map calcPower coords
-  let grid = HM.fromList $ zip coords powerLevels
+  let grid = array ((1, 1), (300, 300)) $ zip coords powerLevels
 
-  let toCheck = [(x, y) | x <- [1 .. 298], y <- [1 .. 209]]
-  let powerLevel9000 = fst $ maximumBy (comparing snd) $ map (\c -> (c, get3x3Power grid c)) toCheck
-  print powerLevel9000
+  let part1 = findMaxForGridSize grid 3
+  print part1
+
+  -- part2
+  let allPowerCombos = map (findMaxForGridSize grid) [1 .. 300]
+  let part2 = maximumBy (comparing (snd . fst)) allPowerCombos
+  print part2
   return ()

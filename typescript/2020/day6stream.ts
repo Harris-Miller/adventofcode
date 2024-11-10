@@ -5,7 +5,8 @@ import { compose } from 'ramda';
 import fs from 'fs';
 import readline from 'readline';
 
-import { transduceAsync, type Transformer, xMap } from '../lib/transducers';
+import { transduceAsync, xMap } from '../lib/transducers';
+import type { Transformer } from '../lib/transducers';
 
 // declare global {
 //   interface Set<T> {
@@ -16,7 +17,6 @@ import { transduceAsync, type Transformer, xMap } from '../lib/transducers';
 // the readline AsyncIterator seems to be auto trimming the file and ignores the final empty line
 // the algorithm expects that final emptyString to be there
 // so I'm wrapping it in an async generator to produce that final emptyString
-// eslint-disable-next-line func-names
 const createReadline = async function* (path: fs.PathLike) {
   const fileStream = fs.createReadStream(path);
 
@@ -32,8 +32,7 @@ const createReadline = async function* (path: fs.PathLike) {
 const xCollectByEmptyLine: Transformer<string, string[]> = next => {
   let collection: string[] = [];
   return (acc: unknown, val: string) => {
-    if (val.trim() === '')
-    {
+    if (val.trim() === '') {
       const group = collection;
       collection = [];
       return next(acc, group);
@@ -41,6 +40,8 @@ const xCollectByEmptyLine: Transformer<string, string[]> = next => {
 
     collection.push(val);
     return acc;
+  };
+};
 
 const processGroupCount1 = (group: string[]) => {
   const combined = group.reduce((acc, x) => acc + x, '');

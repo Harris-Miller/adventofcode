@@ -6,7 +6,7 @@ const groups = content
   .map(x => x.split('\n')); // and each section is on it's own line
 
 const processGroupCount1 = (group: string[]) => {
-  const combined = group.reduce((acc, x) => acc + x, '');
+  const combined = group.reduce((acc, x) => acc + x, ''); // concat into single string
   const sepByChar = combined.split('');
   const unique = new Set(sepByChar);
   const count = unique.size;

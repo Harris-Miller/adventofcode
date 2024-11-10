@@ -32,7 +32,7 @@ const numberMap = new Map<string, number>([
 const collectNumbers = (acc: number[], str: string): number[] => {
   if (isEmpty(str)) return acc;
 
-  const x = head(str);
+  const x = head(str)!;
   const maybeDigit = Number.parseInt(x, 10);
   if (!Number.isNaN(maybeDigit)) {
     acc.push(maybeDigit);

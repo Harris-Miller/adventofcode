@@ -1,5 +1,6 @@
 module Day17 where
 
+import Control.Monad
 import Control.Monad.RWS
 import Data.Array
 import Data.Grid.Array
@@ -9,7 +10,9 @@ import Data.Maybe
 data Square = Rock | Air | Water
   deriving (Show, Eq)
 
-type GridMonad a = RWS Int () (Array (Int, Int) Square) a
+type GridMonad a = RWS ((Int, Int), (Int, Int)) () (Array (Int, Int) Square) a
+
+type GridMonadTIO a = RWST ((Int, Int), (Int, Int)) () (Array (Int, Int) Square) IO a
 
 squareToChar :: Square -> Char
 squareToChar Rock = '#'
@@ -49,64 +52,52 @@ leftOne (x, y) = (x - 1, y)
 downOne :: (Int, Int) -> (Int, Int)
 downOne (x, y) = (x, y + 1)
 
-findFirstOccupiedSpaceBelow :: GridMonad (Maybe (Int, Int))
-findFirstOccupiedSpaceBelow = do
+handleSpanLeft :: (Int, Int) -> GridMonad ()
+handleSpanLeft p@(x, y) = do
+  ((minX, _), _) <- ask
   grid <- get
-  let maybePoint = find ((/= Air) . (grid !)) [(500, y) | y <- [0 ..]]
+  let openBelow = find ((== Air) . (grid !)) $ reverse [(x, y + 1) | x <- [minX .. x - 1]]
+  let foundRock = find ((/= Air) . (grid !)) $ reverse [(x, y) | x <- [minX .. x - 1]]
+  if isJust openBelow
+    then let Just (x2, _) = openBelow in modify (// [((x', y), Water) | x' <- [x2 .. x - 1]]) -- >> handleSpanDown ((downOne . fromJust) openBelow)
+    else
+      when (isJust foundRock) $ let Just (x3, _) = foundRock in void (modify (// [((x', y), Water) | x' <- [x3 .. x - 1]]))
+
+handleSpanRight :: (Int, Int) -> GridMonad ()
+handleSpanRight p@(x, y) = do
+  (_, (maxX, _)) <- ask
+  grid <- get
+  let openBelow = find ((== Air) . (grid !)) $ reverse [(x, y + 1) | x <- [x + 1 .. maxX]]
+  let foundRock = find ((/= Air) . (grid !)) $ reverse [(x, y) | x <- [x + 1 .. maxX]]
+  if isJust openBelow
+    then modify (// [((x', y), Water) | x' <- [x + 1 .. (fst . fromJust) openBelow]]) -- >> handleSpanDown ((downOne . fromJust) openBelow)
+    else
+      when (isJust foundRock) $ void (modify (// [((x', y), Water) | x' <- [x + 1 .. (fst . fromJust) foundRock]]))
+
+handleSpanDown :: (Int, Int) -> GridMonad ()
+handleSpanDown p@(x, y) = do
+  (_, (_, maxY)) <- ask
+  maybeRock <- findFirstOccupiedSpaceBelow p
+  if isJust maybeRock
+    then modify (// [((x, y'), Water) | y' <- [y .. (snd . fromJust) maybeRock]]) >> spanWater (fromJust maybeRock)
+    else void (modify (// [((x, y'), Water) | y' <- [y .. maxY]]))
+
+findFirstOccupiedSpaceBelow :: (Int, Int) -> GridMonad (Maybe (Int, Int))
+findFirstOccupiedSpaceBelow p@(x, y) = do
+  (_, (_, maxY)) <- ask
+  grid <- get
+  let maybePoint = find ((/= Air) . (grid !)) [(x, y') | y' <- [y .. maxY]]
   return $ maybePoint >>= \p -> if p == springSource then Nothing else Just p
-
-downOr :: ((Int, Int) -> GridMonad ()) -> (Int, Int) -> GridMonad ()
-downOr fn p = do
-  modify (// [(p, Water)])
-  grid <- get
-  let p' = downOne p
-  -- if grid ! p' == Air then stopAtEndOrContinue p' else fn p'
-  if grid ! p' == Air then return () else fn p
-
-handleLeft :: (Int, Int) -> GridMonad ()
-handleLeft p = do
-  grid <- get
-  let p' = leftOne p
-  let v = grid ! p'
-  case v of
-    Air -> downOr handleLeft p'
-    _ -> return ()
-
-handleRight :: (Int, Int) -> GridMonad ()
-handleRight p = do
-  grid <- get
-  let p' = rightOne p
-  let v = grid ! p'
-  case v of
-    Air -> downOr handleRight p'
-    _ -> return ()
-
-handleDown :: (Int, Int) -> GridMonad ()
-handleDown p = do
-  grid <- get
-  let p' = downOne p
-  let v = grid ! p'
-  case v of
-    Air -> stopAtEndOrContinue p'
-    _ -> spanWater p'
-
-stopAtEndOrContinue :: (Int, Int) -> GridMonad ()
-stopAtEndOrContinue p@(_, y) = do
-  modify (// [(p, Water)])
-  maxY <- ask
-  state <- get
-  if maxY == y then return () else handleDown p
 
 spanWater :: (Int, Int) -> GridMonad ()
 spanWater p = do
-  modify (// [(p, Water)])
-  handleLeft p >> handleRight p
+  handleSpanLeft p -- >> handleSpanRight p
 
 fillWithWater :: GridMonad ()
 fillWithWater = do
-  maybeSpace <- findFirstOccupiedSpaceBelow
+  maybeSpace <- findFirstOccupiedSpaceBelow springSource
   case maybeSpace of
-    Just space -> spanWater (upOne space) >> fillWithWater
+    Just space -> spanWater (upOne space) -- >> fillWithWater
     Nothing -> return ()
 
 main' :: IO ()
@@ -118,9 +109,12 @@ main' = do
   let minY = 0
   let maxY = maximum (map snd contents)
 
-  let grid = array ((minX, minY), (maxX, maxY)) [((x, y), Air) | x <- [minX .. maxX], y <- [minY .. maxY]] // map (,Rock) contents
+  let bounds = ((minX, minY), (maxX, maxY))
 
-  let (_, result, _) = runRWS fillWithWater maxY grid
+  let grid = array bounds [((x, y), Air) | x <- [minX .. maxX], y <- [minY .. maxY]] // map (,Rock) contents
+  -- mapM_ print $ gridToListString squareToChar grid
+
+  let (_, result, _) = runRWS fillWithWater bounds grid
   mapM_ print $ gridToListString squareToChar result
 
-  return ()
+  putStrLn ""

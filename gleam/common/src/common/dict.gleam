@@ -2,10 +2,13 @@ import gleam/dict.{type Dict}
 import gleam/option.{None, Some}
 import gleam/set.{type Set}
 
+/// Convert a Set(#(a, b)) to a Dict(a, b)
 pub fn from_set(set: Set(#(a, b))) -> Dict(a, b) {
   set |> set.to_list() |> dict.from_list()
 }
 
+/// Update an existing key in a Dict
+/// If the key does not exist, the original Dict is returned
 pub fn adjust(
   in dict: Dict(a, b),
   adjust key: a,
@@ -22,6 +25,8 @@ pub fn adjust(
   }
 }
 
+/// Insert a new value into a Dict with an upsert function
+/// If the key does not exist, the value is inserted directly
 pub fn insert_with(
   in dict: Dict(a, b),
   adjust key: a,

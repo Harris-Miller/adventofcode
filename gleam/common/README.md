@@ -1,25 +1,3 @@
-# common
+# AdventOfCode in Gleam
 
-[![Package Version](https://img.shields.io/hexpm/v/common)](https://hex.pm/packages/common)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/common/)
-
-```sh
-gleam add common
-```
-```gleam
-import common
-
-pub fn main() {
-  // TODO: An example of the project in use
-}
-```
-
-Further documentation can be found at <https://hexdocs.pm/common>.
-
-## Development
-
-```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-gleam shell # Run an Erlang shell
-```
+Each folder is an individual project, `cd` into each and use `gleam` CLI to run individual year/day files

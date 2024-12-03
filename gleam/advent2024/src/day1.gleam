@@ -1,6 +1,6 @@
-import common/dict as dict_utils
-import common/function as function_utils
-import common/result as result_utils
+import common/dict as dictc
+import common/function as functionc
+import common/result as resultc
 import common/tuple
 import gleam/dict
 import gleam/int
@@ -22,7 +22,7 @@ pub fn main() {
       line
       |> string.split("   ")
       |> list.map(int.parse(_))
-      |> list.map(result_utils.unwrap_assert)
+      |> list.map(resultc.unwrap_assert)
       |> tuple.from_list2
     })
 
@@ -32,7 +32,7 @@ pub fn main() {
   let sorted = list.zip(list.sort(ll, int.compare), list.sort(rr, int.compare))
   let r1 =
     sorted
-    |> list.map(function_utils.uncurry2(int.subtract))
+    |> list.map(functionc.uncurry2(int.subtract))
     |> list.map(int.absolute_value)
     |> int.sum
 
@@ -41,7 +41,7 @@ pub fn main() {
   let counts =
     rr
     |> list.fold(dict.new(), fn(acc, key) {
-      dict_utils.insert_with(acc, key, 1, int.add)
+      dictc.insert_with(acc, key, 1, int.add)
     })
 
   let r2 =

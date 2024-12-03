@@ -1,6 +1,6 @@
-import common/function as function_utils
-import common/list as list_utils
-import common/result as result_utils
+import common/function as functionc
+import common/list as listc
+import common/result as resultc
 import gleam/function
 import gleam/int
 import gleam/io
@@ -11,14 +11,14 @@ import simplifile
 
 fn all_are_increasing(list: List(Int)) -> Bool {
   list
-  |> list_utils.pairs()
-  |> list.all(function_utils.uncurry2(fn(l, r) { l + 1 <= r && l + 3 >= r }))
+  |> listc.pairs_()
+  |> list.all(functionc.uncurry2(fn(l, r) { l + 1 <= r && l + 3 >= r }))
 }
 
 fn all_are_decreasing(list: List(Int)) -> Bool {
   list
-  |> list_utils.pairs()
-  |> list.all(function_utils.uncurry2(fn(l, r) { l - 1 >= r && l - 3 <= r }))
+  |> listc.pairs_()
+  |> list.all(functionc.uncurry2(fn(l, r) { l - 1 >= r && l - 3 <= r }))
 }
 
 // const tryAgainRemovingOneAtATime = (ref: number[]) =>
@@ -29,9 +29,9 @@ fn all_are_decreasing(list: List(Int)) -> Bool {
 //   }, false);
 
 fn try_again_removing_one_at_a_time(list: List(Int)) -> Bool {
-  list.range(0, list.length(list))
+  list.range(0, list.length(list) - 1)
   |> list.find(fn(i) {
-    let adjusted = list_utils.remove(list, i)
+    let adjusted = listc.remove_(list, i)
     all_are_increasing(adjusted) || all_are_decreasing(adjusted)
   })
   |> result.replace(True)
@@ -49,7 +49,7 @@ pub fn main() {
         line
         |> string.split(" ")
         |> list.map(int.parse)
-        |> list.map(result_utils.unwrap_assert)
+        |> list.map(resultc.unwrap_assert)
       })
     })
 

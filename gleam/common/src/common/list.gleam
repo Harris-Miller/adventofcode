@@ -1,7 +1,9 @@
+import common/result as resultc
 import gleam/int
 import gleam/list
 import gleam/result
 
+/// Return list without last value
 pub fn init(list: List(a)) -> Result(List(a), Nil) {
   list
   |> list.reverse
@@ -9,29 +11,88 @@ pub fn init(list: List(a)) -> Result(List(a), Nil) {
   |> result.map(list.reverse)
 }
 
+/// Return list without last value. Panics if length < 1
+pub fn init_(list: List(a)) -> List(a) {
+  resultc.unwrap_or_panic(init(list), "init_ requires a list of length >= 1")
+}
+
+/// Find the minimum value of a List(Int)
 pub fn minimum(list: List(Int)) -> Int {
   list.reduce(list, int.min) |> result.unwrap(0)
 }
 
+/// Find the maximum value of a List(Int)
 pub fn maximum(list: List(Int)) -> Int {
   list.reduce(list, int.max) |> result.unwrap(0)
 }
 
-pub fn pairs(list: List(a)) -> List(#(a, a)) {
+fn pairs_recurse(list: List(a)) -> List(#(a, a)) {
   case list {
     [a, b] -> [#(a, b)]
-    [a, b, ..rest] -> [#(a, b), ..pairs([b, ..rest])]
-    [_] | [] -> panic as "pairs requires a list of at least length==2"
+    [a, b, ..rest] -> [#(a, b), ..pairs_recurse([b, ..rest])]
+    [_] | [] -> []
   }
 }
 
-pub fn remove(list: List(a), at index: Int) -> List(a) {
+/// Separate a list into pairs of tuples. If the list has length 0 or 1, `Error(Nil)` is returned.
+///
+/// ## Examples
+/// 
+/// ```gleam
+/// pairs([1, 2, 3])
+/// // -> Ok([#(1, 2), #(2, 3), #(2, 3)])
+/// ```
+/// 
+/// ```gleam
+/// pairs([])
+/// // -> Error(Nil)
+/// ```
+///
+pub fn pairs(list: List(a)) -> Result(List(#(a, a)), Nil) {
+  case pairs_recurse(list) {
+    [] -> Error(Nil)
+    r -> Ok(r)
+  }
+}
+
+/// Separate a list into pairs of tuples. If the list has length 0 or 1, this function will Panic
+///
+/// ## Examples
+/// 
+/// ```gleam
+/// pairs([1, 2, 3])
+/// // -> [#(1, 2), #(2, 3), #(2, 3)]
+/// ```
+/// 
+/// ```gleam
+/// pairs([])
+/// // -> panic "pairs_ requires a list of length >= 2"
+/// ```
+///
+pub fn pairs_(list: List(a)) -> List(#(a, a)) {
+  resultc.unwrap_or_panic(pairs(list), "pairs_ requires a list of length >= 2")
+}
+
+/// Removes the index of a given list.
+/// If index is outside of range, the original list will be returned
+pub fn remove(list: List(a), at index: Int) -> Result(List(a), Nil) {
+  let is_in_range = index >= 0 && index < list.length(list)
   let #(head, tail) = list.split(list, index)
-  case tail {
-    [] -> head
-    _ -> {
-      let assert Ok(rest) = list.rest(tail)
-      list.append(head, rest)
+  case is_in_range {
+    False -> Error(Nil)
+    True -> {
+      tail |> list.rest() |> result.map(list.append(head, _))
     }
   }
+}
+
+pub fn remove_(list: List(a), at index: Int) -> List(a) {
+  resultc.unwrap_or_panic(
+    remove(list, index),
+    "remove_ the received index \""
+      <> int.to_string(index)
+      <> "\" is out of range for list with length \""
+      <> int.to_string(list.length(list))
+      <> "\"",
+  )
 }

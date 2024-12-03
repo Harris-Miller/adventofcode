@@ -58,8 +58,7 @@ pub fn main() {
   let r1 =
     contents
     |> list.map(fn(x) { all_are_increasing(x) || all_are_decreasing(x) })
-    |> list.filter(function.identity)
-    |> list.length
+    |> list.count(function.identity)
 
   io.debug(r1)
 
@@ -70,8 +69,7 @@ pub fn main() {
       || all_are_decreasing(x)
       || try_again_removing_one_at_a_time(x)
     })
-    |> list.filter(function.identity)
-    |> list.length
+    |> list.count(function.identity)
 
   io.debug(r2)
 }

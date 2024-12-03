@@ -1,5 +1,5 @@
 import gleam/dict.{type Dict}
-import gleam/option.{Some}
+import gleam/option.{None, Some}
 import gleam/set.{type Set}
 
 pub fn from_set(set: Set(#(a, b))) -> Dict(a, b) {
@@ -20,4 +20,18 @@ pub fn adjust(
       })
     }
   }
+}
+
+pub fn insert_with(
+  in dict: Dict(a, b),
+  adjust key: a,
+  with value: b,
+  using fun: fn(b, b) -> b,
+) -> Dict(a, b) {
+  dict.upsert(dict, key, fn(rv) {
+    case rv {
+      Some(v) -> fun(v, value)
+      None -> value
+    }
+  })
 }

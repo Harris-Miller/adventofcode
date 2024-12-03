@@ -18,3 +18,7 @@ pairsOrdered xs = go xs
   where
     go [] = []
     go (x : rest) = [(x, x') | x' <- xs] <> go rest
+
+combos :: [a] -> [(a, a)]
+combos [x1, x2] = [(x1, x2)]
+combos (x1 : x2 : xs) = (x1, x2) : combos (x2 : xs)

@@ -21,15 +21,18 @@ tryAgainRemovingOneAtATime list =
       found = find (or . sequence [allAreIncreasing, areAllDecreasing]) lists
    in isJust found
 
+validate :: [[Int] -> Bool] -> [[Int]] -> Int
+validate funcs = length . filter (or . sequence funcs)
+
 main' :: IO ()
 main' = do
   contents <- map (map read . words) . lines <$> readFile "../inputs/2024/Day2/input.txt" :: IO [[Int]]
   -- print contents
 
   -- part 1
-  let r1 = length $ filter id $ map (or . sequence [allAreIncreasing, areAllDecreasing]) contents
+  let r1 = validate [allAreIncreasing, areAllDecreasing] contents
   print r1
 
   -- part 2
-  let r2 = length $ filter id $ map (or . sequence [allAreIncreasing, areAllDecreasing, tryAgainRemovingOneAtATime]) contents
+  let r2 = validate [allAreIncreasing, areAllDecreasing, tryAgainRemovingOneAtATime] contents
   print r2

@@ -1,8 +1,10 @@
 import * as R from 'ramda';
 
+import { parseInt10 } from '../lib/fp';
+
 const content = (await Bun.file('../inputs/2024/Day2/input.txt').text()).trim();
 
-const lines = content.split('\n').map(line => line.split(' ').map(x => Number.parseInt(x, 10)));
+const lines = content.split('\n').map(line => line.split(' ').map(parseInt10));
 
 // console.log(lines);
 

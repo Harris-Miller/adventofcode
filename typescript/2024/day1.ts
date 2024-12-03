@@ -1,12 +1,14 @@
 import * as R from 'ramda';
 
+import { parseInt10 } from '../lib/fp';
+
 const content = (await Bun.file('../inputs/2024/Day1/input.txt').text()).trim();
 
 const rLineRegex = /([0-9]+)\s+([0-9]+)/;
 
 const parse = (str: string): [number, number] => {
   const [, a, b] = str.match(rLineRegex)!;
-  return [Number.parseInt(a, 10), Number.parseInt(b, 10)];
+  return [parseInt10(a), parseInt10(b)];
 };
 
 const asTwoLists = R.flow(content, [

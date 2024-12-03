@@ -7,10 +7,10 @@ import Data.Maybe
 import Data.Traversable
 
 allAreIncreasing :: [Int] -> Bool
-allAreIncreasing = all (\(l, r) -> l + 1 <= r && l + 3 >= r) . combos
+allAreIncreasing = all (\(l, r) -> l + 1 <= r && l + 3 >= r) . pairs
 
 areAllDecreasing :: [Int] -> Bool
-areAllDecreasing = all (\(l, r) -> l - 1 >= r && l - 3 <= r) . combos
+areAllDecreasing = all (\(l, r) -> l - 1 >= r && l - 3 <= r) . pairs
 
 deleteIndex :: Int -> [a] -> [a]
 deleteIndex i = uncurry (<>) . second (drop 1) . splitAt i

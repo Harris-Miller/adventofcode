@@ -5,7 +5,7 @@ import Data.Grid.HashMap
 import Data.HashMap.Strict (HashMap)
 import Data.HashMap.Strict qualified as HM
 import Data.List
-import Data.List.Common (pairsOrdered)
+import Data.List.Common
 import Data.Maybe
 import Data.Point
 
@@ -57,15 +57,15 @@ findPathFromEmptyToPoint p = dfs genNeighbors (found p)
 
 main' :: IO ()
 main' = do
-  contents <- map parse . drop 2 . lines <$> readFile "../inputs/2016/Day22/sample.txt"
-  -- let part1 = length . filter id . map isViable $ pairsOrdered contents
-  -- print part1
+  contents <- map parse . drop 2 . lines <$> readFile "../inputs/2016/Day22/input.txt"
+  let part1 = length . filter id . map isViable $ combosInclusive contents
+  print part1
 
   let grid = HM.fromList $ map (\n -> (coords n, n)) contents :: NodeGrid
   let ss = SearchState {emptyP = findEmptyNode grid, nodeGrid = grid}
   let result = findPathFromEmptyToPoint (Point 1 0) ss
 
-  print result
+  -- print result
 
   -- part 2
   return ()

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-loop-func */
 import * as R from 'ramda';
 import { match } from 'ts-pattern';
 
@@ -40,6 +39,19 @@ const grid = parseGridAsIs(content);
 
 // console.log(grid);
 
+const runPath = (grid: Grid, dir: Direction, coord: Coord) =>
+  match(dir)
+    .with('up', () => lookUp(coord, grid))
+    .with('right', () => lookRight(coord, grid))
+    .with('down', () => lookDown(coord, grid))
+    .with('left', () => lookLeft(coord, grid))
+    .exhaustive();
+
+const blockToRight = (grid: Grid, dir: Direction, coord: Coord): Coord | undefined => {
+  const [, stoppedAt] = runPath(grid, dir, coord);
+  return stoppedAt;
+};
+
 let pos: Coord | undefined = stringToCoords(grid.entries().find(([, val]) => val === '^')![0]);
 
 let dir: Direction = 'up';
@@ -47,12 +59,7 @@ let dir: Direction = 'up';
 let collection = new Set<string>();
 
 while (R.isNotNil(pos)) {
-  const [newVisits, nextPos] = match(dir)
-    .with('up', () => lookUp(pos!, grid))
-    .with('right', () => lookRight(pos!, grid))
-    .with('down', () => lookDown(pos!, grid))
-    .with('left', () => lookLeft(pos!, grid))
-    .exhaustive();
+  const [newVisits, nextPos] = runPath(grid, dir, pos);
 
   dir = turnRight(dir);
   pos = nextPos;

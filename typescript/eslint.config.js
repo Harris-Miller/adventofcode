@@ -17,12 +17,17 @@ const eslintConfig = [
     rules: {
       'no-console': 'off',
       'no-continue': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
       'line-comment-position': 'off',
       'no-constant-condition': 'error',
-      '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
       'no-plusplus': 'off',
+    },
+  },
+  {
+    files: ['**/*.ts', '**/*.mts', '**/*.tsx'],
+    rules: {
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
     },
   },
   {

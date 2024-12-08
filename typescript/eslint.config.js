@@ -22,6 +22,7 @@ const eslintConfig = [
       'line-comment-position': 'off',
       'no-constant-condition': 'error',
       '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
+      'no-plusplus': 'off',
     },
   },
   {

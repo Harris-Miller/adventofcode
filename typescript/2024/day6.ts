@@ -48,6 +48,20 @@ const walkPath = function* (grid: Grid, startCoord: Coord, startDirection: Direc
 
 const parsedGrid = parseGridAsIs(content);
 
+// const lines = content.split('\n');
+// const rows = lines.length;
+// const cols = lines[0].length;
+
+// // eslint-disable-next-line no-plusplus
+// for (let r = 0; r < rows; r++) {
+//   let line = '';
+//   // eslint-disable-next-line no-plusplus
+//   for (let c = 0; c < cols; c++) {
+//     line += parsedGrid.get(R.toString([r, c]))!;
+//   }
+//   console.log(line);
+// }
+
 const startingCoord: Coord = stringToCoord(parsedGrid.entries().find(([, val]) => val === '^')![0]);
 
 const startingDir: Direction = 'up';

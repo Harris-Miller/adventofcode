@@ -5,8 +5,6 @@ import { parseInt10 } from './fp';
 
 export type Coord = [number, number];
 
-export const coordToString = (coord: Coord) => R.toString(coord);
-
 export const stringToCoord = (str: string) => R.tail(R.init(str)).split(', ').map(parseInt10) as [number, number];
 
 export type Grid = Map<string, string>;

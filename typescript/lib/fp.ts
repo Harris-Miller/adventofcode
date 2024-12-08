@@ -16,6 +16,13 @@ export const unzip = <A, B>(tupleArray: [A, B][]): [A[], B[]] => {
   return [as, bs];
 };
 
+/**
+ * Generate all combinations of values
+ * ```typescript
+ * const combos = combinations2([1, 2, 3, 4]);
+ * // [ [ 1, 2 ], [ 1, 3 ], [ 1, 4 ], [ 2, 3 ], [ 2, 4 ], [ 3, 4 ] ]
+ * ```
+ */
 export const combinations2 = <T>(list: T[]): [T, T][] => {
   const len = list.length;
   const result: [T, T][] = [];

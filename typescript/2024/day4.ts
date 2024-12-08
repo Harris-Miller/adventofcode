@@ -84,3 +84,31 @@ for (const vec of vectors) {
 }
 
 console.log(count);
+
+const possibles = [
+  ['M', 'S', 'M', 'S'],
+  ['M', 'M', 'S', 'S'],
+  ['S', 'M', 'S', 'M'],
+  ['S', 'S', 'M', 'M'],
+];
+
+const others = ([r, c]: [number, number]) => [
+  [r - 1, c - 1],
+  [r - 1, c + 1],
+  [r + 1, c - 1],
+  [r + 1, c + 1],
+];
+
+let count2 = 0;
+for (const r of R.range(1, ROW_LENGTH - 1)) {
+  for (const c of R.range(1, COL_LENGTH - 1)) {
+    if (content[r][c] === 'A') {
+      const vals = others([r, c]).map(([rr, cc]) => content[rr][cc]);
+      if (possibles.some(R.equals(vals))) {
+        count2 += 1;
+      }
+    }
+  }
+}
+
+console.log(count2);

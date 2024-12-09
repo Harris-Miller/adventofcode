@@ -1,5 +1,4 @@
 import * as R from 'ramda';
-import { match } from 'ts-pattern';
 
 import type { Coord, Grid } from '../lib/grid';
 import { parseGridAsIs, stringToCoord } from '../lib/grid';
@@ -10,62 +9,59 @@ const content = (await Bun.file('../inputs/2024/Day6/input.txt').text()).trim();
 
 type Direction = 'down' | 'left' | 'right' | 'up';
 
-const getNextCoord = ([r, c]: Coord, dir: Direction) =>
-  match<Direction, Coord>(dir)
-    .with('up', () => [r - 1, c])
-    .with('right', () => [r, c + 1])
-    .with('down', () => [r + 1, c])
-    .with('left', () => [r, c - 1])
-    .exhaustive();
+const getNextCoord = ([r, c]: Coord, dir: Direction): Coord => {
+  switch (dir) {
+    case 'up':
+      return [r - 1, c];
+    case 'right':
+      return [r, c + 1];
+    case 'down':
+      return [r + 1, c];
+    case 'left':
+      return [r, c - 1];
+    default:
+      throw new Error('getNextCoord not Exhaustive');
+  }
+};
 
-const turnRight = (dir: Direction): Direction =>
-  match<Direction, Direction>(dir)
-    .with('up', () => 'right')
-    .with('right', () => 'down')
-    .with('down', () => 'left')
-    .with('left', () => 'up')
-    .exhaustive();
+const turnRight = (dir: Direction): Direction => {
+  switch (dir) {
+    case 'up':
+      return 'right';
+    case 'right':
+      return 'down';
+    case 'down':
+      return 'left';
+    case 'left':
+      return 'up';
+    default:
+      throw new Error('turnRight not Exhaustive');
+  }
+};
 
 const walkPath = function* (grid: Grid, startCoord: Coord, startDirection: Direction): Generator<[Coord, Direction]> {
   let coord = startCoord;
   let dir = startDirection;
+  let space = grid.get(R.toString(coord));
 
-  while (true) {
+  while (R.isNotNil(space)) {
     yield [coord, dir];
     const nextCoord = getNextCoord(coord, dir);
     const nextSpace = grid.get(R.toString(nextCoord));
-
-    // break out if we have left the grid
-    if (R.isNil(nextSpace)) return;
 
     if (nextSpace === '#') {
       dir = turnRight(dir);
     } else {
       coord = nextCoord;
+      space = nextSpace;
     }
   }
 };
 
 const parsedGrid = parseGridAsIs(content);
 
-// const lines = content.split('\n');
-// const rows = lines.length;
-// const cols = lines[0].length;
-
-// // eslint-disable-next-line no-plusplus
-// for (let r = 0; r < rows; r++) {
-//   let line = '';
-//   // eslint-disable-next-line no-plusplus
-//   for (let c = 0; c < cols; c++) {
-//     line += parsedGrid.get(R.toString([r, c]))!;
-//   }
-//   console.log(line);
-// }
-
 const startingCoord: Coord = stringToCoord(parsedGrid.entries().find(([, val]) => val === '^')![0]);
-
 const startingDir: Direction = 'up';
-
 const r1 = new Set(walkPath(parsedGrid, startingCoord, startingDir).map(([coord]) => R.toString(coord)));
 
 console.log(r1.size);
@@ -75,37 +71,19 @@ console.log(r1.size);
 // I'm sure there is a better way, but fuck it
 //
 
-const obstructionsCoordsThatCauseLoops = new Set<string>();
+// don't count starting position
+const guardPath = R.tail(Array.from(r1));
 
-for (const [cCoord, cDir] of walkPath(parsedGrid, startingCoord, startingDir)) {
-  const nextCoord = getNextCoord(cCoord, cDir);
-  const nStr = R.toString(nextCoord);
-
-  // if we've already placed an obstruction here from a different direction, can skip
-  if (obstructionsCoordsThatCauseLoops.has(nStr)) {
-    continue;
-  }
-
-  // if nextSpace already _is_ an obstruction, or is out-of-bound (cannot place obstruction), move on
-  const nextSpace = parsedGrid.get(nStr);
-  if (nextSpace === '#' || R.isNil(nextSpace)) {
-    continue;
-  }
-
-  const gridWithNewObstruction = new Map(parsedGrid);
-  gridWithNewObstruction.set(nStr, '#');
-
-  const loopStops = new Set<string>();
-  // walk from starting point current coord turned do right
-  for (const vector of walkPath(gridWithNewObstruction, cCoord, cDir)) {
-    const lStr = R.toString(vector);
-    // if we've already visited this spot moving in the same direction, we know we are in a loop
-    if (loopStops.has(lStr)) {
-      obstructionsCoordsThatCauseLoops.add(nStr);
-      break;
+const r2 = guardPath
+  .map(cStr => new Map(parsedGrid).set(cStr, '#'))
+  .filter(gridWithNewObstruction => {
+    const history = new Set<string>();
+    for (const vector of walkPath(gridWithNewObstruction, startingCoord, startingDir)) {
+      const vStr = R.toString(vector);
+      if (history.has(vStr)) return true;
+      history.add(vStr);
     }
-    loopStops.add(lStr);
-  }
-}
+    return false;
+  }).length;
 
-console.log(obstructionsCoordsThatCauseLoops.size);
+console.log(r2);

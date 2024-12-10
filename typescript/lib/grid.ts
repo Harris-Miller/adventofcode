@@ -2,14 +2,18 @@ import * as R from 'ramda';
 
 import { parseInt10 } from './fp';
 
-export type Coord = [number, number];
+export type Coord = [row: number, col: number];
 
 export const stringToCoord = (str: string) => R.tail(R.init(str)).split(', ').map(parseInt10) as [number, number];
 
-export type Grid = Map<string, string>;
+export type Grid<T = string> = Map<string, T>;
 
-export const collectGrid = (filter: (char: string) => boolean, input: string): [[number, number], Grid] => {
-  const grid = new Map<string, string>();
+export const collectGrid = <T>(
+  filter: (char: string) => boolean,
+  parse: (char: string) => T,
+  input: string,
+): [[rMax: number, cMax: number], grid: Grid<T>] => {
+  const grid = new Map<string, T>();
   const parsed = input.split('\n').map(line => line.split(''));
   const rLen = parsed.length;
   const cLen = parsed[0].length;
@@ -20,7 +24,7 @@ export const collectGrid = (filter: (char: string) => boolean, input: string): [
       const val = row[c];
       if (filter(val)) {
         const coord = R.toString([r, c]);
-        grid.set(coord, val);
+        grid.set(coord, parse(val));
       }
     }
   }
@@ -28,7 +32,7 @@ export const collectGrid = (filter: (char: string) => boolean, input: string): [
   return [[rLen - 1, cLen - 1], grid];
 };
 
-export const parseGridAsIs = (input: string): Grid => collectGrid(R.T, input)[1];
+export const parseGridAsIs = (input: string): Grid => collectGrid(R.T, R.identity, input)[1];
 
 export const gridToString = (rMax: number, cMax: number, filler: string, grid: Grid) =>
   R.range(0, rMax + 1)
@@ -53,3 +57,19 @@ export const createIsInRangeFunc =
   (rMax: number, cMax: number) =>
   ([r, c]: Coord) =>
     r >= 0 && r <= rMax && c >= 0 && c <= cMax;
+
+export const getNeighbors4 = (coord: Coord | string): Coord[] => {
+  if (typeof coord === 'string') {
+    // eslint-disable-next-line no-param-reassign
+    coord = stringToCoord(coord);
+  }
+
+  const [r, c] = coord;
+
+  return [
+    [r - 1, c],
+    [r, c + 1],
+    [r + 1, c],
+    [r, c - 1],
+  ];
+};

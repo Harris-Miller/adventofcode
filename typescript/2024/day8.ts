@@ -6,7 +6,7 @@ import { collectGrid, createIsInRangeFunc, gridToString, stringToCoord } from '.
 
 const content = (await Bun.file('../inputs/2024/Day8/input.txt').text()).trim();
 
-const [[rMax, cMax], grid] = collectGrid(v => v !== '.', content);
+const [[rMax, cMax], grid] = collectGrid(v => v !== '.', R.identity, content);
 
 const isInRange = createIsInRangeFunc(rMax, cMax);
 

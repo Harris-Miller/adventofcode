@@ -32,7 +32,7 @@ export const collectGrid = <T>(
   return [[rLen - 1, cLen - 1], grid];
 };
 
-export const parseGridAsIs = (input: string): Grid => collectGrid(R.T, R.identity, input)[1];
+export const parseGridAsIs = (input: string) => collectGrid(R.T, R.identity, input);
 
 export const gridToString = (rMax: number, cMax: number, filler: string, grid: Grid) =>
   R.range(0, rMax + 1)

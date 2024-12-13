@@ -58,7 +58,7 @@ const walkPath = function* (grid: Grid, startCoord: Coord, startDirection: Direc
   }
 };
 
-const parsedGrid = parseGridAsIs(content);
+const parsedGrid = parseGridAsIs(content)[1];
 
 const startingCoord: Coord = stringToCoord(parsedGrid.entries().find(([, val]) => val === '^')![0]);
 const startingDir: Direction = 'up';

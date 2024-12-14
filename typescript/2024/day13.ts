@@ -61,3 +61,9 @@ const r1 = moves.map(move => {
 });
 
 console.log(R.sum(r1));
+
+const movesAdjusted = moves.map<Moves>(({ buttonA, buttonB, prize }) => ({
+  buttonA,
+  buttonB,
+  prize: [prize[0] + 10000000000000, prize[1] + 10000000000000],
+}));

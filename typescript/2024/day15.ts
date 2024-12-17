@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import type { Coord, Grid } from '../lib/grid';
 import { gridAsIsToString, parseGridAsIs, stringToCoord } from '../lib/grid';
 
-const content = (await Bun.file('../inputs/2024/Day15/input.txt').text()).trim();
+const content = (await Bun.file('../inputs/2024/Day15/sample.txt').text()).trim();
 
 type Direction = '^' | '<' | '>' | 'v';
 
@@ -12,9 +12,11 @@ const parse = () => {
   return [parseGridAsIs(temp[0]), temp[1].split('').filter(c => c !== '\n') as Direction[]] as const;
 };
 
-const [[, warehouse], movements] = parse();
+const [[, parsed], movements] = parse();
 
-console.log(gridAsIsToString(warehouse));
+const warehouse = new Map(parsed);
+
+// console.log(gridAsIsToString(warehouse));
 
 const start = stringToCoord(warehouse.entries().find(([, val]) => val === '@')![0]);
 
@@ -97,3 +99,31 @@ const r1 = R.sum(
 );
 
 console.log(r1);
+
+const adjustedWarehouse = new Map(
+  parsed.entries().flatMap(([cStr, val]): [string, string][] => {
+    const [r, c] = stringToCoord(cStr);
+    const c2 = c * 2;
+    const n1 = R.toString([r, c2]);
+    const n2 = R.toString([r, c2 + 1]);
+    switch (val) {
+      case '@':
+        return [
+          [n1, '@'],
+          [n2, '.'],
+        ];
+      case 'O':
+        return [
+          [n1, '['],
+          [n2, ']'],
+        ];
+      default:
+        return [
+          [n1, val],
+          [n2, val],
+        ];
+    }
+  }),
+);
+
+console.log(gridAsIsToString(adjustedWarehouse));

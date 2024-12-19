@@ -1,3 +1,4 @@
+import type { Dict } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from './fp';
@@ -34,6 +35,15 @@ export const collectGrid = <T>(
 
 export const parseGridAsIs = (input: string) => collectGrid(R.T, R.identity, input);
 
+export const dictToString = (rMax: number, cMax: number, filler: string, dict: Dict<Coord, string>) =>
+  R.range(0, rMax + 1)
+    .map(r =>
+      R.range(0, cMax + 1)
+        .map(c => dict.get([r, c]) ?? filler)
+        .join(''),
+    )
+    .join('\n');
+
 export const gridToString = (rMax: number, cMax: number, filler: string, grid: Grid) =>
   R.range(0, rMax + 1)
     .map(r =>
@@ -42,6 +52,16 @@ export const gridToString = (rMax: number, cMax: number, filler: string, grid: G
         .join(''),
     )
     .join('\n');
+
+export const dictAsIsToString = (dict: Dict<Coord, string>) => {
+  let rMax = 0;
+  let cMax = 0;
+  for (const [r, c] of dict.keys()) {
+    if (r > rMax) rMax = r;
+    if (c > cMax) cMax = c;
+  }
+  return dictToString(rMax, cMax, ' ', dict);
+};
 
 export const gridAsIsToString = (grid: Grid) => {
   let rMax = 0;

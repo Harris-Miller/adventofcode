@@ -11,8 +11,10 @@ const content = (await Bun.file('../inputs/2024/Day18/input.txt').text()).trim()
 
 // const rMax = 6;
 // const cMax = 6;
+// const toDrop = 12;
 const rMax = 70;
 const cMax = 70;
+const toDrop = 1024;
 
 const processed = content.split('\n').map<Coord>(line => {
   const [c, r] = line.split(',');
@@ -26,7 +28,7 @@ for (let i = 0; i <= rMax; i += 1) {
   }
 }
 
-R.take(1024, processed).forEach(c => {
+R.take(toDrop, processed).forEach(c => {
   grid.set(c, '#');
 });
 
@@ -38,3 +40,23 @@ const found = (coord: Coord) => R.equals(coord, [rMax, cMax]);
 const r1 = dijkstra(next, R.always(1), found, [0, 0] as Coord);
 
 console.log((r1[1]?.length ?? 0) - 1);
+
+const bytesLeft = R.drop(toDrop, processed);
+
+console.log(bytesLeft.length);
+
+let r2: Coord | undefined;
+const dynamicGrid = new Dict(grid.entries());
+const next2 = (coord: Coord) => getNeighbors4(coord).filter(n => dynamicGrid.get(n) === '.');
+
+while (bytesLeft.length) {
+  const nextByte = bytesLeft.shift()!;
+  dynamicGrid.set(nextByte, '#');
+  const r = dijkstra(next2, R.always(1), found, [0, 0] as Coord);
+  if (R.isNil(r[0])) {
+    r2 = nextByte;
+    break;
+  }
+}
+
+console.log(r2);

@@ -2,17 +2,17 @@ import { depthFirstSearch } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
-import type { Coord } from '../lib/grid';
+import type { Point } from '../lib/gridRaw';
 
 const content = (await Bun.file('../inputs/2024/Day13/input.txt').text()).trim();
 
-const parseLine = (line: string) => line.split(', ').map(x => parseInt10(R.drop(2, x))) as Coord;
+const parseLine = (line: string) => line.split(', ').map(x => parseInt10(R.drop(2, x))) as Point;
 
-type Moves = { buttonA: Coord; buttonB: Coord; prize: Coord };
+type Moves = { buttonA: Point; buttonB: Point; prize: Point };
 
 type Selection = 'A' | 'B' | 'S'; // S == start
 
-type State = [selection: Selection, position: Coord];
+type State = [selection: Selection, position: Point];
 
 const parse = (lines: string[]): Moves => ({
   buttonA: parseLine(R.drop(10, lines[0])),
@@ -24,7 +24,7 @@ const moves = content.split('\n\n').map(c => parse(c.split('\n')));
 
 // console.log(moves);
 
-const createFound = (prize: Coord) => (state: State) => R.equals(prize, state[1]);
+const createFound = (prize: Point) => (state: State) => R.equals(prize, state[1]);
 
 const createNext =
   ({ buttonA, buttonB, prize }: Moves) =>

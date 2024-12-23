@@ -1,38 +1,35 @@
-import { breadthFirstTraversal } from 'fp-search-algorithms';
+import { breadthFirstTraversal, Dict, DSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import { getNeighbors4, parseGridAsIs } from '../lib/grid';
+import { getNeighbors4, getPoint, gridEntries, stringToGrid } from '../lib/gridRaw';
+import type { Point } from '../lib/gridRaw';
 
 const content = (await Bun.file('../inputs/2024/Day12/input.txt').text()).trim();
 
-const [, grid] = parseGridAsIs(content);
+const grid = stringToGrid(content);
 
 // console.log(grid);
 
-const visited = new Set<string>();
+const visited = new DSet<Point>();
 
-const regions = new Map<string, [string, number][]>();
+const regions = new Dict<[string, Point], [Point, number][]>();
 
-const findRegion = (cStart: string, letter: string) => {
-  const next = ([cCurrent, _]: [string, number]): [string, number][] =>
-    getNeighbors4(cCurrent)
-      .map(c => R.toString(c))
-      .filter(c => grid.get(c) === letter)
-      .map(c => [c, 4 - getNeighbors4(c).filter(n => grid.get(R.toString(n)) === letter).length]);
+const findRegion = (pStart: Point, letter: string) => {
+  const next = ([pCurrent, _]: [Point, number]): [Point, number][] =>
+    getNeighbors4(pCurrent)
+      .filter(p => getPoint(p, grid) === letter)
+      .map(p => [p, 4 - getNeighbors4(p).filter(n => getPoint(n, grid) === letter).length]);
 
-  const start: [string, number] = [
-    cStart,
-    4 - getNeighbors4(cStart).filter(n => grid.get(R.toString(n)) === letter).length,
-  ];
+  const start: [Point, number] = [pStart, 4 - getNeighbors4(pStart).filter(n => getPoint(n, grid) === letter).length];
 
   const inRegion = breadthFirstTraversal(next, start)
-    .map(([c]) => {
-      visited.add(c[0]);
-      return c;
+    .map(([p]) => {
+      visited.add(p[0]);
+      return p;
     })
     .toArray();
 
-  regions.set(`${letter}-${cStart}`, inRegion);
+  regions.set([letter, pStart], inRegion);
 };
 
 // to collect a region, find a new letter that we haven't visited
@@ -42,9 +39,9 @@ const findRegion = (cStart: string, letter: string) => {
 // on visit, while checking neighbors, all sides that are not same letter have a fence,
 // collect that as part of saving to region
 
-for (const [coord, letter] of grid.entries()) {
-  if (visited.has(coord)) continue;
-  findRegion(coord, letter);
+for (const [point, letter] of gridEntries(grid)) {
+  if (visited.has(point)) continue;
+  findRegion(point, letter);
 }
 
 const r1 = R.sum(

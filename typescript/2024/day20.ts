@@ -1,8 +1,8 @@
 import { dijkstra } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import { findInGrid, getPoint, stringToGrid } from '../lib/gridRaw';
-import type { Grid, Point } from '../lib/gridRaw';
+import { findInGrid, getDirection, getNeighbors4, getPoint, stringToGrid } from '../lib/gridRaw';
+import type { Direction, Grid, Point } from '../lib/gridRaw';
 
 const content = (await Bun.file('../inputs/2024/Day20/input.txt').text()).trim();
 
@@ -15,27 +15,9 @@ const end = findInGrid(val => val === 'E', grid)!;
 
 // console.log(start, end);
 
-const getNeighbors4 = ([r, c]: Point): Point[] => [
-  [r - 1, c],
-  [r, c + 1],
-  [r + 1, c],
-  [r, c - 1],
-];
-
 const okVals = new Set(['.', 'S', 'E']);
 
 const makeNext = (g: Grid) => (p: Point) => getNeighbors4(p).filter(([r, c]) => okVals.has(g[r][c]));
-
-type Direction = 'down' | 'left' | 'right' | 'up';
-
-const getDirection = (prev: Point, current: Point): Direction => {
-  const [up, right, down, left] = getNeighbors4(current);
-  if (R.equals(prev, up)) return 'down';
-  if (R.equals(prev, right)) return 'left';
-  if (R.equals(prev, down)) return 'up';
-  if (R.equals(prev, left)) return 'right';
-  throw new Error('getDirection :: prev is not neighbor of current');
-};
 
 const move = (dir: Direction, [r, c]: Point): Point => {
   switch (dir) {

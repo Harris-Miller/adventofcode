@@ -88,3 +88,6 @@ export const chunksOf = <T>(n: number, arr: T[]): T[][] => {
   }
   return output;
 };
+
+export const fst = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[0];
+export const snd = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[1];

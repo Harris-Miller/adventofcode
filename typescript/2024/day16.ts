@@ -1,21 +1,19 @@
 import { dijkstraAssoc } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import type { Coord } from '../lib/grid';
-import { parseGridAsIs, stringToCoord } from '../lib/grid';
+import type { Direction, Point } from '../lib/gridRaw';
+import { findInGrid, getPoint, stringToGrid } from '../lib/gridRaw';
 
-type Direction = 'down' | 'left' | 'right' | 'up';
-
-type State = [dir: Direction, coord: Coord];
+type State = [dir: Direction, point: Point];
 
 const content = (await Bun.file('../inputs/2024/Day16/sample2.txt').text()).trim();
 
-const [, grid] = parseGridAsIs(content);
+const grid = stringToGrid(content);
 
 // console.log(gridAsIsToString(grid));
 
-const start = stringToCoord(grid.entries().find(([, val]) => val === 'S')![0]);
-const end = stringToCoord(grid.entries().find(([, val]) => val === 'E')![0]);
+const start = findInGrid(val => val === 'S', grid)!;
+const end = findInGrid(val => val === 'E', grid)!;
 
 // console.log(start, end);
 
@@ -34,30 +32,30 @@ const move = ([dir, [r, c]]: State): State => {
   }
 };
 
-const rotate = ([dir, coord]: State): State[] => {
+const rotate = ([dir, point]: State): State[] => {
   switch (dir) {
     case 'up':
     case 'down':
       return [
-        ['left', coord],
-        ['right', coord],
+        ['left', point],
+        ['right', point],
       ];
     case 'right':
     case 'left':
       return [
-        ['up', coord],
-        ['down', coord],
+        ['up', point],
+        ['down', point],
       ];
     default:
-      throw new Error('non-exhaustive');
+      throw new Error('rotate non-exhaustive');
   }
 };
 
-const found = ([, coord]: State): boolean => R.equals(coord, end);
+const found = ([, point]: State): boolean => R.equals(point, end);
 
 const next = (state: State): [State, number][] => {
   const n = move(state);
-  const v = grid.get(R.toString(n[1]));
+  const v = getPoint(n[1], grid);
   const ns: [State, number][] = R.isNotNil(v) && v !== '#' ? [[n, 1]] : [];
   const rs: [State, number][] = rotate(state).map(x => [x, 1000]);
   return [...ns, ...rs];

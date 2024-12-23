@@ -1,53 +1,48 @@
 import { breadthFirstTraversal } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import { parseInt10 } from '../lib/fp';
-import { collectGrid, getNeighbors4 } from '../lib/grid';
+import { fst, parseInt10 } from '../lib/fp';
+import { getNeighbors4, getPoint, gridEntries, parseToGrid } from '../lib/gridRaw';
+import type { Point } from '../lib/gridRaw';
 
 const content = (await Bun.file('../inputs/2024/Day10/input.txt').text()).trim();
 
 // console.log(content);
 
-const [, grid] = collectGrid(R.T, parseInt10, content);
+const grid = parseToGrid(parseInt10, content);
 
-const zeros = grid
-  .entries()
+const zeros = gridEntries(grid)
   .filter(([, val]) => val === 0)
-  .map(([cStr]) => cStr)
-  .toArray();
+  .map(fst);
 
-const next = (cStr: string) => {
-  const valShouldBe = grid.get(cStr)! + 1;
-  return getNeighbors4(cStr)
-    .filter(c => {
-      const val = grid.get(R.toString(c));
-      return val === valShouldBe;
-    })
-    .map(R.toString);
+const next = (point: Point) => {
+  const valShouldBe = getPoint(point, grid)! + 1;
+  return getNeighbors4(point).filter(c => {
+    const val = getPoint(c, grid);
+    return val === valShouldBe;
+  });
 };
 
 const result1 = zeros.map(
   z =>
     breadthFirstTraversal(next, z)
-      .filter(([, path]) => grid.get(R.last(path)!) === 9)
+      .filter(([, path]) => getPoint(R.last(path)!, grid) === 9)
       .toArray().length,
 );
 
 const r1 = R.sum(result1);
 console.log(r1);
 
-type Node = { children: Node[]; coord: string; val: number };
+type Node = { children: Node[]; point: Point; val: number };
 
-const generateTree = (cStr: string): Node => {
-  const val = grid.get(cStr)!;
+const generateTree = (point: Point): Node => {
+  const val = getPoint(point, grid)!;
   const nextValShouldBe = val + 1;
-  const ns = getNeighbors4(cStr)
-    .filter(c => grid.get(R.toString(c)) === nextValShouldBe)
-    .map(R.toString);
+  const ns = getNeighbors4(point).filter(p => getPoint(p, grid) === nextValShouldBe);
 
   return {
     children: ns.map(generateTree),
-    coord: cStr,
+    point,
     val,
   };
 };

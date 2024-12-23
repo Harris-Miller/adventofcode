@@ -2,6 +2,7 @@ import type { Dict } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from './fp';
+import type { Point } from './gridRaw';
 
 export type Coord = [row: number, col: number];
 

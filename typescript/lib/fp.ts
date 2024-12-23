@@ -1,5 +1,3 @@
-import * as R from 'ramda';
-
 /**
  * Array of tuples into separate arrays
  * ```typescript
@@ -40,29 +38,6 @@ export const combinations2 = <T>(list: T[]): [T, T][] => {
   }
   return result;
 };
-
-/**
- * reduce with first value in array serving as initialValue
- */
-export const reduce1: {
-  <T>(fn: (acc: T, value: T) => T): (list: T[]) => T;
-  <T>(fn: (acc: T, value: T) => T, list: T[]): T;
-} = R.curryN(2, <T>(fn: (acc: T, value: T) => T, list: T[]): T => {
-  const [h, ...t] = list;
-  return t.reduce(fn, h);
-});
-
-/**
- * reduceRight with first value in array serving as initialValue
- */
-export const reduceRight1: {
-  <T>(fn: (acc: T, value: T) => T): (list: T[]) => T;
-  <T>(fn: (acc: T, value: T) => T, list: T[]): T;
-} = R.curryN(2, <T>(fn: (acc: T, value: T) => T, list: T[]): T => {
-  const init = R.init(list);
-  const l = R.last(list)!;
-  return init.reduceRight(fn, l);
-});
 
 /* parseInt at radix: 10 */
 export const parseInt10 = (str: string) => Number.parseInt(str, 10);

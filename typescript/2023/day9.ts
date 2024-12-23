@@ -1,7 +1,5 @@
 import { aperture, head, last, sum } from 'ramda';
 
-import { reduceRight1 } from '../lib/fp';
-
 const content = (await Bun.file('../inputs/2023/Day9/input.txt').text())
   .trim()
   .split('\n')
@@ -32,7 +30,7 @@ export const process2 = (history: number[]) => {
     arr = aperture(2, arr).map(([l, r]) => r - l);
   }
 
-  return reduceRight1((l, r) => r - l, acc);
+  return acc.reduceRight((l, r) => r - l);
 };
 
 const result2 = sum(content.map(process2));

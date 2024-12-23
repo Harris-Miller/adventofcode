@@ -128,7 +128,7 @@ const getCost = (_: GameState, nextGameState: GameState) => spellCosts[nextGameS
 const found = (gameState: GameState) => gameState.bossHp <= 0;
 
 const part1 = dijkstra(getNextStates(false), getCost, found, sample);
-console.log(part1?.[0]);
+console.log(part1[0]);
 
 const part2 = dijkstra(getNextStates(true), getCost, found, input);
-console.log(part2?.[0]);
+console.log(part2[0]);

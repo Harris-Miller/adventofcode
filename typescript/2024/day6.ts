@@ -1,8 +1,8 @@
 import { DSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import type { Direction, Grid, Point } from '../lib/gridRaw';
-import { findInGrid, getNextPoint, getPoint, setInGrid, stringToGrid, turnRight } from '../lib/gridRaw';
+import type { Direction, Grid, Point } from '../lib/grid';
+import { findInGrid, getNextPoint, getPoint, setInGrid, stringToGrid, turnRight } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day6/input.txt').text()).trim();
 

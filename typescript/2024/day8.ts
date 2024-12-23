@@ -2,8 +2,8 @@ import { DSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { combinations2 } from '../lib/fp';
-import type { Point } from '../lib/gridRaw';
-import { createIsInRangeFunc, getGridLengths, gridEntries, stringToGrid } from '../lib/gridRaw';
+import type { Point } from '../lib/grid';
+import { createIsInRangeFunc, getGridLengths, gridEntries, stringToGrid } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day8/input.txt').text()).trim();
 

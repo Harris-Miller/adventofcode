@@ -1,8 +1,8 @@
 import { dijkstraAssoc } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import type { Direction, Point } from '../lib/gridRaw';
-import { findInGrid, getPoint, stringToGrid } from '../lib/gridRaw';
+import type { Direction, Point } from '../lib/grid';
+import { findInGrid, getPoint, stringToGrid } from '../lib/grid';
 
 type State = [dir: Direction, point: Point];
 

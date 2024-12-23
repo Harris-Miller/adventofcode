@@ -2,8 +2,8 @@ import { Dict } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
-import type { Point } from '../lib/gridRaw';
-import { dictToString } from '../lib/gridRaw';
+import type { Point } from '../lib/grid';
+import { dictToString } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day14/input.txt').text()).trim();
 

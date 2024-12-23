@@ -1,8 +1,8 @@
 import { dijkstra } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import { findInGrid, getDirection, getNeighbors4, getPoint, stringToGrid } from '../lib/gridRaw';
-import type { Direction, Grid, Point } from '../lib/gridRaw';
+import { findInGrid, getDirection, getNeighbors4, getPoint, stringToGrid } from '../lib/grid';
+import type { Direction, Grid, Point } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day20/input.txt').text()).trim();
 

@@ -1,8 +1,8 @@
 import { Dict } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
-import type { Grid, Point } from '../lib/gridRaw';
-import { dictAsIsToString, findInGrid, getPoint, gridEntries, setInGrid, stringToGrid } from '../lib/gridRaw';
+import type { Grid, Point } from '../lib/grid';
+import { dictAsIsToString, findInGrid, getPoint, gridEntries, setInGrid, stringToGrid } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day15/sample.txt').text()).trim();
 

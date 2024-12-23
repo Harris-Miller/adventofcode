@@ -2,8 +2,8 @@ import { Dict, dijkstra } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
-import type { Point } from '../lib/gridRaw';
-import { getNeighbors4 } from '../lib/gridRaw';
+import type { Point } from '../lib/grid';
+import { getNeighbors4 } from '../lib/grid';
 
 const content = (await Bun.file('../inputs/2024/Day18/input.txt').text()).trim();
 

@@ -68,26 +68,35 @@ export const reduceRight1: {
 export const parseInt10 = (str: string) => Number.parseInt(str, 10);
 
 /**
+ * divvy by a num and offset
+ * The last piece will be shorter if num does not evenly divide the length of the array.
+ * ```typescript
+ * divvy(2, 1, [1, 2, 3, 4])
+ * // => [[1, 2], [2, 3], [3, 4], [4]]
+ *
+ * divvy(2, 2, [1, 2, 3, 4])
+ * // => [[1, 2], [3, 4]]
+ *
+ * divvy(2, 2, [1, 2, 3, 4, 5])
+ * // => [[1, 2], [3, 4], [5]]
+ * ```
+ */
+export const divvy = <T>(num: number, offset: number, arr: T[]): T[][] => {
+  let i = 0;
+  const len = arr.length;
+  const result: T[][] = [];
+  while (i < len) {
+    result.push(arr.slice(i, i + num));
+    i += offset;
+  }
+  return result;
+};
+
+/**
  * Chunk an array into sub arrays of length n
  * The last piece will be shorter if num does not evenly divide the length of the array.
  */
-export const chunksOf = <T>(n: number, arr: T[]): T[][] => {
-  const len = arr.length;
-  // start with one so modulo logic works rest of the way
-  let temp: T[] = [arr[0]];
-  const output: T[][] = [];
-  for (let i = 1; i < len; i += 1) {
-    if (i % n === 0) {
-      output.push(temp);
-      temp = [];
-    }
-    temp.push(arr[i]);
-  }
-  if (temp.length) {
-    output.push(temp);
-  }
-  return output;
-};
+export const chunksOf = <T>(n: number, arr: T[]): T[][] => divvy(n, n, arr);
 
 export const fst = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[0];
 export const snd = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[1];

@@ -1,4 +1,4 @@
-import { Dict } from 'fp-search-algorithms';
+import { HashMap } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import type { Grid, Point } from '../lib/grid';
@@ -97,7 +97,7 @@ const r1 = R.flow(endGrid, [
 
 console.log(r1);
 
-const adjustedWarehouse = new Dict<Point, string>(
+const adjustedWarehouse = new HashMap<Point, string>(
   gridEntries(parsed).flatMap(([[r, c], val]): [Point, string][] => {
     const c2 = c * 2;
     const n1: Point = [r, c2];

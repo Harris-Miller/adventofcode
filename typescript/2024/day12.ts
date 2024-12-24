@@ -1,4 +1,4 @@
-import { breadthFirstTraversal, Dict, DSet } from 'fp-search-algorithms';
+import { breadthFirstTraversal, HashMap, HashSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { getNeighbors4, getPoint, gridEntries, stringToGrid } from '../lib/grid';
@@ -10,9 +10,9 @@ const grid = stringToGrid(content);
 
 // console.log(grid);
 
-const visited = new DSet<Point>();
+const visited = new HashSet<Point>();
 
-const regions = new Dict<[string, Point], [Point, number][]>();
+const regions = new HashMap<[string, Point], [Point, number][]>();
 
 const findRegion = (pStart: Point, letter: string) => {
   const next = ([pCurrent, _]: [Point, number]): [Point, number][] =>

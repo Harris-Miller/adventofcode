@@ -1,4 +1,4 @@
-import { Dict, dijkstra } from 'fp-search-algorithms';
+import { dijkstra, HashMap } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
@@ -21,7 +21,7 @@ const processed = content.split('\n').map<Point>(line => {
   return [parseInt10(r), parseInt10(c)];
 });
 
-const grid = new Dict<Point, string>();
+const grid = new HashMap<Point, string>();
 for (let i = 0; i <= rMax; i += 1) {
   for (let j = 0; j <= cMax; j += 1) {
     grid.set([i, j], '.');
@@ -39,21 +39,21 @@ const found = (coord: Point) => R.equals(coord, [rMax, cMax]);
 
 const r1 = dijkstra(next, R.always(1), found, [0, 0] as Point);
 
-console.log((r1[1]?.length ?? 0) - 1);
+console.log((r1?.[1].length ?? 0) - 1);
 
 const bytesLeft = R.drop(toDrop, processed);
 
 console.log(bytesLeft.length);
 
 let r2: Point | undefined;
-const dynamicGrid = new Dict(grid.entries());
+const dynamicGrid = new HashMap(grid.entries());
 const next2 = (coord: Point) => getNeighbors4(coord).filter(n => dynamicGrid.get(n) === '.');
 
 while (bytesLeft.length) {
   const nextByte = bytesLeft.shift()!;
   dynamicGrid.set(nextByte, '#');
   const r = dijkstra(next2, R.always(1), found, [0, 0] as Point);
-  if (R.isNil(r[0])) {
+  if (R.isNil(r)) {
     r2 = nextByte;
     break;
   }

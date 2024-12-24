@@ -34,9 +34,7 @@ const move = (dir: Direction, [r, c]: Point): Point => {
   }
 };
 
-const result = dijkstra(makeNext(grid), R.always(1), R.equals(end), start);
-const cost = result[0]!;
-const path = result[1]!;
+const [cost, path] = dijkstra(makeNext(grid), R.always(1), R.equals(end), start)!;
 
 // console.log(cost);
 // console.log(path);

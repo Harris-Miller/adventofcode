@@ -1,4 +1,4 @@
-import type { Dict } from 'fp-search-algorithms';
+import type { HashMap } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 export type Grid<T = string> = T[][];
@@ -116,7 +116,7 @@ export const turnLeft = (dir: Direction): Direction => {
   }
 };
 
-export const dictToString = (rMax: number, cMax: number, filler: string, dict: Dict<Point, string>) =>
+export const dictToString = (rMax: number, cMax: number, filler: string, dict: HashMap<Point, string>) =>
   R.range(0, rMax + 1)
     .map(r =>
       R.range(0, cMax + 1)
@@ -125,7 +125,7 @@ export const dictToString = (rMax: number, cMax: number, filler: string, dict: D
     )
     .join('\n');
 
-export const dictAsIsToString = (dict: Dict<Point, string>) => {
+export const dictAsIsToString = (dict: HashMap<Point, string>) => {
   let rMax = 0;
   let cMax = 0;
   for (const [r, c] of dict.keys()) {

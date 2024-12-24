@@ -1,4 +1,4 @@
-import { Dict } from 'fp-search-algorithms';
+import { HashMap } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { parseInt10 } from '../lib/fp';
@@ -30,7 +30,7 @@ const robotToGrid = (rs: Robot[]) =>
     const val = acc.get(p);
     acc.set(p, (val ?? 0) + 1);
     return acc;
-  }, new Dict<Point, number>());
+  }, new HashMap<Point, number>());
 
 const sample: Robot[] = [
   [
@@ -61,7 +61,7 @@ const moved = R.range(0, 100)
 
 // console.log(moved);
 
-const grid2 = new Dict(
+const grid2 = new HashMap(
   robotToGrid(moved)
     .entries()
     .map<[Point, string]>(([k, v]) => [k, v.toString()]),

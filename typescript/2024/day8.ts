@@ -1,4 +1,4 @@
-import { DSet } from 'fp-search-algorithms';
+import { HashSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import { combinations2 } from '../lib/fp';
@@ -83,7 +83,7 @@ const antiNodes = Object.values(freqToPoints).reduce((acc, points) => {
   });
   antiNodeCoords.forEach(c => acc.add(c));
   return acc;
-}, new DSet<Point>());
+}, new HashSet<Point>());
 
 console.log(antiNodes.size);
 
@@ -111,7 +111,7 @@ const antiNodes2 = Object.values(freqToPoints).reduce((acc, coords) => {
   });
   antiNodeCoords.forEach(c => acc.add(c));
   return acc;
-}, new DSet<Point>());
+}, new HashSet<Point>());
 
 console.log(antiNodes2.size);
 

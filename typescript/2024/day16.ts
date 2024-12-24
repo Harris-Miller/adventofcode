@@ -61,6 +61,6 @@ const next = (state: State): [State, number][] => {
   return [...ns, ...rs];
 };
 
-const r1 = dijkstraAssoc(next, found, ['right', start] as State);
+const r1 = dijkstraAssoc(next, found, ['right', start] as State)!;
 const [r1Score] = r1;
 console.log(r1Score);

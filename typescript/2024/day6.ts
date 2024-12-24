@@ -1,4 +1,4 @@
-import { DSet } from 'fp-search-algorithms';
+import { HashSet } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import type { Direction, Grid, Point } from '../lib/grid';
@@ -31,7 +31,7 @@ const parsedGrid = stringToGrid(content);
 
 const startingCoord: Point = findInGrid(([val]) => val === '^', parsedGrid)!;
 const startingDir: Direction = 'up';
-const r1 = new DSet(walkPath(parsedGrid, startingCoord, startingDir).map(([coord]) => coord));
+const r1 = new HashSet(walkPath(parsedGrid, startingCoord, startingDir).map(([coord]) => coord));
 
 console.log(r1.size);
 
@@ -46,7 +46,7 @@ const guardPath = R.tail(Array.from(r1));
 const r2 = guardPath
   .map(p => setInGrid(p, '#', R.clone(parsedGrid)))
   .filter(gridWithNewObstruction => {
-    const history = new DSet<[Point, Direction]>();
+    const history = new HashSet<[Point, Direction]>();
     for (const vector of walkPath(gridWithNewObstruction, startingCoord, startingDir)) {
       if (history.has(vector)) return true;
       history.add(vector);

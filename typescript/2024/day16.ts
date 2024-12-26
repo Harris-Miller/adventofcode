@@ -1,4 +1,4 @@
-import { dijkstraAssoc } from 'fp-search-algorithms';
+import { dijkstraAssoc, yen } from 'fp-search-algorithms';
 import * as R from 'ramda';
 
 import type { Direction, Point } from '../lib/grid';

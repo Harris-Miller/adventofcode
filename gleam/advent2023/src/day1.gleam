@@ -60,17 +60,17 @@ fn do_collect_digits(s: String, acc: List(String)) -> List(String) {
       case first_char_digit(s) {
         True -> {
           let assert Ok(d) = string.first(s)
-          do_collect_digits(string.drop_left(s, 1), list.append(acc, [d]))
+          do_collect_digits(string.drop_start(s, 1), list.append(acc, [d]))
         }
         False -> {
           let r = list.find(digits_as_text, string.starts_with(s, _))
           case r {
             Ok(as_str) -> {
               let d = text_to_digit(as_str)
-              do_collect_digits(string.drop_left(s, 1), list.append(acc, [d]))
+              do_collect_digits(string.drop_start(s, 1), list.append(acc, [d]))
             }
             Error(_) -> {
-              do_collect_digits(string.drop_left(s, 1), acc)
+              do_collect_digits(string.drop_start(s, 1), acc)
             }
           }
         }

@@ -38,7 +38,7 @@ fn parse_group(s: String) -> Group {
 //     groups = map parseGroup $ splitOn "; " gameGroups
 fn parse_game(s: String) -> #(Int, Game) {
   let assert Ok(#(name, groups)) = string.split_once(s, ": ")
-  let assert Ok(num) = int.parse(string.drop_left(name, 5))
+  let assert Ok(num) = int.parse(string.drop_start(name, 5))
   let game = groups |> string.split("; ") |> list.map(parse_group)
   #(num, game)
   // #(1, [[#("", 1)]])
@@ -68,7 +68,7 @@ fn calc_game_power(game: Game) -> Int {
   |> list.flat_map(identity)
   |> list.fold(dict.new(), fn(acc, t) {
     let #(color, num) = t
-    dict.update(acc, color, fn(option) {
+    dict.upsert(acc, color, fn(option) {
       case option {
         Some(v) -> int.max(v, num)
         None -> num

@@ -17,3 +17,6 @@ tmap3 f (a, b, c) = (f a, f b, f c)
 
 toList :: (a, a) -> [a]
 toList (a, b) = [a, b]
+
+sequenceT :: (Monad m) => (m a, m a) -> m (a, a)
+sequenceT (a, b) = toTuple <$> sequence [a, b]

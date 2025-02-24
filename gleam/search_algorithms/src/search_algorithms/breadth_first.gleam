@@ -1,5 +1,4 @@
 import gleam/deque.{pop_front}
-import gleam/io
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder, Done, Next, find, unfold}

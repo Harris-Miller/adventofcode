@@ -1,53 +1,44 @@
 import gleam/deque.{pop_front}
+import gleam/io
 import gleam/list
-import gleam/option.{None, Some, to_result}
-import gleam/result.{try}
 import gleam/set
-import gleam/yielder.{Done, Next, filter_map, find, unfold}
+import gleam/yielder.{type Yielder, Done, Next, find, unfold}
 
-pub fn breadth_first_yielder(next: fn(a) -> List(a), initial: a) {
-  unfold(from: #(deque.from_list([#(initial, [])]), set.new()), with: fn(state) {
+pub fn breadth_first_yielder(
+  next: fn(a) -> List(a),
+  initial: a,
+) -> Yielder(List(a)) {
+  unfold(from: #(deque.from_list([[initial]]), set.new()), with: fn(state) {
     let #(queue, visited) = state
 
-    let r = {
-      use #(#(state, path), next_queue) <- try(pop_front(queue))
-
-      let r = case set.contains(visited, state) {
-        True -> Next(None, #(next_queue, visited))
-        False -> {
-          let next_visited = set.insert(visited, state)
-          let next_path = [state, ..path]
-          let next_states =
-            state
-            |> next()
-            |> list.filter(fn(v) { !set.contains(next_visited, v) })
-            |> list.map(fn(v) { #(v, next_path) })
-          let next_queue =
-            list.fold(next_states, next_queue, fn(acc, a) {
-              deque.push_back(acc, a)
-            })
-          Next(Some(#(state, path)), #(next_queue, visited))
-        }
-      }
-      Ok(r)
-    }
-
-    case r {
-      Ok(a) -> a
+    case pop_front(queue) {
       Error(_) -> Done
+      Ok(#(path, next_queue)) -> {
+        let assert Ok(current) = list.first(path)
+        let next_visited = set.insert(visited, current)
+
+        let next_states =
+          current
+          |> next()
+          |> list.filter(fn(v) { !set.contains(next_visited, v) })
+          |> list.map(fn(v) { [v, ..path] })
+
+        let next_queue = list.fold(next_states, next_queue, deque.push_back)
+
+        Next(path, #(next_queue, visited))
+      }
     }
   })
-  |> filter_map(to_result(_, Nil))
 }
 
 pub fn breadth_first_search(
   next: fn(a) -> List(a),
   found: fn(a) -> Bool,
   initial: a,
-) -> Result(#(a, List(a)), Nil) {
+) -> Result(List(a), Nil) {
   let iterator = breadth_first_yielder(next, initial)
-  find(iterator, fn(route) {
-    let #(value, _) = route
+  find(iterator, fn(path) {
+    let assert Ok(value) = list.first(path)
     found(value)
   })
 }

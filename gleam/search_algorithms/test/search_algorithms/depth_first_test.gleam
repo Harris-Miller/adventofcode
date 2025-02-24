@@ -39,15 +39,6 @@ pub fn depth_first_yielder_test() {
   r |> should.equal(["1", "11", "111", "112", "12", "121", "122"])
 }
 
-// test('search function', () => {
-//   const next = ({ children }: Tree<string>) => children;
-//   const found = ({ value }: Tree<string>) => value === '122';
-
-//   const searchResults = depthFirstSearch(next, found, tree)?.path.map(x => x.value);
-
-//   expect(searchResults).toEqual(['1', '12', '122']);
-// });
-
 pub fn depth_first_search_test() {
   let tree = get_tree()
   let next = fn(node: Node(String)) {

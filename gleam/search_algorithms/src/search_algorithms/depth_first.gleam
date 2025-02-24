@@ -1,5 +1,5 @@
+import gleam/bool
 import gleam/function
-import gleam/io
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder, Done, Next, find, unfold}
@@ -11,30 +11,28 @@ pub fn depth_first_yielder(
   unfold(from: #([[initial]], set.new()), with: fn(state) {
     let #(stack, visited) = state
 
-    case stack {
-      [] -> Done
-      [path, ..next_stack] -> {
-        let assert Ok(current) = list.first(path)
+    use <- bool.guard(list.is_empty(stack), Done)
 
-        case set.contains(visited, current) {
-          True -> Next(Error(Nil), #(next_stack, visited))
-          False -> {
-            let next_visited = set.insert(visited, current)
+    let assert [path, ..next_stack] = stack
+    let assert Ok(current) = list.first(path)
 
-            let next_states =
-              current
-              |> next()
-              |> list.filter(fn(v) { !set.contains(next_visited, v) })
-              |> list.map(fn(v) { [v, ..path] })
+    use <- bool.guard(
+      set.contains(visited, current),
+      Next(Error(Nil), #(next_stack, visited)),
+    )
 
-            let next_queue =
-              list.fold_right(next_states, next_stack, fn(st, v) { [v, ..st] })
+    let next_visited = set.insert(visited, current)
 
-            Next(Ok(path), #(next_queue, next_visited))
-          }
-        }
-      }
-    }
+    let next_states =
+      current
+      |> next()
+      |> list.filter(fn(v) { !set.contains(next_visited, v) })
+      |> list.map(fn(v) { [v, ..path] })
+
+    let next_queue =
+      list.fold_right(next_states, next_stack, fn(st, v) { [v, ..st] })
+
+    Next(Ok(path), #(next_queue, next_visited))
   })
   |> yielder.filter_map(function.identity)
 }

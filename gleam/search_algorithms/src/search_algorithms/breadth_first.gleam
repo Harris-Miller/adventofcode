@@ -1,6 +1,8 @@
+import gleam/bool
 import gleam/deque.{pop_front}
 import gleam/function
 import gleam/list
+import gleam/result
 import gleam/set
 import gleam/yielder.{type Yielder, Done, Next, find, unfold}
 
@@ -10,30 +12,29 @@ pub fn breadth_first_yielder(
 ) -> Yielder(List(a)) {
   unfold(from: #(deque.from_list([[initial]]), set.new()), with: fn(state) {
     let #(queue, visited) = state
+    let front = pop_front(queue)
 
-    case pop_front(queue) {
-      Error(_) -> Done
-      Ok(#(path, next_queue)) -> {
-        let assert Ok(current) = list.first(path)
+    use <- bool.guard(result.is_error(front), Done)
 
-        case set.contains(visited, current) {
-          True -> Next(Error(Nil), #(next_queue, visited))
-          False -> {
-            let next_visited = set.insert(visited, current)
+    let assert Ok(#(path, next_queue)) = front
+    let assert Ok(current) = list.first(path)
 
-            let next_states =
-              current
-              |> next()
-              |> list.filter(fn(v) { !set.contains(next_visited, v) })
-              |> list.map(fn(v) { [v, ..path] })
+    use <- bool.guard(
+      set.contains(visited, current),
+      Next(Error(Nil), #(next_queue, visited)),
+    )
 
-            let next_queue = list.fold(next_states, next_queue, deque.push_back)
+    let next_visited = set.insert(visited, current)
 
-            Next(Ok(path), #(next_queue, next_visited))
-          }
-        }
-      }
-    }
+    let next_states =
+      current
+      |> next()
+      |> list.filter(fn(v) { !set.contains(next_visited, v) })
+      |> list.map(fn(v) { [v, ..path] })
+
+    let next_queue = list.fold(next_states, next_queue, deque.push_back)
+
+    Next(Ok(path), #(next_queue, next_visited))
   })
   |> yielder.filter_map(function.identity)
 }

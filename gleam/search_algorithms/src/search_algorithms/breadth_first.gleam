@@ -1,4 +1,5 @@
 import gleam/deque.{pop_front}
+import gleam/function
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder, Done, Next, find, unfold}
@@ -14,20 +15,27 @@ pub fn breadth_first_yielder(
       Error(_) -> Done
       Ok(#(path, next_queue)) -> {
         let assert Ok(current) = list.first(path)
-        let next_visited = set.insert(visited, current)
 
-        let next_states =
-          current
-          |> next()
-          |> list.filter(fn(v) { !set.contains(next_visited, v) })
-          |> list.map(fn(v) { [v, ..path] })
+        case set.contains(visited, current) {
+          True -> Next(Error(Nil), #(next_queue, visited))
+          False -> {
+            let next_visited = set.insert(visited, current)
 
-        let next_queue = list.fold(next_states, next_queue, deque.push_back)
+            let next_states =
+              current
+              |> next()
+              |> list.filter(fn(v) { !set.contains(next_visited, v) })
+              |> list.map(fn(v) { [v, ..path] })
 
-        Next(path, #(next_queue, visited))
+            let next_queue = list.fold(next_states, next_queue, deque.push_back)
+
+            Next(Ok(path), #(next_queue, next_visited))
+          }
+        }
       }
     }
   })
+  |> yielder.filter_map(function.identity)
 }
 
 pub fn breadth_first_search(

@@ -1,5 +1,4 @@
 import gleam/dict.{type Dict}
-import gleam/io
 import gleam/list
 import gleam/result
 import gleam/set
@@ -69,7 +68,14 @@ pub fn cheese_search_test() {
   }
   let found = fn(point: #(Int, Int)) { point == end }
 
-  let assert Ok(result) = breadth_first_search(next, found, start)
+  let iterator = breadth_first_yielder(next, start)
+  let assert Ok(result) =
+    yielder.find(iterator, fn(path) {
+      let assert Ok(value) = list.first(path)
+      found(value)
+    })
+
+  // let assert Ok(result) = breadth_first_search(next, found, start)
 
   list.length(result) |> should.equal(247)
 }

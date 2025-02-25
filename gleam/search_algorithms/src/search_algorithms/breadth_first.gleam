@@ -34,7 +34,7 @@ pub fn breadth_first_yielder(
     let #(queue, visited) = state
 
     use #(path, next_queue) <- unwrap_guard(pop_front(queue), fn(_) { Done })
-    let assert Ok(current) = list.first(path)
+    let assert [current, ..] = path
 
     use <- bool.guard(
       set.contains(visited, current),

@@ -14,7 +14,7 @@ pub fn depth_first_yielder(
     use <- bool.guard(list.is_empty(stack), Done)
 
     let assert [path, ..next_stack] = stack
-    let assert Ok(current) = list.first(path)
+    let assert [current, ..] = path
 
     use <- bool.guard(
       set.contains(visited, current),

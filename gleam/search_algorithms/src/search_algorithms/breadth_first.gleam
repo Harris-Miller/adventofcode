@@ -1,69 +1,60 @@
 import gleam/bool
-import gleam/deque.{pop_front}
+import gleam/deque
 import gleam/function
 import gleam/list
-import gleam/result
 import gleam/set
-import gleam/yielder.{type Yielder, Done, Next, find, unfold}
+import gleam/yielder.{type Yielder}
+import search_algorithms/utils
 
-/// Combings result.unwrap with bool.guard
-/// Useful for extracting out an Ok() and returning early with handling Error() into something completely different
-fn unwrap_guard(
-  with result: Result(a, b),
-  return consequence: fn(b) -> c,
-  otherwise alternative: fn(a) -> c,
-) -> c {
-  bool.lazy_guard(
-    result.is_error(result),
-    fn() {
-      let assert Error(b) = result
-      consequence(b)
-    },
-    fn() {
-      let assert Ok(a) = result
-      alternative(a)
+/// Create a Yielder iterating in breadth-first order, generating next states as states are visited
+/// * States are not revisited
+/// * Each yield is a `List(a)` representing the path from initial to current states in reverse order `[current, .., initial]`
+pub fn breadth_first_yielder(
+  next_states: fn(a) -> List(a),
+  from initial: a,
+) -> Yielder(List(a)) {
+  yielder.unfold(
+    from: #(deque.from_list([[initial]]), set.new()),
+    with: fn(state) {
+      let #(queue, visited) = state
+
+      use #(path, next_queue) <- utils.unwrap_guard(
+        deque.pop_front(queue),
+        yielder.Done,
+      )
+      // use #(path, next_queue) <- deque.pop_front(queue)
+      let assert [current, ..] = path
+
+      use <- bool.guard(
+        set.contains(visited, current),
+        yielder.Next(Error(Nil), #(next_queue, visited)),
+      )
+
+      let next_visited = set.insert(visited, current)
+
+      let ns =
+        current
+        |> next_states()
+        |> list.filter(fn(v) { !set.contains(next_visited, v) })
+        |> list.map(fn(v) { [v, ..path] })
+
+      let next_queue = list.fold(ns, next_queue, deque.push_back)
+
+      yielder.Next(Ok(path), #(next_queue, next_visited))
     },
   )
-}
-
-pub fn breadth_first_yielder(
-  next: fn(a) -> List(a),
-  initial: a,
-) -> Yielder(List(a)) {
-  unfold(from: #(deque.from_list([[initial]]), set.new()), with: fn(state) {
-    let #(queue, visited) = state
-
-    use #(path, next_queue) <- unwrap_guard(pop_front(queue), fn(_) { Done })
-    let assert [current, ..] = path
-
-    use <- bool.guard(
-      set.contains(visited, current),
-      Next(Error(Nil), #(next_queue, visited)),
-    )
-
-    let next_visited = set.insert(visited, current)
-
-    let next_states =
-      current
-      |> next()
-      |> list.filter(fn(v) { !set.contains(next_visited, v) })
-      |> list.map(fn(v) { [v, ..path] })
-
-    let next_queue = list.fold(next_states, next_queue, deque.push_back)
-
-    Next(Ok(path), #(next_queue, next_visited))
-  })
   |> yielder.filter_map(function.identity)
 }
 
+///
 pub fn breadth_first_search(
   next: fn(a) -> List(a),
   found: fn(a) -> Bool,
   initial: a,
 ) -> Result(List(a), Nil) {
   let iterator = breadth_first_yielder(next, initial)
-  find(iterator, fn(path) {
-    let assert Ok(value) = list.first(path)
+  yielder.find(iterator, fn(path) {
+    let assert [value, ..] = path
     found(value)
   })
 }

@@ -1,21 +1,14 @@
 import common/result as resultc
 import gleam/dict.{type Dict}
 import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/order
 import gleam/result
 import gleam/set.{type Set}
-import gleam/yielder.{type Yielder}
-import search_algorithms/internal/priority_queue.{type Queue}
-
-pub type SearchContainer {
-  SearchContainer
-}
+import search_algorithms/internal/search_container.{type SearchContainer}
 
 pub type SearchState(state_key, state) {
   SearchState(
     current: state,
-    queue: Queue(state),
+    queue: SearchContainer(state),
     visited: Set(state_key),
     paths: Dict(state_key, List(state)),
   )
@@ -40,7 +33,7 @@ fn next_search_state(
   old: SearchState(state_key, state),
 ) -> Result(SearchState(state_key, state), Nil) {
   let update_queue_paths = fn(
-    olds: #(Queue(state), Dict(state_key, List(state))),
+    olds: #(SearchContainer(state), Dict(state_key, List(state))),
     st: state,
   ) {
     let key = make_key(st)
@@ -51,7 +44,7 @@ fn next_search_state(
         let steps_so_far =
           dict.get(old.paths, make_key(old.current))
           |> resultc.unwrap_assert()
-        let q = priority_queue.push(old_queue, st)
+        let q = search_container.push(old_queue, st)
         let ps = dict.insert(old_paths, key, [st, ..steps_so_far])
 
         case dict.get(old_paths, key) {
@@ -70,7 +63,7 @@ fn next_search_state(
   let #(new_queue, new_paths) =
     list.fold(next(old.current), #(old.queue, old.paths), update_queue_paths)
 
-  priority_queue.pop(new_queue)
+  search_container.pop(new_queue)
   |> result.map(fn(q) {
     let #(new_current, remaining_queue) = q
     SearchState(
@@ -89,7 +82,7 @@ fn next_search_state(
 }
 
 pub fn generalized_search(
-  _container: SearchContainer,
+  container: SearchContainer(state),
   make_key: fn(state) -> state_key,
   better: fn(List(state), List(state)) -> Bool,
   next: fn(state) -> List(state),
@@ -100,7 +93,7 @@ pub fn generalized_search(
   let initial_state =
     SearchState(
       initial,
-      priority_queue.new(fn(_a, _b) { order.Lt }),
+      container,
       set.from_list([initial_key]),
       dict.from_list([#(initial_key, [])]),
     )

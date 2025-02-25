@@ -1,6 +1,3 @@
-import gleam/bool
-import gleam/result
-
 /// Unwrap a Result with assert, panics when `Error`.
 pub fn unwrap_assert(result: Result(a, b)) -> a {
   let assert Ok(a) = result
@@ -22,10 +19,10 @@ pub fn unwrap_guard(
   return consequence: c,
   otherwise alternative: fn(a) -> c,
 ) -> c {
-  bool.guard(result.is_error(result), consequence, fn() {
-    let assert Ok(a) = result
-    alternative(a)
-  })
+  case result {
+    Error(_) -> consequence
+    Ok(a) -> alternative(a)
+  }
 }
 
 /// Combines result.unwrap with bool.guard
@@ -35,15 +32,8 @@ pub fn unwrap_lazy_guard(
   return consequence: fn(b) -> c,
   otherwise alternative: fn(a) -> c,
 ) -> c {
-  bool.lazy_guard(
-    result.is_error(result),
-    fn() {
-      let assert Error(b) = result
-      consequence(b)
-    },
-    fn() {
-      let assert Ok(a) = result
-      alternative(a)
-    },
-  )
+  case result {
+    Error(b) -> consequence(b)
+    Ok(a) -> alternative(a)
+  }
 }

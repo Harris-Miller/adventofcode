@@ -1,9 +1,13 @@
+import gleam/io
+import gleam/list
 import gleam/result
 import gleam/yielder
 import gleeunit
 import gleeunit/should
 import non_empty_list
-import search_algorithms/depth_first.{depth_first_search, depth_first_yielder}
+import search_algorithms/depth_first.{
+  depth_first_search, depth_first_yielder, dfs,
+}
 
 pub fn main() {
   gleeunit.main()
@@ -60,4 +64,31 @@ pub fn depth_first_search_test() {
     })
 
   r |> should.equal(non_empty_list.new("122", ["12", "1"]))
+}
+
+pub fn dfs_test() {
+  let tree = get_tree()
+  let next = fn(node: Node(String)) {
+    let Node(_, children) = node
+    children
+  }
+  let found = fn(node: Node(String)) {
+    let Node(val, _) = node
+    val == "122"
+  }
+
+  let t = dfs(next, found, tree)
+
+  io.debug(t)
+
+  let assert Ok(r) =
+    t
+    |> result.map(fn(state) {
+      list.map(state, fn(node) {
+        let Node(val, _) = node
+        val
+      })
+    })
+
+  r |> should.equal(["122", "12", "1"])
 }

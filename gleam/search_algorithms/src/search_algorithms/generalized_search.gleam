@@ -14,6 +14,15 @@ pub type SearchState(state_key, state) {
   )
 }
 
+// fn least_costly(a: List(#(a, b)), b: List(#(a, b))) {
+//   case a, b {
+//     [#(cost_a, _), ..], [#(cost_b, _), ..] -> True
+//     // logically this never happens, but need to exhaust the pattern matching
+//     [], _ -> False
+//     _, [] -> True
+//   }
+// }
+
 fn find_iterate(
   next: fn(a) -> Result(a, Nil),
   found: fn(a) -> Bool,

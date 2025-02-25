@@ -5,6 +5,8 @@ import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
 import non_empty_list.{type NonEmptyList}
+import search_algorithms/generalized_search
+import search_algorithms/internal/search_container.{Stack}
 
 pub fn depth_first_yielder(
   next: fn(a) -> List(a),
@@ -48,4 +50,19 @@ pub fn depth_first_search(
     let value = non_empty_list.first(path)
     found(value)
   })
+}
+
+pub fn dfs(
+  next: fn(a) -> List(a),
+  found: fn(a) -> Bool,
+  initial: a,
+) -> Result(List(a), Nil) {
+  generalized_search.generalized_search(
+    Stack([]),
+    function.identity,
+    fn(_, _) { False },
+    next,
+    found,
+    initial,
+  )
 }

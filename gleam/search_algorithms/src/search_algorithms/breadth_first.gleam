@@ -6,6 +6,8 @@ import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
 import non_empty_list.{type NonEmptyList}
+import search_algorithms/generalized_search
+import search_algorithms/internal/search_container.{Queue}
 
 /// Create a Yielder iterating in breadth-first order, generating next states as states are visited
 /// * States are not revisited
@@ -59,4 +61,19 @@ pub fn breadth_first_search(
     let value = non_empty_list.first(path)
     found(value)
   })
+}
+
+pub fn bfs(
+  next: fn(a) -> List(a),
+  found: fn(a) -> Bool,
+  initial: a,
+) -> Result(List(a), Nil) {
+  generalized_search.generalized_search(
+    Queue(deque.new()),
+    function.identity,
+    fn(_, _) { False },
+    next,
+    found,
+    initial,
+  )
 }

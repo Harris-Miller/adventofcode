@@ -1,5 +1,4 @@
 import common/result as resultc
-import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option.{type Option}
@@ -111,8 +110,8 @@ pub fn uncons_guard(
   return consequence: b,
   otherwise alternative: fn(#(a, List(a))) -> b,
 ) -> b {
-  bool.guard(list.is_empty(list), consequence, fn() {
-    let assert [head, ..tail] = list
-    alternative(#(head, tail))
-  })
+  case list {
+    [] -> consequence
+    [head, ..tail] -> alternative(#(head, tail))
+  }
 }

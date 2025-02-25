@@ -6,6 +6,7 @@ import gleam/string
 import gleam/yielder
 import gleeunit
 import gleeunit/should
+import non_empty_list
 import search_algorithms/breadth_first.{
   breadth_first_search, breadth_first_yielder,
 }
@@ -21,13 +22,10 @@ pub fn breadth_first_yielder_test() {
   let r =
     breadth_first_yielder(next, "1")
     |> yielder.take_while(satisfying: fn(state) {
-      let assert Ok(val) = list.first(state)
+      let val = non_empty_list.first(state)
       val != "1111"
     })
-    |> yielder.map(fn(state) {
-      let assert Ok(val) = list.first(state)
-      val
-    })
+    |> yielder.map(non_empty_list.first)
     |> yielder.to_list
 
   r |> should.equal(["1", "11", "12", "111", "112", "121", "122"])
@@ -40,7 +38,7 @@ pub fn breadth_first_search_test() {
   let results = breadth_first_search(next, found, "1")
 
   results
-  |> should.equal(Ok(["122", "12", "1"]))
+  |> should.equal(Ok(non_empty_list.new("122", ["12", "1"])))
 }
 
 pub fn cheese_search_test() {
@@ -71,13 +69,11 @@ pub fn cheese_search_test() {
   let iterator = breadth_first_yielder(next, start)
   let assert Ok(result) =
     yielder.find(iterator, fn(path) {
-      let assert Ok(value) = list.first(path)
+      let value = non_empty_list.first(path)
       found(value)
     })
 
-  // let assert Ok(result) = breadth_first_search(next, found, start)
-
-  list.length(result) |> should.equal(247)
+  non_empty_list.to_list(result) |> list.length() |> should.equal(247)
 }
 
 fn make_grid(s: String) -> Dict(#(Int, Int), String) {

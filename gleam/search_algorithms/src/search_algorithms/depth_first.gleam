@@ -3,17 +3,19 @@ import gleam/function
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
+import non_empty_list.{type NonEmptyList}
 import search_algorithms/utils
 
 pub fn depth_first_yielder(
   next: fn(a) -> List(a),
   initial: a,
-) -> Yielder(List(a)) {
-  yielder.unfold(from: #([[initial]], set.new()), with: fn(state) {
+) -> Yielder(NonEmptyList(a)) {
+  let init_queue = non_empty_list.single(initial)
+  yielder.unfold(from: #([init_queue], set.new()), with: fn(state) {
     let #(stack, visited) = state
 
     use #(path, next_stack) <- utils.uncons_guard(stack, yielder.Done)
-    let assert [current, ..] = path
+    let current = non_empty_list.first(path)
 
     use <- bool.guard(
       set.contains(visited, current),
@@ -26,7 +28,7 @@ pub fn depth_first_yielder(
       current
       |> next()
       |> list.filter(fn(v) { !set.contains(next_visited, v) })
-      |> list.map(fn(v) { [v, ..path] })
+      |> list.map(non_empty_list.prepend(path, _))
 
     let next_queue =
       list.fold_right(next_states, next_stack, fn(st, v) { [v, ..st] })
@@ -40,10 +42,10 @@ pub fn depth_first_search(
   next: fn(a) -> List(a),
   found: fn(a) -> Bool,
   initial: a,
-) -> Result(List(a), Nil) {
+) -> Result(NonEmptyList(a), Nil) {
   let iterator = depth_first_yielder(next, initial)
   yielder.find(iterator, fn(path) {
-    let assert [value, ..] = path
+    let value = non_empty_list.first(path)
     found(value)
   })
 }

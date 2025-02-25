@@ -1,8 +1,8 @@
-import gleam/list
 import gleam/result
 import gleam/yielder
 import gleeunit
 import gleeunit/should
+import non_empty_list
 import search_algorithms/depth_first.{depth_first_search, depth_first_yielder}
 
 pub fn main() {
@@ -30,7 +30,7 @@ pub fn depth_first_yielder_test() {
   let r =
     depth_first_yielder(next, tree)
     |> yielder.map(fn(path) {
-      let assert Ok(state) = list.first(path)
+      let state = non_empty_list.first(path)
       let Node(value, _) = state
       value
     })
@@ -53,11 +53,11 @@ pub fn depth_first_search_test() {
   let assert Ok(r) =
     depth_first_search(next, found, tree)
     |> result.map(fn(state) {
-      list.map(state, fn(node) {
+      non_empty_list.map(state, fn(node) {
         let Node(val, _) = node
         val
       })
     })
 
-  r |> should.equal(["122", "12", "1"])
+  r |> should.equal(non_empty_list.new("122", ["12", "1"]))
 }

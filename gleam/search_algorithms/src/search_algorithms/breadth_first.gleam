@@ -4,6 +4,7 @@ import gleam/function
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
+import non_empty_list.{type NonEmptyList}
 import search_algorithms/utils
 
 /// Create a Yielder iterating in breadth-first order, generating next states as states are visited
@@ -12,9 +13,10 @@ import search_algorithms/utils
 pub fn breadth_first_yielder(
   next_states: fn(a) -> List(a),
   from initial: a,
-) -> Yielder(List(a)) {
+) -> Yielder(NonEmptyList(a)) {
+  let init_queue = non_empty_list.single(initial)
   yielder.unfold(
-    from: #(deque.from_list([[initial]]), set.new()),
+    from: #(deque.from_list([init_queue]), set.new()),
     with: fn(state) {
       let #(queue, visited) = state
 
@@ -22,8 +24,8 @@ pub fn breadth_first_yielder(
         deque.pop_front(queue),
         yielder.Done,
       )
-      // use #(path, next_queue) <- deque.pop_front(queue)
-      let assert [current, ..] = path
+      let current = non_empty_list.first(path)
+      // let assert [current, ..] = path
 
       use <- bool.guard(
         set.contains(visited, current),
@@ -36,7 +38,7 @@ pub fn breadth_first_yielder(
         current
         |> next_states()
         |> list.filter(fn(v) { !set.contains(next_visited, v) })
-        |> list.map(fn(v) { [v, ..path] })
+        |> list.map(non_empty_list.prepend(path, _))
 
       let next_queue = list.fold(ns, next_queue, deque.push_back)
 
@@ -51,10 +53,10 @@ pub fn breadth_first_search(
   next: fn(a) -> List(a),
   found: fn(a) -> Bool,
   initial: a,
-) -> Result(List(a), Nil) {
+) -> Result(NonEmptyList(a), Nil) {
   let iterator = breadth_first_yielder(next, initial)
   yielder.find(iterator, fn(path) {
-    let assert [value, ..] = path
+    let value = non_empty_list.first(path)
     found(value)
   })
 }

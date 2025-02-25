@@ -10,8 +10,8 @@ pub fn depth_first_yielder(
   next: fn(a) -> List(a),
   initial: a,
 ) -> Yielder(NonEmptyList(a)) {
-  let init_queue = non_empty_list.single(initial)
-  yielder.unfold(from: #([init_queue], set.new()), with: fn(state) {
+  let init_path = non_empty_list.single(initial)
+  yielder.unfold(from: #([init_path], set.new()), with: fn(state) {
     let #(stack, visited) = state
 
     use #(path, next_stack) <- listc.uncons_guard(stack, yielder.Done)

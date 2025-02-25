@@ -1,3 +1,4 @@
+import common/result as resultc
 import gleam/bool
 import gleam/deque
 import gleam/function
@@ -5,7 +6,6 @@ import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
 import non_empty_list.{type NonEmptyList}
-import search_algorithms/utils
 
 /// Create a Yielder iterating in breadth-first order, generating next states as states are visited
 /// * States are not revisited
@@ -14,13 +14,13 @@ pub fn breadth_first_yielder(
   next_states: fn(a) -> List(a),
   from initial: a,
 ) -> Yielder(NonEmptyList(a)) {
-  let init_queue = non_empty_list.single(initial)
+  let init_path = non_empty_list.single(initial)
   yielder.unfold(
-    from: #(deque.from_list([init_queue]), set.new()),
+    from: #(deque.from_list([init_path]), set.new()),
     with: fn(state) {
       let #(queue, visited) = state
 
-      use #(path, next_queue) <- utils.unwrap_guard(
+      use #(path, next_queue) <- resultc.unwrap_guard(
         deque.pop_front(queue),
         yielder.Done,
       )

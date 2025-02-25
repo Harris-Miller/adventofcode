@@ -1,10 +1,10 @@
+import common/list as listc
 import gleam/bool
 import gleam/function
 import gleam/list
 import gleam/set
 import gleam/yielder.{type Yielder}
 import non_empty_list.{type NonEmptyList}
-import search_algorithms/utils
 
 pub fn depth_first_yielder(
   next: fn(a) -> List(a),
@@ -14,7 +14,7 @@ pub fn depth_first_yielder(
   yielder.unfold(from: #([init_queue], set.new()), with: fn(state) {
     let #(stack, visited) = state
 
-    use #(path, next_stack) <- utils.uncons_guard(stack, yielder.Done)
+    use #(path, next_stack) <- listc.uncons_guard(stack, yielder.Done)
     let current = non_empty_list.first(path)
 
     use <- bool.guard(

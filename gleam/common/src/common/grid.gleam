@@ -4,7 +4,7 @@ import gleam/dict.{type Dict}
 import gleam/io
 import gleam/list
 import gleam/string
-import gleam/string_builder
+import gleam/string_tree
 
 pub type Grid(a) =
   Dict(#(Int, Int), a)
@@ -62,11 +62,11 @@ pub fn to_string(from grid: Grid(a), using fun: fn(a) -> String) -> String {
   let cols = list.range(0, col_max)
 
   list.map(rows, fn(row) {
-    list.fold(cols, string_builder.new(), fn(sb, col) {
+    list.fold(cols, string_tree.new(), fn(sb, col) {
       let assert Ok(v) = dict.get(grid, #(row, col))
-      string_builder.append(sb, fun(v))
+      string_tree.append(sb, fun(v))
     })
-    |> string_builder.to_string()
+    |> string_tree.to_string()
   })
   |> string.join("\n")
 }

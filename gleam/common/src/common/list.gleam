@@ -1,6 +1,8 @@
 import common/result as resultc
+import gleam/bool
 import gleam/int
 import gleam/list
+import gleam/option.{type Option}
 import gleam/result
 
 /// Return list without last value
@@ -95,4 +97,22 @@ pub fn remove_(list: List(a), at index: Int) -> List(a) {
       <> int.to_string(list.length(list))
       <> "\"",
   )
+}
+
+pub fn uncons(list: List(a)) -> Option(#(a, List(a))) {
+  case list {
+    [head, ..tail] -> option.Some(#(head, tail))
+    [] -> option.None
+  }
+}
+
+pub fn uncons_guard(
+  with list: List(a),
+  return consequence: b,
+  otherwise alternative: fn(#(a, List(a))) -> b,
+) -> b {
+  bool.guard(list.is_empty(list), consequence, fn() {
+    let assert [head, ..tail] = list
+    alternative(#(head, tail))
+  })
 }

@@ -6,17 +6,34 @@ import gleam/result
 import gleam/set
 import gleam/yielder.{type Yielder, Done, Next, find, unfold}
 
+/// Combings result.unwrap with bool.guard
+/// Useful for extracting out an Ok() and returning early with handling Error() into something completely different
+fn unwrap_guard(
+  with result: Result(a, b),
+  return consequence: fn(b) -> c,
+  otherwise alternative: fn(a) -> c,
+) -> c {
+  bool.lazy_guard(
+    result.is_error(result),
+    fn() {
+      let assert Error(b) = result
+      consequence(b)
+    },
+    fn() {
+      let assert Ok(a) = result
+      alternative(a)
+    },
+  )
+}
+
 pub fn breadth_first_yielder(
   next: fn(a) -> List(a),
   initial: a,
 ) -> Yielder(List(a)) {
   unfold(from: #(deque.from_list([[initial]]), set.new()), with: fn(state) {
     let #(queue, visited) = state
-    let front = pop_front(queue)
 
-    use <- bool.guard(result.is_error(front), Done)
-
-    let assert Ok(#(path, next_queue)) = front
+    use #(path, next_queue) <- unwrap_guard(pop_front(queue), fn(_) { Done })
     let assert Ok(current) = list.first(path)
 
     use <- bool.guard(

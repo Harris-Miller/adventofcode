@@ -60,7 +60,7 @@ pub fn dfs(
   generalized_search.generalized_search(
     Stack([]),
     function.identity,
-    fn(_, _) { False },
+    fn(_, _) { True },
     next,
     found,
     initial,

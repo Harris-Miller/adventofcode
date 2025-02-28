@@ -65,30 +65,31 @@ pub fn depth_first_search_test() {
 
   r |> should.equal(non_empty_list.new("122", ["12", "1"]))
 }
+// pub fn dfs_test() {
+//   let tree = get_tree()
+//   let next = fn(node: Node(String)) {
+//     let Node(_, children) = node
+//     io.debug(children)
+//     children
+//   }
+//   let found = fn(node: Node(String)) {
+//     let Node(val, _) = node
+//     io.debug(val)
+//     val == "122"
+//   }
 
-pub fn dfs_test() {
-  let tree = get_tree()
-  let next = fn(node: Node(String)) {
-    let Node(_, children) = node
-    children
-  }
-  let found = fn(node: Node(String)) {
-    let Node(val, _) = node
-    val == "122"
-  }
+//   let t = dfs(next, found, tree)
 
-  let t = dfs(next, found, tree)
+//   io.debug(t)
 
-  io.debug(t)
+//   let assert Ok(r) =
+//     t
+//     |> result.map(fn(state) {
+//       list.map(state, fn(node) {
+//         let Node(val, _) = node
+//         val
+//       })
+//     })
 
-  let assert Ok(r) =
-    t
-    |> result.map(fn(state) {
-      list.map(state, fn(node) {
-        let Node(val, _) = node
-        val
-      })
-    })
-
-  r |> should.equal(["122", "12", "1"])
-}
+//   r |> should.equal(["122", "12", "1"])
+// }

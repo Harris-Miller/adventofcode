@@ -1,5 +1,6 @@
 import common/result as resultc
 import gleam/dict.{type Dict}
+import gleam/io
 import gleam/list
 import gleam/result
 import gleam/set.{type Set}
@@ -23,7 +24,7 @@ pub type SearchState(state_key, state) {
 //   }
 // }
 
-fn find_iterate(
+pub fn find_iterate(
   next: fn(a) -> Result(a, Nil),
   found: fn(a) -> Bool,
   initial: a,
@@ -115,8 +116,11 @@ pub fn generalized_search(
     )
 
   let get_steps = fn(search_st: SearchState(state_key, state)) {
-    dict.get(search_st.paths, make_key(search_st.current))
-    |> resultc.unwrap_assert()
+    let steps =
+      dict.get(search_st.paths, make_key(search_st.current))
+      |> resultc.unwrap_assert()
+    io.debug(steps)
+    steps
   }
 
   result.map(end_result, fn(st) { st |> get_steps() |> list.reverse() })

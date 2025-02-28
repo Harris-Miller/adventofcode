@@ -27,7 +27,7 @@ pub fn unwrap_guard(
 
 /// Combines result.unwrap with bool.guard
 /// Useful for extracting out an Ok() and returning early with handling Error() into something completely different
-pub fn unwrap_lazy_guard(
+pub fn lazy_unwrap_guard(
   with result: Result(a, b),
   return consequence: fn(b) -> c,
   otherwise alternative: fn(a) -> c,

@@ -2,8 +2,8 @@ import common/grid
 import gleam/dict.{type Dict}
 import gleam/function.{identity}
 import gleam/io
-import gleam/iterator.{iterate, take}
 import gleam/list
+import gleam/yielder
 import simplifile
 
 fn next_space(grid: Dict(#(Int, Int), Bool)) {
@@ -67,12 +67,14 @@ pub fn main() {
       }
     })
 
-  let assert Ok(r) = iterate(grid, step) |> take(101) |> iterator.last()
+  let assert Ok(r) =
+    yielder.iterate(grid, step) |> yielder.take(101) |> yielder.last()
   let r = r |> dict.values() |> list.filter(identity) |> list.length()
   io.debug(r)
 
   let grid2 = turn_corners_on(grid)
-  let assert Ok(r) = iterate(grid2, step2) |> take(101) |> iterator.last()
+  let assert Ok(r) =
+    yielder.iterate(grid2, step2) |> yielder.take(101) |> yielder.last()
   let r = r |> dict.values() |> list.filter(identity) |> list.length()
   io.debug(r)
   // grid

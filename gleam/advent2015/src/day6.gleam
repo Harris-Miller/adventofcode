@@ -103,7 +103,7 @@ fn process2(
 pub fn main() {
   let assert Ok(contents) =
     simplifile.read(from: "../../inputs/2015/Day6/input.txt")
-    |> result.nil_error()
+    |> result.replace_error(Nil)
     |> result.then(fn(file) {
       string.split(file, "\n")
       |> list_utils.init

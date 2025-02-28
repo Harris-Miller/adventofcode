@@ -62,7 +62,7 @@ fn parse(line: String) {
 pub fn main() {
   let assert Ok(contents) =
     simplifile.read(from: "../../inputs/2015/Day16/input.txt")
-    |> result.nil_error()
+    |> result.replace_error(Nil)
     |> result.then(fn(file) {
       file
       |> string.split("\n")

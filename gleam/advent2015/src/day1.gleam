@@ -1,9 +1,9 @@
 import gleam/int
 import gleam/io
-import gleam/iterator
 import gleam/list
 import gleam/result
 import gleam/string
+import gleam/yielder
 import simplifile
 
 fn parse(char: String) -> Int {
@@ -43,9 +43,9 @@ pub fn main() {
     contents
     |> list.map(parse)
     |> list.scan(0, int.add)
-    |> iterator.from_list
-    |> iterator.index
-    |> iterator.to_list
+    |> yielder.from_list
+    |> yielder.index
+    |> yielder.to_list
     |> find_position
 
   io.debug(r2 + 1)

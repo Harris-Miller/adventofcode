@@ -9,7 +9,7 @@ import simplifile
 pub fn main() {
   let assert Ok(groups) =
     simplifile.read(from: "../../inputs/2020/Day6/input.txt")
-    |> result.nil_error()
+    |> result.replace_error(Nil)
     |> result.map(fn(s) {
       s
       |> string.trim()

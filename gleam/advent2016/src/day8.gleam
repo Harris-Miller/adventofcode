@@ -107,7 +107,7 @@ fn process_instruction(maxes: #(Int, Int)) {
 pub fn main() {
   let assert Ok(instructions) =
     simplifile.read(from: "../../inputs/2016/Day8/input.txt")
-    |> result.nil_error()
+    |> result.replace_error(Nil)
     |> result.map(string.split(_, "\n"))
     |> result.then(listc.init)
     |> result.map(list.map(_, parse))

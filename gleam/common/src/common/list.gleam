@@ -1,6 +1,6 @@
 import common/result as resultc
 import gleam/int
-import gleam/list
+import gleam/list.{index_map}
 import gleam/option.{type Option}
 import gleam/result
 
@@ -114,4 +114,8 @@ pub fn uncons_guard(
     [] -> consequence
     [head, ..tail] -> alternative(#(head, tail))
   }
+}
+
+pub fn with_index(list: List(a)) -> List(#(a, Int)) {
+  index_map(list, fn(a, i) { #(a, i) })
 }

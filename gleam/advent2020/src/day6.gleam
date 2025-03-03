@@ -9,13 +9,9 @@ import simplifile
 pub fn main() {
   let assert Ok(groups) =
     simplifile.read(from: "../../inputs/2020/Day6/input.txt")
-    |> result.replace_error(Nil)
-    |> result.map(fn(s) {
-      s
-      |> string.trim()
-      |> string.split("\n\n")
-      |> list.map(string.split(_, "\n"))
-    })
+    |> result.map(string.trim)
+    |> result.map(string.split(_, "\n\n"))
+    |> result.map(list.map(_, string.split(_, "\n")))
 
   let part1 =
     groups

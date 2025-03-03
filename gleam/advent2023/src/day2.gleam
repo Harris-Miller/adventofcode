@@ -1,3 +1,4 @@
+import common/tuple
 import gleam/dict
 import gleam/function.{identity}
 import gleam/int
@@ -94,7 +95,7 @@ pub fn main() {
     |> list.map(fn(game) {
       #(game.0, is_game_possible(to_check_against, game.1))
     })
-    |> list.filter(fn(t) { t.1 })
+    |> list.filter(tuple.snd)
     |> list.map(fn(t) { t.0 })
     |> int.sum()
 

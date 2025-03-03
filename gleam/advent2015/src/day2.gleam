@@ -1,3 +1,5 @@
+import common/list as listc
+import common/result as resultc
 import gleam/int
 import gleam/io
 import gleam/list
@@ -18,6 +20,16 @@ fn determine_area_needed(list: List(Int)) -> Int {
   }
 }
 
+fn determine_length_needed(list: List(Int)) -> Int {
+  list
+  |> list.sort(int.compare)
+  |> listc.init
+  |> resultc.unwrap_assert
+  |> list.flat_map(fn(x) { [x, x] })
+  |> int.sum
+  |> fn(l) { int.product(list) + l }
+}
+
 pub fn main() {
   let assert Ok(contents) =
     simplifile.read(from: "../../inputs/2015/Day2/input.txt")
@@ -28,14 +40,18 @@ pub fn main() {
     |> list.reverse
     |> list.rest
     |> result.map(list.reverse)
-    |> result.map(list.map(_, fn(s) {
-      s
-      |> string.split("x")
-      |> list.map(int.parse)
-      |> list.map(result.unwrap(_, 0))
-    }))
+    |> result.map(
+      list.map(_, fn(s) {
+        s
+        |> string.split("x")
+        |> list.map(int.parse)
+        |> list.map(result.unwrap(_, 0))
+      }),
+    )
 
   let part1 = rows |> list.map(determine_area_needed) |> int.sum
   io.debug(part1)
+
+  let part2 = rows |> list.map(determine_length_needed) |> int.sum
+  io.debug(part2)
 }
-// 

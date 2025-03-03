@@ -1,3 +1,4 @@
+import common/result as resultc
 import gleam/int
 import gleam/io
 import gleam/list
@@ -7,15 +8,14 @@ import simplifile
 import utils/list_utils.{init}
 
 fn find_first_digit_l(l: List(String)) -> String {
-  let assert Ok(r) =
-    l
-    |> list.find(fn(d) {
-      case int.parse(d) {
-        Ok(_) -> True
-        Error(_) -> False
-      }
-    })
-  r
+  l
+  |> list.find(fn(d) {
+    case int.parse(d) {
+      Ok(_) -> True
+      Error(_) -> False
+    }
+  })
+  |> resultc.unwrap_assert
 }
 
 fn find_first_digit(s: String) -> String {

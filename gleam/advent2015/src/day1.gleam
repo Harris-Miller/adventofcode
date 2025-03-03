@@ -1,9 +1,9 @@
+import common/list as listc
 import gleam/int
 import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
-import gleam/yielder
 import simplifile
 
 fn parse(char: String) -> Int {
@@ -16,12 +16,9 @@ fn parse(char: String) -> Int {
 
 fn find_position(xs: List(#(Int, Int))) -> Int {
   case xs {
-    [#(v, i), ..rest] ->
-      case v {
-        -1 -> i
-        _ -> find_position(rest)
-      }
     [] -> -1
+    [#(-1, i), ..] -> i
+    [_, ..rest] -> find_position(rest)
   }
 }
 
@@ -43,9 +40,7 @@ pub fn main() {
     contents
     |> list.map(parse)
     |> list.scan(0, int.add)
-    |> yielder.from_list
-    |> yielder.index
-    |> yielder.to_list
+    |> listc.with_index
     |> find_position
 
   io.debug(r2 + 1)

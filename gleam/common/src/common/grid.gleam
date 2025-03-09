@@ -6,8 +6,18 @@ import gleam/list
 import gleam/string
 import gleam/string_tree
 
+pub type Direction {
+  Up
+  Right
+  Down
+  Left
+}
+
+pub type Point =
+  #(Int, Int)
+
 pub type Grid(a) =
-  Dict(#(Int, Int), a)
+  Dict(Point, a)
 
 pub fn make_empty(num_rows: Int, num_cols: Int, fill: a) -> Grid(a) {
   let rows = list.range(0, num_rows - 1)
@@ -20,8 +30,9 @@ pub fn make_empty(num_rows: Int, num_cols: Int, fill: a) -> Grid(a) {
 }
 
 pub fn parse(str: String, with parser: fn(String) -> b) {
-  let assert Ok(lines) = str |> string.split("\n") |> listc.init
-  lines
+  str
+  |> string.trim()
+  |> string.split("\n")
   |> list.index_map(fn(values, row) {
     values
     |> string.split("")
@@ -31,18 +42,18 @@ pub fn parse(str: String, with parser: fn(String) -> b) {
   |> dict.from_list
 }
 
-pub fn get_maxes(grid: Grid(a)) -> #(Int, Int) {
+pub fn get_maxes(grid: Grid(a)) -> Point {
   let row_max = grid |> dict.keys() |> list.map(tuplec.fst) |> listc.maximum()
   let col_max = grid |> dict.keys() |> list.map(tuplec.snd) |> listc.maximum()
   #(row_max, col_max)
 }
 
-pub fn get_neighbors4(point: #(Int, Int)) {
+pub fn get_neighbors4(point: Point) {
   let #(row, col) = point
   [#(row, col - 1), #(row + 1, col), #(row, col + 1), #(row - 1, col)]
 }
 
-pub fn get_neighbors8(point: #(Int, Int)) {
+pub fn get_neighbors8(point: Point) {
   let #(row, col) = point
   [
     #(row - 1, col - 1),
@@ -91,5 +102,24 @@ pub fn to_std_char(b: Bool) -> String {
   case b {
     False -> "."
     True -> "#"
+  }
+}
+
+pub fn get_next_point(from point: Point, moving direction: Direction) -> Point {
+  let #(r, c) = point
+  case direction {
+    Up -> #(r - 1, c)
+    Right -> #(r, c + 1)
+    Down -> #(r + 1, c)
+    Left -> #(r, c - 1)
+  }
+}
+
+pub fn turn_right(from direction: Direction) -> Direction {
+  case direction {
+    Up -> Right
+    Right -> Down
+    Down -> Left
+    Left -> Up
   }
 }

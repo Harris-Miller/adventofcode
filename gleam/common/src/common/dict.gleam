@@ -1,6 +1,11 @@
+import common/result as resultc
 import gleam/dict.{type Dict}
 import gleam/option.{None, Some}
 import gleam/set.{type Set}
+
+pub fn get_(from: Dict(a, b), get: a) -> b {
+  resultc.unwrap_assert(dict.get(from, get))
+}
 
 /// Convert a Set(#(a, b)) to a Dict(a, b)
 pub fn from_set(set: Set(#(a, b))) -> Dict(a, b) {

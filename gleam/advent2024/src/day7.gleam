@@ -10,10 +10,6 @@ import gleam/string
 import search_algorithms/breadth_first
 import simplifile
 
-// const parse = (line: string): [number, number[]] => {
-//   const [testValue, nums] = line.split(': ');
-//   return [parseInt10(testValue), nums.split(' ').map(parseInt10)];
-// };
 fn parse(line: String) {
   let assert [test_value, nums] = string.split(line, ": ")
   let a = int.parse(test_value) |> resultc.unwrap_assert
@@ -25,21 +21,6 @@ fn parse(line: String) {
   #(a, b)
 }
 
-// const process =
-//   (ops: ((a: number, b: number) => number)[]) =>
-//   ([testValue, values]: [number, number[]]) => {
-//     const found = ([acc, idx]: State) => acc === testValue && idx === values.length - 1;
-//     const next = ([acc, idx]: State): State[] => {
-//       if (acc > testValue) return [];
-//       const nextIdx = idx + 1;
-//       if (nextIdx >= values.length) return [];
-//       const value = values[nextIdx];
-//       return ops.map<State>(fn => [fn(acc, value), nextIdx]);
-//     };
-
-//     const result = breadthFirstSearch(next, found, [values[0], 0]);
-//     return result;
-//   };
 fn process(ops: List(fn(Int, Int) -> Int)) {
   fn(t: #(Int, List(#(Int, Int)))) {
     let #(test_value, values) = t
@@ -64,6 +45,13 @@ fn process(ops: List(fn(Int, Int) -> Int)) {
   }
 }
 
+fn combine_nums(a: Int, b: Int) -> Int {
+  let a_s = int.to_string(a)
+  let b_s = int.to_string(b)
+  let assert Ok(c) = int.parse(a_s <> b_s)
+  c
+}
+
 pub fn main() {
   let assert Ok(content) =
     simplifile.read(from: "../../inputs/2024/Day7/input.txt")
@@ -74,7 +62,6 @@ pub fn main() {
 
   // io.debug(equations)
 
-  // const r1 = R.sum(equations.filter(process([R.add, R.multiply])).map(a => a[0]));
   let r1 =
     equations
     |> list.filter(process([int.add, int.multiply]))
@@ -82,4 +69,12 @@ pub fn main() {
     |> int.sum
 
   io.debug(r1)
+
+  let r2 =
+    equations
+    |> list.filter(process([int.add, int.multiply, combine_nums]))
+    |> list.map(tuple.fst)
+    |> int.sum
+
+  io.debug(r2)
 }

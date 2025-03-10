@@ -17,7 +17,7 @@ fn parse(char: String) -> Int {
 fn find_position(xs: List(#(Int, Int))) -> Int {
   case xs {
     [] -> -1
-    [#(-1, i), ..] -> i
+    [#(i, -1), ..] -> i
     [_, ..rest] -> find_position(rest)
   }
 }

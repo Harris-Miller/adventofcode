@@ -6,13 +6,6 @@ import gleam/list
 import gleam/string
 import gleam/string_tree
 
-pub type Direction {
-  Up
-  Right
-  Down
-  Left
-}
-
 pub type Point =
   #(Int, Int)
 
@@ -102,24 +95,5 @@ pub fn to_std_char(b: Bool) -> String {
   case b {
     False -> "."
     True -> "#"
-  }
-}
-
-pub fn get_next_point(from point: Point, moving direction: Direction) -> Point {
-  let #(r, c) = point
-  case direction {
-    Up -> #(r - 1, c)
-    Right -> #(r, c + 1)
-    Down -> #(r + 1, c)
-    Left -> #(r, c - 1)
-  }
-}
-
-pub fn turn_right(from direction: Direction) -> Direction {
-  case direction {
-    Up -> Right
-    Right -> Down
-    Down -> Left
-    Left -> Up
   }
 }

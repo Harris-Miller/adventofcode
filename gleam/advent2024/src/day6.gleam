@@ -1,4 +1,5 @@
-import common/grid.{type Direction, type Grid, type Point, Up}
+import common/direction.{type Direction, Up}
+import common/grid.{type Grid, type Point}
 import common/result as resultc
 import common/tuple
 import gleam/dict
@@ -22,12 +23,16 @@ fn walk_path(
       let #(point, dir, space_result) = state
 
       use space <- resultc.unwrap_guard(space_result, yielder.Done)
-      let next_point = grid.get_next_point(point, dir)
+      let next_point = direction.move(point, dir)
       let next_space = dict.get(grid, next_point)
 
       case next_space {
         Ok("#") ->
-          yielder.Next(#(point, dir), #(point, grid.turn_right(dir), Ok(space)))
+          yielder.Next(#(point, dir), #(
+            point,
+            direction.turn_right(dir),
+            Ok(space),
+          ))
         _ -> yielder.Next(#(point, dir), #(next_point, dir, next_space))
       }
     },

@@ -13,9 +13,9 @@ fn in_right_order(rule: #(String, String), page: List(String)) {
   let #(r1, r2) = rule
   let pages_i = listc.with_index(page)
   let i1_result =
-    list.find(pages_i, fn(t) { t.0 == r1 }) |> result.map(tuplec.snd)
+    list.find(pages_i, fn(t) { t.1 == r1 }) |> result.map(tuplec.fst)
   let i2_result =
-    list.find(pages_i, fn(t) { t.0 == r2 }) |> result.map(tuplec.snd)
+    list.find(pages_i, fn(t) { t.1 == r2 }) |> result.map(tuplec.fst)
 
   // if neither are not found, that means the rule doesn't apply to these pages, in which case just return True
   use i1 <- resultc.unwrap_guard(i1_result, True)

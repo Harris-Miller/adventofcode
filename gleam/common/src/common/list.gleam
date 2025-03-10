@@ -116,6 +116,6 @@ pub fn uncons_guard(
   }
 }
 
-pub fn with_index(list: List(a)) -> List(#(a, Int)) {
-  index_map(list, fn(a, i) { #(a, i) })
+pub fn with_index(list: List(a)) -> List(#(Int, a)) {
+  index_map(list, fn(a, i) { #(i, a) })
 }

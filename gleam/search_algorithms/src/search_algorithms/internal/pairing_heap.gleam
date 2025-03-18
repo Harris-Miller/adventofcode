@@ -1,8 +1,5 @@
-//// This module provides an implementation of the pairing heap data structure,
-//// a type of self-adjusting heap with efficient insert, find_min, and delete_min, and merge operations.
-
-// Based on "Purely Functional Data Structures" by Okasaki (1998)
-
+/// An extension of: https://github.com/schurhammer/gleamy_structures/blob/v1.1.0/src/gleamy/pairing_heap.gleam
+import gleam/list
 import gleam/order.{type Order, Gt}
 
 type Tree(a) {
@@ -19,10 +16,32 @@ pub fn new(compare: fn(a, a) -> Order) -> Heap(a) {
   Heap(Empty, compare)
 }
 
+/// Checks if key is in queue
+pub fn has(heap: Heap(a), key: a) -> Bool {
+  has_loop([heap.root], key)
+}
+
+fn has_loop(roots: List(Tree(a)), key: a) -> Bool {
+  case roots {
+    [] -> False
+    [Empty, ..] -> False
+    [Tree(a, children), ..xs] -> {
+      case a == key {
+        True -> True
+        False -> has_loop(list.append(xs, children), key)
+      }
+    }
+  }
+}
+
 /// Inserts a new item into the heap, preserving the heap property.
 /// Time complexity: O(1)
 pub fn insert(heap: Heap(a), key: a) -> Heap(a) {
-  Heap(merge_trees(Tree(key, []), heap.root, heap.compare), heap.compare)
+  case has(heap, key) {
+    True -> heap
+    False ->
+      Heap(merge_trees(Tree(key, []), heap.root, heap.compare), heap.compare)
+  }
 }
 
 /// Returns the minimum element in the heap, if the heap is not empty.
@@ -51,6 +70,30 @@ pub fn delete_min(heap: Heap(a)) -> Result(#(a, Heap(a)), Nil) {
 pub fn merge(heap1: Heap(a), heap2: Heap(a)) -> Heap(a) {
   let compare = heap1.compare
   Heap(merge_trees(heap1.root, heap2.root, compare), compare)
+}
+
+/// Output to list in order
+pub fn to_list(heap: Heap(a)) -> List(a) {
+  to_list_loop(heap, [])
+}
+
+fn to_list_loop(heap: Heap(a), acc: List(a)) -> List(a) {
+  case delete_min(heap) {
+    Error(_) -> list.reverse(acc)
+    Ok(#(a, heap)) -> to_list_loop(heap, [a, ..acc])
+  }
+}
+
+pub fn count(heap: Heap(a)) -> Int {
+  count_loop([heap.root])
+}
+
+fn count_loop(roots: List(Tree(a))) -> Int {
+  case roots {
+    [] -> 0
+    [Empty, ..] -> 0
+    [Tree(_, children), ..xs] -> 1 + count_loop(list.append(xs, children))
+  }
 }
 
 fn merge_trees(x: Tree(a), y: Tree(a), compare: fn(a, a) -> Order) -> Tree(a) {

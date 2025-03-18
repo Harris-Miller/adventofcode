@@ -19,52 +19,10 @@ pub opaque type KVBinaryTree(k, v) {
   Tip
 }
 
-// Tip constructor
-pub fn tip() -> KVBinaryTree(k, v) {
-  Tip
-}
-
-pub fn singleton(key: k, value: v) -> KVBinaryTree(k, v) {
-  Branch(1, key, value, Tip, Tip)
-}
-
-pub fn upsert(
-  compare: fn(k, k) -> Order,
-  into root: KVBinaryTree(k, v),
-  for key: k,
-  with fun: fn(Option(v)) -> v,
-) -> KVBinaryTree(k, v) {
-  case root {
-    Tip -> Branch(1, key, fun(None), Tip, Tip)
-    Branch(size, other_key, other_value, left, right) ->
-      case compare(key, other_key) {
-        Lt ->
-          balance_left(key, other_value, upsert(compare, left, key, fun), right)
-        Gt ->
-          balance_right(
-            key,
-            other_value,
-            left,
-            upsert(compare, right, key, fun),
-          )
-        Eq -> Branch(size, key, fun(Some(other_value)), left, right)
-      }
-  }
-}
-
-pub fn insert(
-  compare: fn(k, k) -> Order,
-  root: KVBinaryTree(k, v),
-  key: k,
-  value: v,
-) -> KVBinaryTree(k, v) {
-  upsert(compare, root, key, fn(_) { value })
-}
-
 pub fn delete(
-  compare: fn(k, k) -> Order,
-  root: KVBinaryTree(k, v),
-  key: k,
+  from root: KVBinaryTree(k, v),
+  with compare: fn(k, k) -> Order,
+  delete key: k,
 ) -> KVBinaryTree(k, v) {
   case root {
     Tip -> Tip
@@ -74,17 +32,109 @@ pub fn delete(
           balance_right(
             other_key,
             other_value,
-            delete(compare, left, key),
+            delete(left, compare, key),
             right,
           )
         Gt ->
-          balance_left(
-            other_key,
-            other_value,
-            left,
-            delete(compare, right, key),
-          )
+          balance_left(other_key, other_value, left, delete(left, compare, key))
         Eq -> glue(left, right)
+      }
+  }
+}
+
+pub fn fold(
+  over root: KVBinaryTree(k, v),
+  from initial: acc,
+  with fun: fn(acc, k, v) -> acc,
+) -> acc {
+  case root {
+    Tip -> initial
+    Branch(_, key, value, left, right) ->
+      fold(right, fun(fold(left, initial, fun), key, value), fun)
+  }
+}
+
+pub fn fold_right(
+  over root: KVBinaryTree(k, v),
+  from initial: acc,
+  with fun: fn(acc, k, v) -> acc,
+) -> acc {
+  case root {
+    Tip -> initial
+    Branch(_, key, value, left, right) ->
+      fold_right(left, fun(fold_right(right, initial, fun), key, value), fun)
+  }
+}
+
+pub fn get(
+  from root: KVBinaryTree(k, v),
+  with compare: fn(k, k) -> Order,
+  get key: k,
+) -> Result(v, Nil) {
+  case root {
+    Tip -> Error(Nil)
+    Branch(_, branch_key, branch_value, left, right) ->
+      case compare(key, branch_key) {
+        Lt -> get(left, compare, key)
+        Gt -> get(right, compare, key)
+        Eq -> Ok(branch_value)
+      }
+  }
+}
+
+pub fn map(
+  in root: KVBinaryTree(k, v1),
+  with fun: fn(k, v1) -> v2,
+) -> KVBinaryTree(k, v2) {
+  case root {
+    Tip -> Tip
+    Branch(size, key, value, left, right) ->
+      Branch(size, key, fun(key, value), map(left, fun), map(right, fun))
+  }
+}
+
+// Tip constructor
+pub fn tip() -> KVBinaryTree(k, v) {
+  Tip
+}
+
+pub fn to_asc_list(root: KVBinaryTree(k, v)) -> List(#(k, v)) {
+  fold_right(root, [], fn(acc, k, v) { [#(k, v), ..acc] })
+}
+
+pub fn to_desc_list(root: KVBinaryTree(k, v)) -> List(#(k, v)) {
+  fold(root, [], fn(acc, k, v) { [#(k, v), ..acc] })
+}
+
+pub fn tree_size(tree: KVBinaryTree(k, v)) -> Int {
+  case tree {
+    Tip -> 0
+    Branch(size, _, _, _, _) -> size
+  }
+}
+
+pub fn update(
+  into root: KVBinaryTree(k, v),
+  with compare: fn(k, k) -> Order,
+  for key: k,
+  using fun: fn(Option(v)) -> v,
+) -> #(Option(v), KVBinaryTree(k, v)) {
+  case root {
+    Tip -> #(None, Branch(1, key, fun(None), Tip, Tip))
+    Branch(size, branch_key, branch_value, left, right) ->
+      case compare(key, branch_key) {
+        Lt -> {
+          let #(old_val, branch) = update(left, compare, key, fun)
+          #(old_val, balance_left(key, branch_value, branch, right))
+        }
+        Gt -> {
+          let #(old_val, branch) = update(right, compare, key, fun)
+          #(old_val, balance_right(key, branch_value, left, branch))
+        }
+        Eq -> #(
+          Some(branch_value),
+          Branch(size, key, fun(Some(branch_value)), left, right),
+        )
       }
   }
 }
@@ -370,12 +420,5 @@ fn balance_right(
           }
       }
     }
-  }
-}
-
-pub fn tree_size(tree: KVBinaryTree(k, v)) -> Int {
-  case tree {
-    Tip -> 0
-    Branch(size, _, _, _, _) -> size
   }
 }

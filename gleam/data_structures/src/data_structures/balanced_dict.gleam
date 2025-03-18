@@ -76,9 +76,7 @@ pub fn get_and_insert(
   update key: k,
   insert value: v,
 ) -> #(Option(v), BalancedDict(k, v)) {
-  let BalancedDict(root, compare) = dict
-  let #(old_value, new_root) = tree.update(root, compare, key, fn(_) { value })
-  #(old_value, BalancedDict(new_root, compare))
+  get_and_upsert(dict, key, fn(_) { value })
 }
 
 pub fn get_and_upsert(

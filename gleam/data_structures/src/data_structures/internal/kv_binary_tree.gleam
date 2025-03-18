@@ -121,20 +121,17 @@ pub fn update(
 ) -> #(Option(v), KVBinaryTree(k, v)) {
   case root {
     Tip -> #(None, Branch(1, key, fun(None), Tip, Tip))
-    Branch(size, branch_key, branch_value, left, right) ->
-      case compare(key, branch_key) {
+    Branch(size, other_key, value, left, right) ->
+      case compare(key, other_key) {
         Lt -> {
-          let #(old_val, branch) = update(left, compare, key, fun)
-          #(old_val, balance_left(key, branch_value, branch, right))
+          let #(orig_value, branch) = update(left, compare, key, fun)
+          #(orig_value, balance_left(other_key, value, branch, right))
         }
         Gt -> {
-          let #(old_val, branch) = update(right, compare, key, fun)
-          #(old_val, balance_right(key, branch_value, left, branch))
+          let #(orig_value, branch) = update(right, compare, key, fun)
+          #(orig_value, balance_right(other_key, value, left, branch))
         }
-        Eq -> #(
-          Some(branch_value),
-          Branch(size, key, fun(Some(branch_value)), left, right),
-        )
+        Eq -> #(Some(value), Branch(size, key, fun(Some(value)), left, right))
       }
   }
 }
@@ -331,10 +328,10 @@ fn balance_right(
       case left {
         Tip ->
           case right {
-            Tip -> Tip
+            Tip -> Branch(1, key, value, Tip, Tip)
             Branch(r_size, r_key, r_value, r_left, r_right) ->
               case r_left, r_right {
-                Tip, Tip -> Branch(1, key, value, Tip, Tip)
+                Tip, Tip -> Branch(2, key, value, Tip, right)
                 Tip, Branch(_, _, _, _, _) -> {
                   let new_left = Branch(1, key, value, Tip, Tip)
                   Branch(3, r_key, r_value, new_left, r_right)

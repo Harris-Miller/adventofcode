@@ -8,32 +8,32 @@ const ratio: Int = 2
 /// Internal
 /// Associated insertion / deletion functions, et al, require a compare function
 /// that in encapsulated by `BalancedTree`
-pub opaque type KVBinaryTree(a, b) {
+pub opaque type KVBinaryTree(k, v) {
   Branch(
     size: Int,
-    key: a,
-    value: b,
-    left: KVBinaryTree(a, b),
-    right: KVBinaryTree(a, b),
+    key: k,
+    value: v,
+    left: KVBinaryTree(k, v),
+    right: KVBinaryTree(k, v),
   )
   Tip
 }
 
 // Tip constructor
-pub fn tip() -> KVBinaryTree(a, b) {
+pub fn tip() -> KVBinaryTree(k, v) {
   Tip
 }
 
-pub fn singleton(key: a, value: b) -> KVBinaryTree(a, b) {
+pub fn singleton(key: k, value: v) -> KVBinaryTree(k, v) {
   Branch(1, key, value, Tip, Tip)
 }
 
 pub fn upsert(
-  compare: fn(a, a) -> Order,
-  into root: KVBinaryTree(a, b),
-  for key: a,
-  with fun: fn(Option(b)) -> b,
-) -> KVBinaryTree(a, b) {
+  compare: fn(k, k) -> Order,
+  into root: KVBinaryTree(k, v),
+  for key: k,
+  with fun: fn(Option(v)) -> v,
+) -> KVBinaryTree(k, v) {
   case root {
     Tip -> Branch(1, key, fun(None), Tip, Tip)
     Branch(size, other_key, other_value, left, right) ->
@@ -53,19 +53,19 @@ pub fn upsert(
 }
 
 pub fn insert(
-  compare: fn(a, a) -> Order,
-  root: KVBinaryTree(a, b),
-  key: a,
-  value: b,
-) -> KVBinaryTree(a, b) {
+  compare: fn(k, k) -> Order,
+  root: KVBinaryTree(k, v),
+  key: k,
+  value: v,
+) -> KVBinaryTree(k, v) {
   upsert(compare, root, key, fn(_) { value })
 }
 
 pub fn delete(
-  compare: fn(a, a) -> Order,
-  root: KVBinaryTree(a, b),
-  key: a,
-) -> KVBinaryTree(a, b) {
+  compare: fn(k, k) -> Order,
+  root: KVBinaryTree(k, v),
+  key: k,
+) -> KVBinaryTree(k, v) {
   case root {
     Tip -> Tip
     Branch(_, other_key, other_value, left, right) ->
@@ -90,9 +90,9 @@ pub fn delete(
 }
 
 fn glue(
-  left: KVBinaryTree(a, b),
-  right: KVBinaryTree(a, b),
-) -> KVBinaryTree(a, b) {
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
   case left, right {
     Tip, r -> r
     l, Tip -> l
@@ -114,16 +114,16 @@ fn glue(
   }
 }
 
-type MinView(a, b) {
-  MinView(key: a, value: b, right_tree: KVBinaryTree(a, b))
+type MinView(k, v) {
+  MinView(key: k, value: v, right_tree: KVBinaryTree(k, v))
 }
 
 fn min_view_sure(
-  key: a,
-  value: b,
-  left: KVBinaryTree(a, b),
-  right: KVBinaryTree(a, b),
-) -> MinView(a, b) {
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> MinView(k, v) {
   case left {
     Tip -> MinView(key, value, right)
     Branch(_, l_key, l_value, l_left, l_right) -> {
@@ -134,16 +134,16 @@ fn min_view_sure(
   }
 }
 
-type MaxView(a, b) {
-  MaxView(key: a, value: b, left_tree: KVBinaryTree(a, b))
+type MaxView(k, v) {
+  MaxView(key: k, value: v, left_tree: KVBinaryTree(k, v))
 }
 
 fn max_view_sure(
-  key: a,
-  value: b,
-  left: KVBinaryTree(a, b),
-  right: KVBinaryTree(a, b),
-) -> MaxView(a, b) {
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> MaxView(k, v) {
   case right {
     Tip -> MaxView(key, value, left)
     Branch(_, r_key, r_value, r_left, r_right) -> {
@@ -155,11 +155,11 @@ fn max_view_sure(
 }
 
 fn balance_left(
-  key: a,
-  value: b,
-  left: KVBinaryTree(a, b),
-  right: KVBinaryTree(a, b),
-) -> KVBinaryTree(a, b) {
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
   case left, right {
     Branch(l_size, _, _, _, _), Branch(r_size, _, _, _, _)
       if l_size <= delta * r_size
@@ -268,11 +268,11 @@ fn balance_left(
 }
 
 fn balance_right(
-  key: a,
-  value: b,
-  left: KVBinaryTree(a, b),
-  right: KVBinaryTree(a, b),
-) -> KVBinaryTree(a, b) {
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
   case left, right {
     Branch(l_size, _, _, _, _), Branch(r_size, _, _, _, _)
       if r_size <= delta * l_size
@@ -373,7 +373,7 @@ fn balance_right(
   }
 }
 
-pub fn tree_size(tree: KVBinaryTree(a, b)) -> Int {
+pub fn tree_size(tree: KVBinaryTree(k, v)) -> Int {
   case tree {
     Tip -> 0
     Branch(size, _, _, _, _) -> size

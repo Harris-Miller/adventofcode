@@ -2,6 +2,7 @@ import common/list as listc
 import data_structures/balanced_dict
 import gleam/int
 import gleam/list
+import gleam/pair
 import gleam/set
 import gleam/string
 import gleeunit
@@ -21,12 +22,12 @@ pub fn keeps_everything_in_order_test() {
 
   dict
   |> balanced_dict.to_asc_list()
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(ordered)
 
   dict
   |> balanced_dict.to_desc_list()
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(ordered |> list.reverse())
 }
 
@@ -82,7 +83,7 @@ pub fn map_test() {
 
   balanced_dict.map_values(dict, fn(_, _) { "foo" })
   |> balanced_dict.to_asc_list()
-  |> list.map(fn(kvp) { kvp.1 })
+  |> list.map(pair.second)
   |> should.equal(ordered |> list.map(fn(_) { "foo" }))
 }
 
@@ -106,13 +107,13 @@ pub fn drop_test() {
 
   balanced_dict.drop(
     dict,
-    dict |> balanced_dict.to_asc_list() |> list.map(fn(kvp) { kvp.0 }),
+    dict |> balanced_dict.to_asc_list() |> list.map(pair.first),
   )
   |> should.equal(balanced_dict.new(int.compare))
 
   let updated = balanced_dict.drop(dict, to_remove)
   balanced_dict.to_asc_list(updated)
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(remaining)
 }
 
@@ -134,7 +135,7 @@ pub fn take_test() {
 
   let updated = balanced_dict.take(dict, to_keep)
   balanced_dict.to_asc_list(updated)
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(to_keep |> list.sort(int.compare))
 }
 
@@ -165,7 +166,7 @@ pub fn view_min_test() {
   let assert Ok(#(kvp, next)) = balanced_dict.view_min(dict)
   kvp.0 |> should.equal(1)
   balanced_dict.to_asc_list(next)
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(to_assert)
 }
 
@@ -181,7 +182,7 @@ pub fn view_max_test() {
   let assert Ok(#(kvp, next)) = balanced_dict.view_max(dict)
   kvp.0 |> should.equal(100)
   balanced_dict.to_asc_list(next)
-  |> list.map(fn(kvp) { kvp.0 })
+  |> list.map(pair.first)
   |> should.equal(to_assert)
 }
 

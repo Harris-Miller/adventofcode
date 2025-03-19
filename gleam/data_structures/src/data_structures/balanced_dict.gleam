@@ -2,6 +2,7 @@ import data_structures/internal/kv_binary_tree.{type KVBinaryTree} as tree
 import gleam/list
 import gleam/option.{type Option}
 import gleam/order.{type Order}
+import gleam/pair
 import gleam/result
 import gleam/set
 
@@ -143,7 +144,7 @@ pub fn is_empty(dict: BalancedDict(k, v)) -> Bool {
 }
 
 pub fn keys(dict: BalancedDict(k, v)) -> List(k) {
-  dict |> to_asc_list |> list.map(fn(kvp) { kvp.0 })
+  dict |> to_asc_list |> list.map(pair.first)
 }
 
 pub fn map_values(
@@ -207,7 +208,7 @@ pub fn upsert(
 }
 
 pub fn values(dict: BalancedDict(k, v)) -> List(v) {
-  dict |> to_asc_list |> list.map(fn(kvp) { kvp.1 })
+  dict |> to_asc_list |> list.map(pair.second)
 }
 
 pub fn view_min(

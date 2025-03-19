@@ -1,15 +1,19 @@
 import common/list as listc
+import data_structures/balanced_map.{type BalancedDict}
 import gleam/deque.{type Deque}
 import gleam/list
 import gleam/option
 import gleam/result
 
-pub type SearchContainer(a) {
-  Stack(List(a))
-  Queue(Deque(a))
+pub type SearchContainer(k, v) {
+  Stack(List(k))
+  Queue(Deque(k))
+  // LIFOHeap(BalancedMap(k, v))
 }
 
-pub fn pop(sc: SearchContainer(a)) -> Result(#(a, SearchContainer(a)), Nil) {
+pub fn pop(
+  sc: SearchContainer(k, v),
+) -> Result(#(k, SearchContainer(k, v)), Nil) {
   case sc {
     Stack(list) ->
       listc.uncons(list)
@@ -27,7 +31,7 @@ pub fn pop(sc: SearchContainer(a)) -> Result(#(a, SearchContainer(a)), Nil) {
   }
 }
 
-pub fn push(sc: SearchContainer(a), item: a) -> SearchContainer(a) {
+pub fn push(sc: SearchContainer(k, v), item: k) -> SearchContainer(k, v) {
   case sc {
     Stack(list) -> list.prepend(list, item) |> Stack()
     Queue(queue) -> deque.push_back(queue, item) |> Queue()

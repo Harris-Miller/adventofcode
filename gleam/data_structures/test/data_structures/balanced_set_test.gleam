@@ -55,12 +55,12 @@ pub fn size_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict = balanced_set.from_list(shuffled, int.compare)
+  let map = balanced_set.from_list(shuffled, int.compare)
 
   let re_shuffled = list.shuffle(ordered)
   let with_index = list.range(0, 99) |> list.reverse() |> list.zip(re_shuffled)
 
-  list.fold(with_index, dict, fn(incoming, kvp) {
+  list.fold(with_index, map, fn(incoming, kvp) {
     let #(index, value) = kvp
     let outgoing = balanced_set.delete(incoming, value)
     balanced_set.size(outgoing) |> should.equal(index)
@@ -130,9 +130,9 @@ pub fn view_min_test() {
 
   let assert [_, ..to_assert] = ordered
 
-  let dict = balanced_set.from_list(shuffled, int.compare)
+  let map = balanced_set.from_list(shuffled, int.compare)
 
-  let assert Ok(#(v, next)) = balanced_set.view_min(dict)
+  let assert Ok(#(v, next)) = balanced_set.view_min(map)
   v |> should.equal(1)
 
   balanced_set.to_asc_list(next)

@@ -1,5 +1,5 @@
 import common/list as listc
-import data_structures/balanced_dict
+import data_structures/balanced_map
 import gleam/int
 import gleam/list
 import gleam/pair
@@ -17,27 +17,27 @@ pub fn keeps_everything_in_order_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  dict
-  |> balanced_dict.to_asc_list()
+  map
+  |> balanced_map.to_asc_list()
   |> list.map(pair.first)
   |> should.equal(ordered)
 
-  dict
-  |> balanced_dict.to_desc_list()
+  map
+  |> balanced_map.to_desc_list()
   |> list.map(pair.first)
   |> should.equal(ordered |> list.reverse())
 }
 
 pub fn overwrites_existing_keys_test() {
-  let dict =
-    balanced_dict.new(string.compare)
-    |> balanced_dict.insert("foo", 1)
-    |> balanced_dict.insert("foo", 3)
-    |> balanced_dict.insert("foo", 5)
-  let assert Ok(v) = balanced_dict.get(dict, "foo")
+  let map =
+    balanced_map.new(string.compare)
+    |> balanced_map.insert("foo", 1)
+    |> balanced_map.insert("foo", 3)
+    |> balanced_map.insert("foo", 5)
+  let assert Ok(v) = balanced_map.get(map, "foo")
   v |> should.equal(5)
 }
 
@@ -45,31 +45,31 @@ pub fn has_key_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
   list.each(ordered, fn(key) {
-    balanced_dict.has_key(dict, key) |> should.equal(True)
+    balanced_map.has_key(map, key) |> should.equal(True)
   })
 
-  balanced_dict.has_key(dict, 0) |> should.equal(False)
-  balanced_dict.has_key(dict, 101) |> should.equal(False)
+  balanced_map.has_key(map, 0) |> should.equal(False)
+  balanced_map.has_key(map, 101) |> should.equal(False)
 }
 
 pub fn size_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
   let re_shuffled = list.shuffle(ordered)
   let with_index = list.range(0, 99) |> list.reverse() |> list.zip(re_shuffled)
 
-  list.fold(with_index, dict, fn(incoming, kvp) {
+  list.fold(with_index, map, fn(incoming, kvp) {
     let #(index, value) = kvp
-    let outgoing = balanced_dict.delete(incoming, value)
-    balanced_dict.size(outgoing) |> should.equal(index)
+    let outgoing = balanced_map.delete(incoming, value)
+    balanced_map.size(outgoing) |> should.equal(index)
     outgoing
   })
 }
@@ -78,11 +78,11 @@ pub fn map_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  balanced_dict.map_values(dict, fn(_, _) { "foo" })
-  |> balanced_dict.to_asc_list()
+  balanced_map.map_values(map, fn(_, _) { "foo" })
+  |> balanced_map.to_asc_list()
   |> list.map(pair.second)
   |> should.equal(ordered |> list.map(fn(_) { "foo" }))
 }
@@ -102,17 +102,17 @@ pub fn drop_test() {
     |> set.to_list()
     |> list.sort(int.compare)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  balanced_dict.drop(
-    dict,
-    dict |> balanced_dict.to_asc_list() |> list.map(pair.first),
+  balanced_map.drop(
+    map,
+    map |> balanced_map.to_asc_list() |> list.map(pair.first),
   )
-  |> should.equal(balanced_dict.new(int.compare))
+  |> should.equal(balanced_map.new(int.compare))
 
-  let updated = balanced_dict.drop(dict, to_remove)
-  balanced_dict.to_asc_list(updated)
+  let updated = balanced_map.drop(map, to_remove)
+  balanced_map.to_asc_list(updated)
   |> list.map(pair.first)
   |> should.equal(remaining)
 }
@@ -128,13 +128,13 @@ pub fn take_test() {
       }
     })
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  balanced_dict.take(dict, []) |> should.equal(balanced_dict.new(int.compare))
+  balanced_map.take(map, []) |> should.equal(balanced_map.new(int.compare))
 
-  let updated = balanced_dict.take(dict, to_keep)
-  balanced_dict.to_asc_list(updated)
+  let updated = balanced_map.take(map, to_keep)
+  balanced_map.to_asc_list(updated)
   |> list.map(pair.first)
   |> should.equal(to_keep |> list.sort(int.compare))
 }
@@ -145,11 +145,11 @@ pub fn get_test() {
   let shuffled2 = list.shuffle(ordered)
   let tuples = list.zip(shuffled1, shuffled2)
 
-  let dict = balanced_dict.from_list(tuples, int.compare)
+  let map = balanced_map.from_list(tuples, int.compare)
 
   list.each(list.shuffle(ordered), fn(k) {
     let assert Ok(v1) = list.key_find(tuples, k)
-    let assert Ok(v2) = balanced_dict.get(dict, k)
+    let assert Ok(v2) = balanced_map.get(map, k)
     v1 |> should.equal(v2)
   })
 }
@@ -160,12 +160,12 @@ pub fn view_min_test() {
 
   let assert [_, ..to_assert] = ordered
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  let assert Ok(#(kvp, next)) = balanced_dict.view_min(dict)
+  let assert Ok(#(kvp, next)) = balanced_map.view_min(map)
   kvp.0 |> should.equal(1)
-  balanced_dict.to_asc_list(next)
+  balanced_map.to_asc_list(next)
   |> list.map(pair.first)
   |> should.equal(to_assert)
 }
@@ -176,12 +176,12 @@ pub fn view_max_test() {
 
   let assert Ok(to_assert) = listc.init(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  let assert Ok(#(kvp, next)) = balanced_dict.view_max(dict)
+  let assert Ok(#(kvp, next)) = balanced_map.view_max(map)
   kvp.0 |> should.equal(100)
-  balanced_dict.to_asc_list(next)
+  balanced_map.to_asc_list(next)
   |> list.map(pair.first)
   |> should.equal(to_assert)
 }
@@ -190,10 +190,10 @@ pub fn get_min_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  let assert Ok(kvp) = balanced_dict.get_min(dict)
+  let assert Ok(kvp) = balanced_map.get_min(map)
   kvp |> should.equal(#(1, ""))
 }
 
@@ -201,9 +201,9 @@ pub fn get_max_test() {
   let ordered = list.range(1, 100)
   let shuffled = list.shuffle(ordered)
 
-  let dict =
-    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+  let map =
+    balanced_map.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  let assert Ok(kvp) = balanced_dict.get_max(dict)
+  let assert Ok(kvp) = balanced_map.get_max(map)
   kvp |> should.equal(#(100, ""))
 }

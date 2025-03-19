@@ -7,14 +7,10 @@ import gleam/set
 
 // combine
 // each
-// filter
 
-// from_list
 // keys
-// map_values
-// merge
 
-// to_list
+// merge
 
 // values
 
@@ -142,6 +138,10 @@ pub fn is_empty(dict: BalancedDict(k, v)) -> Bool {
   size(dict) == 0
 }
 
+pub fn keys(dict: BalancedDict(k, v)) -> List(k) {
+  dict |> to_asc_list |> list.map(fn(kvp) { kvp.0 })
+}
+
 pub fn map_values(
   in dict: BalancedDict(k, v1),
   with fun: fn(k, v1) -> v2,
@@ -191,6 +191,10 @@ pub fn upsert(
   with fun: fn(Option(v)) -> v,
 ) -> BalancedDict(k, v) {
   get_and_upsert(dict, key, fun).1
+}
+
+pub fn values(dict: BalancedDict(k, v)) -> List(v) {
+  dict |> to_asc_list |> list.map(fn(kvp) { kvp.1 })
 }
 
 pub fn view_min(

@@ -5,15 +5,6 @@ import gleam/order.{type Order}
 import gleam/result
 import gleam/set
 
-// combine
-// each
-
-// keys
-
-// merge
-
-// values
-
 pub opaque type BalancedDict(k, v) {
   BalancedDict(root: KVBinaryTree(k, v), compare: fn(k, k) -> Order)
 }
@@ -21,6 +12,19 @@ pub opaque type BalancedDict(k, v) {
 pub fn clear(dict: BalancedDict(k, v)) {
   let BalancedDict(_, compare) = dict
   new(compare)
+}
+
+pub fn combine(
+  dict: BalancedDict(k, v),
+  other: BalancedDict(k, v),
+  with fun: fn(v, v) -> v,
+) -> BalancedDict(k, v) {
+  fold(dict, other, fn(acc, key, value) {
+    case get(acc, key) {
+      Ok(other_value) -> insert(acc, key, fun(value, other_value))
+      Error(_) -> insert(acc, key, value)
+    }
+  })
 }
 
 pub fn delete(
@@ -38,6 +42,13 @@ pub fn drop(
   let keys_set = set.from_list(disallowed_keys)
   let new_root = tree.filter(root, fn(k, _) { !set.contains(keys_set, k) })
   BalancedDict(new_root, compare)
+}
+
+pub fn each(dict: BalancedDict(k, v), fun: fn(k, v) -> z) -> Nil {
+  fold(dict, Nil, fn(nil, k, v) {
+    fun(k, v)
+    nil
+  })
 }
 
 pub fn filter(
@@ -149,6 +160,15 @@ pub fn map_values(
   let BalancedDict(root, compare) = dict
   let new_root = tree.map(root, fun)
   BalancedDict(new_root, compare)
+}
+
+pub fn merge(
+  into dict: BalancedDict(k, v),
+  from new_entries: BalancedDict(k, v),
+) -> BalancedDict(k, v) {
+  new_entries
+  |> to_asc_list()
+  |> list.fold(dict, fn(acc, kvp) { insert(acc, kvp.0, kvp.1) })
 }
 
 pub fn new(compare: fn(k, k) -> Order) -> BalancedDict(k, v) {

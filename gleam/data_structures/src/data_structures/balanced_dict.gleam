@@ -166,13 +166,18 @@ pub fn merge(
   into dict: BalancedDict(k, v),
   from new_entries: BalancedDict(k, v),
 ) -> BalancedDict(k, v) {
-  new_entries
-  |> to_asc_list()
-  |> list.fold(dict, fn(acc, kvp) { insert(acc, kvp.0, kvp.1) })
+  fold(new_entries, dict, fn(acc, key, value) { insert(acc, key, value) })
 }
 
 pub fn new(compare: fn(k, k) -> Order) -> BalancedDict(k, v) {
   BalancedDict(tree.tip(), compare)
+}
+
+pub fn reorder(
+  this dict: BalancedDict(k, v),
+  with compare: fn(k, k) -> Order,
+) -> BalancedDict(k, v) {
+  fold(dict, new(compare), insert)
 }
 
 pub fn size(dict: BalancedDict(k, v)) -> Int {

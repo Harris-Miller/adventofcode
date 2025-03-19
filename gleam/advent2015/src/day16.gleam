@@ -1,5 +1,5 @@
 import common/list as list_utils
-import common/tuple
+import common/pair as pairc
 import gleam/dict
 import gleam/int
 import gleam/io
@@ -53,7 +53,7 @@ fn parse(line: String) {
   items
   |> string.split(", ")
   |> list.map(fn(s) {
-    let #(thing, num_str) = s |> string.split(": ") |> tuple.from_list2
+    let #(thing, num_str) = s |> string.split(": ") |> pairc.from_list2
     let assert Ok(num) = num_str |> int.parse()
     #(thing, num)
   })

@@ -5,6 +5,7 @@ import gleam/bool
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/pair
 import gleam/result
 import gleam/string
 import search_algorithms/breadth_first
@@ -65,7 +66,7 @@ pub fn main() {
   let r1 =
     equations
     |> list.filter(process([int.add, int.multiply]))
-    |> list.map(tuple.fst)
+    |> list.map(pair.first)
     |> int.sum
 
   io.debug(r1)
@@ -73,7 +74,7 @@ pub fn main() {
   let r2 =
     equations
     |> list.filter(process([int.add, int.multiply, combine_nums]))
-    |> list.map(tuple.fst)
+    |> list.map(pair.first)
     |> int.sum
 
   io.debug(r2)

@@ -1,8 +1,8 @@
 import common/list as listc
-import common/tuple as tuplec
 import gleam/dict.{type Dict}
 import gleam/io
 import gleam/list
+import gleam/pair
 import gleam/string
 import gleam/string_tree
 
@@ -36,8 +36,8 @@ pub fn parse(str: String, with parser: fn(String) -> b) {
 }
 
 pub fn get_maxes(grid: Grid(a)) -> Point {
-  let row_max = grid |> dict.keys() |> list.map(tuplec.fst) |> listc.maximum()
-  let col_max = grid |> dict.keys() |> list.map(tuplec.snd) |> listc.maximum()
+  let row_max = grid |> dict.keys() |> list.map(pair.first) |> listc.maximum()
+  let col_max = grid |> dict.keys() |> list.map(pair.second) |> listc.maximum()
   #(row_max, col_max)
 }
 

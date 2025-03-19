@@ -6,6 +6,7 @@ import gleam/dict
 import gleam/function
 import gleam/io
 import gleam/list
+import gleam/pair
 import gleam/result
 import gleam/set
 import gleam/string
@@ -52,12 +53,12 @@ pub fn main() {
     |> dict.to_list
     |> list.find(fn(t) { t.1 == "^" })
     |> resultc.unwrap_assert
-    |> tuple.fst
+    |> pair.first
   let start_direction = Up
 
   let points =
     walk_path(grid, start_point, start_direction)
-    |> yielder.map(tuple.fst)
+    |> yielder.map(pair.first)
     |> yielder.to_list
     |> set.from_list
   io.debug(set.size(points))

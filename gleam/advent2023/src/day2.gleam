@@ -1,10 +1,10 @@
-import common/tuple
 import gleam/dict
 import gleam/function.{identity}
 import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/pair
 import gleam/result
 import gleam/string
 import simplifile
@@ -95,7 +95,7 @@ pub fn main() {
     |> list.map(fn(game) {
       #(game.0, is_game_possible(to_check_against, game.1))
     })
-    |> list.filter(tuple.snd)
+    |> list.filter(pair.second)
     |> list.map(fn(t) { t.0 })
     |> int.sum()
 

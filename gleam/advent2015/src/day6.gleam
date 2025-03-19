@@ -1,7 +1,7 @@
 import common/list as list_utils
 import common/option as option_utils
+import common/pair as pairc
 import common/result as result_utils
-import common/tuple
 import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/int
@@ -23,7 +23,7 @@ fn to_tuple(s: String) -> #(Int, Int) {
   |> string.split(",")
   |> list.map(int.parse)
   |> list.map(result_utils.unwrap_assert)
-  |> tuple.from_list2
+  |> pairc.from_list2
 }
 
 fn parse(line: String) {

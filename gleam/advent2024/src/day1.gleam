@@ -1,11 +1,12 @@
 import common/dict as dictc
 import common/function as functionc
+import common/pair as pairc
 import common/result as resultc
-import common/tuple
 import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/pair
 import gleam/result
 import gleam/string
 import simplifile
@@ -21,9 +22,9 @@ pub fn main() {
     |> list.map(fn(line) {
       line
       |> string.split("   ")
-      |> list.map(int.parse(_))
+      |> list.map(int.parse)
       |> list.map(resultc.unwrap_assert)
-      |> tuple.from_list2
+      |> pairc.from_list2
     })
 
   // io.debug(pairs)
@@ -50,7 +51,7 @@ pub fn main() {
       dict.get(counts, key) |> result.map(int.multiply(_, key))
     })
     |> result.partition
-    |> tuple.fst
+    |> pair.first
     |> int.sum
 
   io.debug(r2)

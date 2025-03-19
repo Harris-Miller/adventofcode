@@ -1,5 +1,5 @@
 import common/list as listc
-import data_structures/balanced_map.{type BalancedDict}
+import data_structures/balanced_map.{type BalancedMap}
 import gleam/deque.{type Deque}
 import gleam/list
 import gleam/option

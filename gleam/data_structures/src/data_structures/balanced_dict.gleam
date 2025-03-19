@@ -24,8 +24,7 @@ pub fn delete(
   from dict: BalancedDict(k, v),
   delete key: k,
 ) -> BalancedDict(k, v) {
-  let BalancedDict(root, compare) = dict
-  BalancedDict(tree.delete(root, compare, key), compare)
+  get_and_delete(dict, key).1
 }
 
 pub fn drop(
@@ -69,6 +68,15 @@ pub fn from_list(
 pub fn get(from dict: BalancedDict(k, v), get key: k) -> Result(v, Nil) {
   let BalancedDict(root, compare) = dict
   tree.get(root, compare, key)
+}
+
+pub fn get_and_delete(
+  from dict: BalancedDict(k, v),
+  delete key: k,
+) -> #(Option(v), BalancedDict(k, v)) {
+  let BalancedDict(root, compare) = dict
+  let #(value, new_root) = tree.delete(root, compare, key)
+  #(value, BalancedDict(new_root, compare))
 }
 
 pub fn get_and_insert(
@@ -123,7 +131,7 @@ pub fn new(compare: fn(k, k) -> Order) -> BalancedDict(k, v) {
 
 pub fn size(dict: BalancedDict(k, v)) -> Int {
   let BalancedDict(root, _) = dict
-  tree.tree_size(root)
+  tree.size(root)
 }
 
 pub fn to_asc_list(dict: BalancedDict(k, v)) -> List(#(k, v)) {

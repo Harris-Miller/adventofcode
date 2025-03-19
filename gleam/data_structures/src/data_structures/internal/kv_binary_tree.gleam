@@ -23,21 +23,22 @@ pub fn delete(
   from root: KVBinaryTree(k, v),
   with compare: fn(k, k) -> Order,
   delete key: k,
-) -> KVBinaryTree(k, v) {
+) -> #(Option(v), KVBinaryTree(k, v)) {
   case root {
-    Tip -> Tip
+    Tip -> #(None, Tip)
     Branch(_, other_key, other_value, left, right) ->
       case compare(key, other_key) {
-        Lt ->
-          balance_right(
-            other_key,
-            other_value,
-            delete(left, compare, key),
-            right,
-          )
-        Gt ->
-          balance_left(other_key, other_value, left, delete(left, compare, key))
-        Eq -> glue(left, right)
+        Lt -> {
+          let #(orig_value, branch) = delete(left, compare, key)
+          let tree = balance(other_key, other_value, branch, right)
+          #(orig_value, tree)
+        }
+        Gt -> {
+          let #(orig_value, branch) = delete(right, compare, key)
+          let tree = balance(other_key, other_value, left, branch)
+          #(orig_value, tree)
+        }
+        Eq -> #(Some(other_value), glue(left, right))
       }
   }
 }
@@ -106,7 +107,7 @@ pub fn to_desc_list(root: KVBinaryTree(k, v)) -> List(#(k, v)) {
   fold(root, [], fn(acc, k, v) { [#(k, v), ..acc] })
 }
 
-pub fn tree_size(tree: KVBinaryTree(k, v)) -> Int {
+pub fn size(tree: KVBinaryTree(k, v)) -> Int {
   case tree {
     Tip -> 0
     Branch(size, _, _, _, _) -> size
@@ -125,11 +126,13 @@ pub fn update(
       case compare(key, other_key) {
         Lt -> {
           let #(orig_value, branch) = update(left, compare, key, fun)
-          #(orig_value, balance_left(other_key, value, branch, right))
+          let tree = balance(other_key, value, branch, right)
+          #(orig_value, tree)
         }
         Gt -> {
           let #(orig_value, branch) = update(right, compare, key, fun)
-          #(orig_value, balance_right(other_key, value, left, branch))
+          let tree = balance(other_key, value, left, branch)
+          #(orig_value, tree)
         }
         Eq -> #(Some(value), Branch(size, key, fun(Some(value)), left, right))
       }
@@ -176,7 +179,9 @@ fn min_view_sure(
     Branch(_, l_key, l_value, l_left, l_right) -> {
       let MinView(mv_key, mv_value, mv_left) =
         min_view_sure(l_key, l_value, l_left, l_right)
-      MinView(mv_key, mv_value, balance_left(key, value, mv_left, right))
+      // let tree = balance_left(key, value, mv_left, right)
+      let tree = balance(key, value, mv_left, right)
+      MinView(mv_key, mv_value, tree)
     }
   }
 }
@@ -196,226 +201,122 @@ fn max_view_sure(
     Branch(_, r_key, r_value, r_left, r_right) -> {
       let MaxView(mv_key, mv_value, mv_right) =
         max_view_sure(r_key, r_value, r_left, r_right)
-      MaxView(mv_key, mv_value, balance_right(key, value, left, mv_right))
+      let tree = balance(key, value, left, mv_right)
+      MaxView(mv_key, mv_value, tree)
     }
   }
 }
 
-fn balance_left(
+fn balance(
   key: k,
   value: v,
   left: KVBinaryTree(k, v),
   right: KVBinaryTree(k, v),
 ) -> KVBinaryTree(k, v) {
-  case left, right {
-    Branch(l_size, _, _, _, _), Branch(r_size, _, _, _, _)
-      if l_size <= delta * r_size
-    -> Branch(1 + l_size + r_size, key, value, left, right)
-    _, _ ->
-      case right {
-        Tip ->
-          case left {
-            Tip -> Branch(1, key, value, Tip, Tip)
-            Branch(l_size, l_key, l_value, l_left, l_right) -> {
-              case l_left, l_right {
-                Tip, Tip -> Branch(2, key, value, left, Tip)
-                Tip, Branch(_, lr_key, lr_value, _, _) -> {
-                  let new_left = Branch(1, l_key, l_value, Tip, Tip)
-                  let new_right = Branch(1, key, value, Tip, Tip)
-                  Branch(3, lr_key, lr_value, new_left, new_right)
-                }
-                Branch(_, _, _, _, _), Tip -> {
-                  let new_right = Branch(1, key, value, Tip, Tip)
-                  Branch(3, l_key, l_value, l_left, new_right)
-                }
-                Branch(ll_size, _, _, _, _),
-                  Branch(lr_size, lr_key, lr_value, lr_left, lr_right)
-                -> {
-                  case lr_size < ratio * ll_size {
-                    True -> {
-                      let new_right =
-                        Branch(1 + lr_size, key, value, l_right, Tip)
-                      Branch(1 + l_size, l_key, l_value, l_left, new_right)
-                    }
-                    False -> {
-                      let new_left =
-                        Branch(
-                          1 + ll_size + tree_size(lr_left),
-                          l_key,
-                          l_value,
-                          l_left,
-                          lr_left,
-                        )
-                      let new_right =
-                        Branch(
-                          1 + tree_size(lr_right),
-                          key,
-                          value,
-                          lr_right,
-                          Tip,
-                        )
-                      Branch(1 + l_size, lr_key, lr_value, new_left, new_right)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        Branch(r_size, _, _, _, _) ->
-          case left {
-            Tip -> Branch(1 + r_size, key, value, Tip, right)
-            Branch(l_size, l_key, l_value, l_left, l_right) ->
-              case l_left, l_right {
-                Branch(ll_size, _, _, _, _),
-                  Branch(lr_size, lr_key, lr_value, lr_left, lr_right)
-                ->
-                  case lr_size < ratio * ll_size {
-                    True -> {
-                      let new_right =
-                        Branch(1 + r_size + lr_size, key, value, l_right, right)
-                      Branch(
-                        1 + l_size + r_size,
-                        l_key,
-                        l_value,
-                        l_left,
-                        new_right,
-                      )
-                    }
-                    False -> {
-                      let new_left =
-                        Branch(
-                          1 + ll_size + tree_size(lr_left),
-                          l_key,
-                          l_value,
-                          l_left,
-                          lr_left,
-                        )
-                      let new_right =
-                        Branch(
-                          1 + r_size + tree_size(lr_right),
-                          key,
-                          value,
-                          lr_right,
-                          right,
-                        )
-                      Branch(
-                        1 + l_size + r_size,
-                        lr_key,
-                        lr_value,
-                        new_left,
-                        new_right,
-                      )
-                    }
-                  }
-                _, _ -> panic as "Failure in balance_left"
-              }
-          }
-      }
+  let size_l = size(left)
+  let size_r = size(right)
+  let size_x = size_l + size_r + 1
+
+  let a = size_l + size_r <= 1
+  let b = size_r > delta * size_l
+  let c = size_l > delta * size_r
+
+  case a, b, c {
+    True, _, _ -> Branch(size_x, key, value, left, right)
+    _, True, _ -> rotate_left(key, value, left, right)
+    _, _, True -> rotate_right(key, value, left, right)
+    _, _, _ -> Branch(size_x, key, value, left, right)
   }
 }
 
-fn balance_right(
+fn rotate_left(
   key: k,
   value: v,
   left: KVBinaryTree(k, v),
   right: KVBinaryTree(k, v),
 ) -> KVBinaryTree(k, v) {
-  case left, right {
-    Branch(l_size, _, _, _, _), Branch(r_size, _, _, _, _)
-      if r_size <= delta * l_size
-    -> Branch(1 + l_size + r_size, key, value, left, right)
-    _, _ -> {
-      case left {
-        Tip ->
-          case right {
-            Tip -> Branch(1, key, value, Tip, Tip)
-            Branch(r_size, r_key, r_value, r_left, r_right) ->
-              case r_left, r_right {
-                Tip, Tip -> Branch(2, key, value, Tip, right)
-                Tip, Branch(_, _, _, _, _) -> {
-                  let new_left = Branch(1, key, value, Tip, Tip)
-                  Branch(3, r_key, r_value, new_left, r_right)
-                }
-                Branch(_, rl_key, rl_value, _, _), Tip -> {
-                  let new_left = Branch(1, key, value, Tip, Tip)
-                  let new_right = Branch(1, r_key, r_value, Tip, Tip)
-                  Branch(3, rl_key, rl_value, new_left, new_right)
-                }
-                Branch(rl_size, rl_key, rl_value, rl_left, rl_right),
-                  Branch(rr_size, _, _, _, _)
-                ->
-                  case rl_size < ratio * rr_size {
-                    True -> {
-                      let new_left =
-                        Branch(1 + rl_size, key, value, Tip, r_left)
-                      Branch(1 + r_size, r_key, r_value, new_left, r_right)
-                    }
-                    False -> {
-                      let new_left =
-                        Branch(1 + tree_size(rl_left), key, value, Tip, rl_left)
-                      let new_right =
-                        Branch(
-                          1 + rr_size + tree_size(rl_right),
-                          r_key,
-                          r_value,
-                          rl_right,
-                          r_right,
-                        )
-                      Branch(1 + r_size, rl_key, rl_value, new_left, new_right)
-                    }
-                  }
-              }
-          }
-        Branch(l_size, _, _, _, _) ->
-          case right {
-            Tip -> Tip
-            Branch(r_size, r_key, r_value, r_left, r_right) ->
-              case r_left, r_right {
-                Branch(rl_size, rl_key, rl_value, rl_left, rl_right),
-                  Branch(rr_size, _, _, _, _)
-                ->
-                  case rl_size < ratio * rr_size {
-                    True -> {
-                      let new_left =
-                        Branch(1 + l_size + rl_size, key, value, left, r_left)
-                      Branch(
-                        1 + l_size + r_size,
-                        r_key,
-                        r_value,
-                        new_left,
-                        r_right,
-                      )
-                    }
-                    False -> {
-                      let new_left =
-                        Branch(
-                          1 + l_size + tree_size(rl_left),
-                          key,
-                          value,
-                          left,
-                          rl_left,
-                        )
-                      let new_right =
-                        Branch(
-                          1 + rr_size + tree_size(rl_right),
-                          r_key,
-                          r_value,
-                          rl_right,
-                          r_right,
-                        )
-                      Branch(
-                        1 + l_size + r_size,
-                        rl_key,
-                        rl_value,
-                        new_left,
-                        new_right,
-                      )
-                    }
-                  }
-                _, _ -> panic as "Failure in balance_right"
-              }
-          }
-      }
-    }
+  let assert Branch(_, _, _, r_left, r_right) = right
+  case size(r_left) < ratio * size(r_right) {
+    True -> single_left(key, value, left, right)
+    False -> double_left(key, value, left, right)
   }
+}
+
+fn rotate_right(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  let assert Branch(_, _, _, l_left, l_right) = left
+  case size(l_right) < ratio * size(l_left) {
+    True -> single_right(key, value, left, right)
+    False -> double_right(key, value, left, right)
+  }
+}
+
+fn single_left(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  let assert Branch(_, r_key, r_value, r_left, r_right) = right
+
+  let new_left = make(key, value, left, r_left)
+
+  make(r_key, r_value, new_left, r_right)
+}
+
+fn single_right(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  let assert Branch(_, l_key, l_value, l_left, l_right) = left
+
+  let new_right = make(key, value, l_right, right)
+
+  make(l_key, l_value, l_left, new_right)
+}
+
+fn double_left(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  let assert Branch(_, r_key, r_value, r_left, r_right) = right
+  let assert Branch(_, rl_key, rl_value, rl_left, rl_right) = r_left
+
+  let new_left = make(key, value, left, rl_left)
+  let new_right = make(r_key, r_value, rl_right, r_right)
+
+  make(rl_key, rl_value, new_left, new_right)
+}
+
+fn double_right(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  let assert Branch(_, l_key, r_key, l_left, l_right) = left
+  let assert Branch(_, lr_key, lr_value, lr_left, lr_right) = l_right
+
+  let new_left = make(l_key, r_key, l_left, lr_left)
+  let new_right = make(key, value, lr_right, right)
+
+  make(lr_key, lr_value, new_left, new_right)
+}
+
+/// constructor maintains the size of the tree
+fn make(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  Branch(size(left) + size(right) + 1, key, value, left, right)
 }

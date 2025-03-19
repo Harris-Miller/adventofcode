@@ -34,14 +34,19 @@ pub fn overwrites_existing_keys_test() {
 }
 
 pub fn size_test() {
-  let rand = case int.random(100) {
-    0 -> 1
-    a -> a
-  }
-  let ordered = list.range(1, rand)
+  let ordered = list.range(1, 20)
+  let shuffled = list.shuffle(ordered)
 
   let dict =
-    balanced_dict.from_list(list.map(ordered, fn(k) { #(k, "") }), int.compare)
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
-  dict |> balanced_dict.size() |> should.equal(rand)
+  let re_shuffled = list.shuffle(ordered)
+  let with_index = list.range(0, 19) |> list.reverse() |> list.zip(re_shuffled)
+
+  list.fold(with_index, dict, fn(incoming, kvp) {
+    let #(index, value) = kvp
+    let outgoing = balanced_dict.delete(incoming, value)
+    balanced_dict.size(outgoing) |> should.equal(index)
+    outgoing
+  })
 }

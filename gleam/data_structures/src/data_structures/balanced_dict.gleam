@@ -38,10 +38,9 @@ pub fn drop(
   from dict: BalancedDict(k, v),
   drop disallowed_keys: List(k),
 ) -> BalancedDict(k, v) {
-  let BalancedDict(root, compare) = dict
   let keys_set = set.from_list(disallowed_keys)
-  let new_root = tree.filter(root, fn(k, _) { !set.contains(keys_set, k) })
-  BalancedDict(new_root, compare)
+  let new_root = tree.filter(dict.root, fn(k, _) { !set.contains(keys_set, k) })
+  BalancedDict(..dict, root: new_root)
 }
 
 pub fn each(dict: BalancedDict(k, v), fun: fn(k, v) -> z) -> Nil {
@@ -55,9 +54,7 @@ pub fn filter(
   in dict: BalancedDict(k, v),
   keeping predicate: fn(k, v) -> Bool,
 ) -> BalancedDict(k, v) {
-  let BalancedDict(root, compare) = dict
-  let new_root = tree.filter(root, predicate)
-  BalancedDict(new_root, compare)
+  BalancedDict(..dict, root: tree.filter(dict.root, predicate))
 }
 
 pub fn fold(
@@ -65,8 +62,7 @@ pub fn fold(
   from initial: acc,
   with fun: fn(acc, k, v) -> acc,
 ) -> acc {
-  let BalancedDict(root, _) = dict
-  tree.fold(root, initial, fun)
+  tree.fold(dict.root, initial, fun)
 }
 
 pub fn fold_right(
@@ -74,8 +70,7 @@ pub fn fold_right(
   from initial: acc,
   with fun: fn(acc, k, v) -> acc,
 ) -> acc {
-  let BalancedDict(root, _) = dict
-  tree.fold_right(root, initial, fun)
+  tree.fold_right(dict.root, initial, fun)
 }
 
 pub fn from_list(
@@ -121,13 +116,11 @@ pub fn get_and_upsert(
 }
 
 pub fn get_min(from dict: BalancedDict(k, v)) -> Result(#(k, v), Nil) {
-  let BalancedDict(root, _) = dict
-  tree.get_min(root)
+  tree.get_min(dict.root)
 }
 
 pub fn get_max(from dict: BalancedDict(k, v)) -> Result(#(k, v), Nil) {
-  let BalancedDict(root, _) = dict
-  tree.get_max(root)
+  tree.get_max(dict.root)
 }
 
 pub fn has_key(from dict: BalancedDict(k, v), get key: k) -> Bool {
@@ -157,9 +150,7 @@ pub fn map_values(
   in dict: BalancedDict(k, v1),
   with fun: fn(k, v1) -> v2,
 ) -> BalancedDict(k, v2) {
-  let BalancedDict(root, compare) = dict
-  let new_root = tree.map(root, fun)
-  BalancedDict(new_root, compare)
+  BalancedDict(..dict, root: tree.map(dict.root, fun))
 }
 
 pub fn merge(
@@ -181,8 +172,7 @@ pub fn reorder(
 }
 
 pub fn size(dict: BalancedDict(k, v)) -> Int {
-  let BalancedDict(root, _) = dict
-  tree.size(root)
+  tree.size(dict.root)
 }
 
 pub fn take(
@@ -192,22 +182,20 @@ pub fn take(
   case desired_keys {
     [] -> clear(dict)
     _ -> {
-      let BalancedDict(root, compare) = dict
       let keys_set = set.from_list(desired_keys)
-      let new_root = tree.filter(root, fn(k, _) { set.contains(keys_set, k) })
-      BalancedDict(new_root, compare)
+      let new_root =
+        tree.filter(dict.root, fn(k, _) { set.contains(keys_set, k) })
+      BalancedDict(..dict, root: new_root)
     }
   }
 }
 
 pub fn to_asc_list(dict: BalancedDict(k, v)) -> List(#(k, v)) {
-  let BalancedDict(root, _) = dict
-  tree.to_asc_list(root)
+  tree.to_asc_list(dict.root)
 }
 
 pub fn to_desc_list(dict: BalancedDict(k, v)) -> List(#(k, v)) {
-  let BalancedDict(root, _) = dict
-  tree.to_desc_list(root)
+  tree.to_desc_list(dict.root)
 }
 
 pub fn upsert(
@@ -225,21 +213,19 @@ pub fn values(dict: BalancedDict(k, v)) -> List(v) {
 pub fn view_min(
   from dict: BalancedDict(k, v),
 ) -> Result(#(#(k, v), BalancedDict(k, v)), Nil) {
-  let BalancedDict(root, compare) = dict
-  tree.view_min(root)
+  tree.view_min(dict.root)
   |> result.map(fn(res) {
     let #(kvp, new_root) = res
-    #(kvp, BalancedDict(new_root, compare))
+    #(kvp, BalancedDict(..dict, root: new_root))
   })
 }
 
 pub fn view_max(
   from dict: BalancedDict(k, v),
 ) -> Result(#(#(k, v), BalancedDict(k, v)), Nil) {
-  let BalancedDict(root, compare) = dict
-  tree.view_max(root)
+  tree.view_max(dict.root)
   |> result.map(fn(res) {
     let #(kvp, new_root) = res
-    #(kvp, BalancedDict(new_root, compare))
+    #(kvp, BalancedDict(..dict, root: new_root))
   })
 }

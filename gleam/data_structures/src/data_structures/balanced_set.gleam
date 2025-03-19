@@ -8,18 +8,15 @@ pub opaque type BalancedSet(a) {
 }
 
 pub fn clear(set: BalancedSet(a)) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.clear(dict), compare)
+  BalancedSet(..set, dict: balanced_dict.clear(set.dict))
 }
 
 pub fn contains(in set: BalancedSet(a), this member: a) -> Bool {
-  let BalancedSet(dict, _) = set
-  balanced_dict.has_key(dict, member)
+  balanced_dict.has_key(set.dict, member)
 }
 
 pub fn delete(from set: BalancedSet(a), this member: a) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.delete(dict, member), compare)
+  BalancedSet(..set, dict: balanced_dict.delete(set.dict, member))
 }
 
 pub fn difference(
@@ -33,8 +30,7 @@ pub fn drop(
   from set: BalancedSet(a),
   drop disallowed: List(a),
 ) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.drop(dict, disallowed), compare)
+  BalancedSet(..set, dict: balanced_dict.drop(set.dict, disallowed))
 }
 
 pub fn each(set: BalancedSet(a), fun: fn(a) -> b) -> Nil {
@@ -48,8 +44,10 @@ pub fn filter(
   in set: BalancedSet(a),
   keeping predicate: fn(a) -> Bool,
 ) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.filter(dict, fn(k, _) { predicate(k) }), compare)
+  BalancedSet(
+    ..set,
+    dict: balanced_dict.filter(set.dict, fn(k, _) { predicate(k) }),
+  )
 }
 
 pub fn fold(
@@ -57,8 +55,7 @@ pub fn fold(
   from initial: b,
   with reducer: fn(b, a) -> b,
 ) -> b {
-  let BalancedSet(dict, _) = set
-  balanced_dict.fold(dict, initial, fn(acc, k, _) { reducer(acc, k) })
+  balanced_dict.fold(set.dict, initial, fn(acc, k, _) { reducer(acc, k) })
 }
 
 pub fn fold_right(
@@ -66,8 +63,7 @@ pub fn fold_right(
   from initial: b,
   with reducer: fn(b, a) -> b,
 ) -> b {
-  let BalancedSet(dict, _) = set
-  balanced_dict.fold_right(dict, initial, fn(acc, k, _) { reducer(acc, k) })
+  balanced_dict.fold_right(set.dict, initial, fn(acc, k, _) { reducer(acc, k) })
 }
 
 pub fn from_list(members: List(a), compare: fn(a, a) -> Order) -> BalancedSet(a) {
@@ -79,18 +75,15 @@ pub fn from_list(members: List(a), compare: fn(a, a) -> Order) -> BalancedSet(a)
 }
 
 pub fn get_min(from set: BalancedSet(a)) -> Result(a, Nil) {
-  let BalancedSet(dict, _) = set
-  dict |> balanced_dict.get_min() |> result.map(fn(kvp) { kvp.0 })
+  set.dict |> balanced_dict.get_min() |> result.map(fn(kvp) { kvp.0 })
 }
 
 pub fn get_max(from set: BalancedSet(a)) -> Result(a, Nil) {
-  let BalancedSet(dict, _) = set
-  dict |> balanced_dict.get_max() |> result.map(fn(kvp) { kvp.0 })
+  set.dict |> balanced_dict.get_max() |> result.map(fn(kvp) { kvp.0 })
 }
 
 pub fn insert(into set: BalancedSet(a), this member: a) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.insert(dict, member, Nil), compare)
+  BalancedSet(..set, dict: balanced_dict.insert(set.dict, member, Nil))
 }
 
 pub fn intersection(
@@ -106,12 +99,12 @@ pub fn is_disjoint(first: BalancedSet(a), from second: BalancedSet(a)) -> Bool {
 }
 
 pub fn is_empty(set: BalancedSet(a)) -> Bool {
-  let BalancedSet(dict, _) = set
-  balanced_dict.size(dict) == 0
+  balanced_dict.size(set.dict) == 0
 }
 
 pub fn is_subset(first: BalancedSet(a), of second: BalancedSet(a)) -> Bool {
-  intersection(of: first, and: second) == first
+  intersection(of: first, and: second) |> to_asc_list()
+  == first |> to_asc_list()
 }
 
 pub fn map(
@@ -139,8 +132,7 @@ pub fn reorder(
 }
 
 pub fn size(set: BalancedSet(v)) -> Int {
-  let BalancedSet(dict, _) = set
-  balanced_dict.size(dict)
+  balanced_dict.size(set.dict)
 }
 
 pub fn symmetric_difference(
@@ -157,18 +149,15 @@ pub fn take(
   from set: BalancedSet(a),
   keeping desired: List(a),
 ) -> BalancedSet(a) {
-  let BalancedSet(dict, compare) = set
-  BalancedSet(balanced_dict.take(dict, desired), compare)
+  BalancedSet(..set, dict: balanced_dict.take(set.dict, desired))
 }
 
 pub fn to_asc_list(set: BalancedSet(a)) -> List(a) {
-  let BalancedSet(dict, _) = set
-  dict |> balanced_dict.to_asc_list() |> list.map(fn(kvp) { kvp.0 })
+  set.dict |> balanced_dict.to_asc_list() |> list.map(fn(kvp) { kvp.0 })
 }
 
 pub fn to_desc_list(set: BalancedSet(a)) -> List(a) {
-  let BalancedSet(dict, _) = set
-  dict |> balanced_dict.to_desc_list() |> list.map(fn(kvp) { kvp.0 })
+  set.dict |> balanced_dict.to_desc_list() |> list.map(fn(kvp) { kvp.0 })
 }
 
 pub fn union(
@@ -180,22 +169,20 @@ pub fn union(
 }
 
 pub fn view_min(from set: BalancedSet(a)) -> Result(#(a, BalancedSet(a)), Nil) {
-  let BalancedSet(dict, compare) = set
-  dict
+  set.dict
   |> balanced_dict.view_min()
   |> result.map(fn(r) {
     let #(kvp, new_dict) = r
-    #(kvp.0, BalancedSet(new_dict, compare))
+    #(kvp.0, BalancedSet(..set, dict: new_dict))
   })
 }
 
 pub fn view_max(from set: BalancedSet(a)) -> Result(#(a, BalancedSet(a)), Nil) {
-  let BalancedSet(dict, compare) = set
-  dict
+  set.dict
   |> balanced_dict.view_max()
   |> result.map(fn(r) {
     let #(kvp, new_dict) = r
-    #(kvp.0, BalancedSet(new_dict, compare))
+    #(kvp.0, BalancedSet(..set, dict: new_dict))
   })
 }
 

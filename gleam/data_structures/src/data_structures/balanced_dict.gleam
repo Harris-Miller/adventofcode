@@ -9,7 +9,7 @@ pub opaque type BalancedDict(k, v) {
   BalancedDict(root: KVBinaryTree(k, v), compare: fn(k, k) -> Order)
 }
 
-pub fn clear(dict: BalancedDict(k, v)) {
+pub fn clear(dict: BalancedDict(k, v)) -> BalancedDict(k, v) {
   let BalancedDict(_, compare) = dict
   new(compare)
 }

@@ -1,3 +1,4 @@
+import common/list as listc
 import data_structures/balanced_dict
 import gleam/int
 import gleam/list
@@ -37,6 +38,21 @@ pub fn overwrites_existing_keys_test() {
     |> balanced_dict.insert("foo", 5)
   let assert Ok(v) = balanced_dict.get(dict, "foo")
   v |> should.equal(5)
+}
+
+pub fn has_key_test() {
+  let ordered = list.range(1, 100)
+  let shuffled = list.shuffle(ordered)
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  list.each(ordered, fn(key) {
+    balanced_dict.has_key(dict, key) |> should.equal(True)
+  })
+
+  balanced_dict.has_key(dict, 0) |> should.equal(False)
+  balanced_dict.has_key(dict, 101) |> should.equal(False)
 }
 
 pub fn size_test() {
@@ -88,10 +104,38 @@ pub fn drop_test() {
   let dict =
     balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
 
+  balanced_dict.drop(
+    dict,
+    dict |> balanced_dict.to_asc_list() |> list.map(fn(kvp) { kvp.0 }),
+  )
+  |> should.equal(balanced_dict.new(int.compare))
+
   let updated = balanced_dict.drop(dict, to_remove)
   balanced_dict.to_asc_list(updated)
   |> list.map(fn(kvp) { kvp.0 })
   |> should.equal(remaining)
+}
+
+pub fn take_test() {
+  let ordered = list.range(1, 50)
+  let shuffled = list.shuffle(ordered)
+  let to_keep =
+    list.filter(ordered, fn(_) {
+      case int.random(1) {
+        v if v > 0 -> True
+        _ -> False
+      }
+    })
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  balanced_dict.take(dict, []) |> should.equal(balanced_dict.new(int.compare))
+
+  let updated = balanced_dict.take(dict, to_keep)
+  balanced_dict.to_asc_list(updated)
+  |> list.map(fn(kvp) { kvp.0 })
+  |> should.equal(to_keep |> list.sort(int.compare))
 }
 
 pub fn get_test() {
@@ -107,4 +151,58 @@ pub fn get_test() {
     let assert Ok(v2) = balanced_dict.get(dict, k)
     v1 |> should.equal(v2)
   })
+}
+
+pub fn view_min_test() {
+  let ordered = list.range(1, 100)
+  let shuffled = list.shuffle(ordered)
+
+  let assert [_, ..to_assert] = ordered
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  let assert Ok(#(kvp, next)) = balanced_dict.view_min(dict)
+  kvp.0 |> should.equal(1)
+  balanced_dict.to_asc_list(next)
+  |> list.map(fn(kvp) { kvp.0 })
+  |> should.equal(to_assert)
+}
+
+pub fn view_max_test() {
+  let ordered = list.range(1, 100)
+  let shuffled = list.shuffle(ordered)
+
+  let assert Ok(to_assert) = listc.init(ordered)
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  let assert Ok(#(kvp, next)) = balanced_dict.view_max(dict)
+  kvp.0 |> should.equal(100)
+  balanced_dict.to_asc_list(next)
+  |> list.map(fn(kvp) { kvp.0 })
+  |> should.equal(to_assert)
+}
+
+pub fn get_min_test() {
+  let ordered = list.range(1, 100)
+  let shuffled = list.shuffle(ordered)
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  let assert Ok(kvp) = balanced_dict.get_min(dict)
+  kvp |> should.equal(#(1, ""))
+}
+
+pub fn get_max_test() {
+  let ordered = list.range(1, 100)
+  let shuffled = list.shuffle(ordered)
+
+  let dict =
+    balanced_dict.from_list(list.map(shuffled, fn(k) { #(k, "") }), int.compare)
+
+  let assert Ok(kvp) = balanced_dict.get_max(dict)
+  kvp |> should.equal(#(100, ""))
 }

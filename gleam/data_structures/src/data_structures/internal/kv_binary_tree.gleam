@@ -43,6 +43,27 @@ pub fn delete(
   }
 }
 
+pub fn filter(
+  root: KVBinaryTree(k, v),
+  predicate: fn(k, v) -> Bool,
+) -> KVBinaryTree(k, v) {
+  case root {
+    Tip -> Tip
+    Branch(_, key, value, left, right) -> {
+      let pl = filter(left, predicate)
+      let pr = filter(right, predicate)
+
+      case predicate(key, value), pl, pr {
+        True, Branch(_, l_key, _, _, _), Branch(_, r_key, _, _, _)
+          if key == l_key && key == r_key
+        -> root
+        True, _, _ -> link(key, value, pl, pr)
+        _, _, _ -> merge_trees(pl, pr)
+      }
+    }
+  }
+}
+
 pub fn fold(
   over root: KVBinaryTree(k, v),
   from initial: acc,
@@ -94,11 +115,6 @@ pub fn map(
   }
 }
 
-// Tip constructor
-pub fn tip() -> KVBinaryTree(k, v) {
-  Tip
-}
-
 pub fn to_asc_list(root: KVBinaryTree(k, v)) -> List(#(k, v)) {
   fold_right(root, [], fn(acc, k, v) { [#(k, v), ..acc] })
 }
@@ -139,6 +155,30 @@ pub fn update(
   }
 }
 
+pub fn view_min(
+  root: KVBinaryTree(k, v),
+) -> Result(#(#(k, v), KVBinaryTree(k, v)), Nil) {
+  case root {
+    Tip -> Error(Nil)
+    Branch(_, key, value, left, right) -> {
+      let #(k, v, tree) = remove_min(key, value, left, right)
+      Ok(#(#(k, v), tree))
+    }
+  }
+}
+
+pub fn view_max(
+  root: KVBinaryTree(k, v),
+) -> Result(#(#(k, v), KVBinaryTree(k, v)), Nil) {
+  case root {
+    Tip -> Error(Nil)
+    Branch(_, key, value, left, right) -> {
+      let #(k, v, tree) = remove_max(key, value, left, right)
+      Ok(#(#(k, v), tree))
+    }
+  }
+}
+
 fn glue(
   left: KVBinaryTree(k, v),
   right: KVBinaryTree(k, v),
@@ -151,58 +191,49 @@ fn glue(
     ->
       case l_size > r_size {
         True -> {
-          let MaxView(mv_key, mv_value, mv_left) =
-            max_view_sure(l_key, l_value, l_left, l_right)
+          let #(mv_key, mv_value, mv_left) =
+            remove_max(l_key, l_value, l_left, l_right)
           Branch(l_size + r_size, mv_key, mv_value, mv_left, right)
         }
         False -> {
-          let MinView(mv_key, mv_value, mv_right) =
-            min_view_sure(r_key, r_value, r_left, r_right)
+          let #(mv_key, mv_value, mv_right) =
+            remove_min(r_key, r_value, r_left, r_right)
           Branch(l_size + r_size, mv_key, mv_value, left, mv_right)
         }
       }
   }
 }
 
-type MinView(k, v) {
-  MinView(key: k, value: v, right_tree: KVBinaryTree(k, v))
-}
-
-fn min_view_sure(
+fn remove_min(
   key: k,
   value: v,
   left: KVBinaryTree(k, v),
   right: KVBinaryTree(k, v),
-) -> MinView(k, v) {
+) -> #(k, v, KVBinaryTree(k, v)) {
   case left {
-    Tip -> MinView(key, value, right)
+    Tip -> #(key, value, right)
     Branch(_, l_key, l_value, l_left, l_right) -> {
-      let MinView(mv_key, mv_value, mv_left) =
-        min_view_sure(l_key, l_value, l_left, l_right)
-      // let tree = balance_left(key, value, mv_left, right)
+      let #(mv_key, mv_value, mv_left) =
+        remove_min(l_key, l_value, l_left, l_right)
       let tree = balance(key, value, mv_left, right)
-      MinView(mv_key, mv_value, tree)
+      #(mv_key, mv_value, tree)
     }
   }
 }
 
-type MaxView(k, v) {
-  MaxView(key: k, value: v, left_tree: KVBinaryTree(k, v))
-}
-
-fn max_view_sure(
+fn remove_max(
   key: k,
   value: v,
   left: KVBinaryTree(k, v),
   right: KVBinaryTree(k, v),
-) -> MaxView(k, v) {
+) -> #(k, v, KVBinaryTree(k, v)) {
   case right {
-    Tip -> MaxView(key, value, left)
+    Tip -> #(key, value, left)
     Branch(_, r_key, r_value, r_left, r_right) -> {
-      let MaxView(mv_key, mv_value, mv_right) =
-        max_view_sure(r_key, r_value, r_left, r_right)
+      let #(mv_key, mv_value, mv_right) =
+        remove_max(r_key, r_value, r_left, r_right)
       let tree = balance(key, value, left, mv_right)
-      MaxView(mv_key, mv_value, tree)
+      #(mv_key, mv_value, tree)
     }
   }
 }
@@ -319,4 +350,102 @@ fn make(
   right: KVBinaryTree(k, v),
 ) -> KVBinaryTree(k, v) {
   Branch(size(left) + size(right) + 1, key, value, left, right)
+}
+
+pub fn get_min(tree: KVBinaryTree(k, v)) -> Result(#(k, v), Nil) {
+  case tree {
+    Tip -> Error(Nil)
+    _ -> Ok(get_min_loop(tree))
+  }
+}
+
+fn get_min_loop(tree: KVBinaryTree(k, v)) -> #(k, v) {
+  let assert Branch(_, key, value, left, _) = tree
+  case left {
+    Tip -> #(key, value)
+    _ -> get_min_loop(left)
+  }
+}
+
+pub fn get_max(tree: KVBinaryTree(k, v)) -> Result(#(k, v), Nil) {
+  case tree {
+    Tip -> Error(Nil)
+    _ -> Ok(get_max_loop(tree))
+  }
+}
+
+pub fn tip() {
+  Tip
+}
+
+fn get_max_loop(tree: KVBinaryTree(k, v)) -> #(k, v) {
+  let assert Branch(_, key, value, _, right) = tree
+  case right {
+    Tip -> #(key, value)
+    _ -> get_max_loop(right)
+  }
+}
+
+fn link(
+  key: k,
+  value: v,
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  case left, right {
+    Tip, _ -> insert_min(key, value, right)
+    _, Tip -> insert_max(key, value, left)
+    Branch(l_size, _, _, _, _), Branch(r_size, r_key, r_value, r_left, r_right)
+      if delta * l_size < r_size
+    -> {
+      let new_left = link(key, value, left, r_left)
+      balance(r_key, r_value, new_left, r_right)
+    }
+    Branch(l_size, l_key, l_value, l_left, l_right), Branch(r_size, _, _, _, _)
+      if delta * l_size < r_size
+    -> {
+      let new_right = link(key, value, l_right, right)
+      balance(l_key, l_value, l_left, new_right)
+    }
+    Branch(_, _, _, _, _), Branch(_, _, _, _, _) ->
+      make(key, value, left, right)
+  }
+}
+
+fn insert_min(key: k, value: v, tree: KVBinaryTree(k, v)) -> KVBinaryTree(k, v) {
+  case tree {
+    Tip -> Branch(1, key, value, Tip, Tip)
+    Branch(_, k, v, l, r) -> balance(k, v, insert_min(key, value, l), r)
+  }
+}
+
+fn insert_max(key: k, value: v, tree: KVBinaryTree(k, v)) -> KVBinaryTree(k, v) {
+  case tree {
+    Tip -> Branch(1, key, value, Tip, Tip)
+    Branch(_, k, v, l, r) -> balance(k, v, l, insert_max(key, value, r))
+  }
+}
+
+/// merge two trees
+fn merge_trees(
+  left: KVBinaryTree(k, v),
+  right: KVBinaryTree(k, v),
+) -> KVBinaryTree(k, v) {
+  case left, right {
+    Tip, _ -> right
+    _, Tip -> left
+    Branch(l_size, _, _, _, _), Branch(r_size, r_key, r_value, r_left, r_right)
+      if delta * l_size < r_size
+    -> {
+      let new_left = merge_trees(left, r_left)
+      balance(r_key, r_value, new_left, r_right)
+    }
+    Branch(l_size, l_key, l_value, l_left, l_right), Branch(r_size, _, _, _, _)
+      if delta * r_size < l_size
+    -> {
+      let new_right = merge_trees(l_right, right)
+      balance(l_key, l_value, l_left, new_right)
+    }
+    Branch(_, _, _, _, _), Branch(_, _, _, _, _) -> glue(left, right)
+  }
 }

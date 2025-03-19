@@ -2,6 +2,8 @@ import data_structures/internal/kv_binary_tree.{type KVBinaryTree} as tree
 import gleam/list
 import gleam/option.{type Option}
 import gleam/order.{type Order}
+import gleam/result
+import gleam/set
 
 // combine
 // each
@@ -20,6 +22,11 @@ pub opaque type BalancedDict(k, v) {
   BalancedDict(root: KVBinaryTree(k, v), compare: fn(k, k) -> Order)
 }
 
+pub fn clear(dict: BalancedDict(k, v)) {
+  let BalancedDict(_, compare) = dict
+  new(compare)
+}
+
 pub fn delete(
   from dict: BalancedDict(k, v),
   delete key: k,
@@ -31,10 +38,19 @@ pub fn drop(
   from dict: BalancedDict(k, v),
   drop disallowed_keys: List(k),
 ) -> BalancedDict(k, v) {
-  case disallowed_keys {
-    [] -> dict
-    [first, ..rest] -> drop(delete(dict, first), rest)
-  }
+  let BalancedDict(root, compare) = dict
+  let keys_set = set.from_list(disallowed_keys)
+  let new_root = tree.filter(root, fn(k, _) { !set.contains(keys_set, k) })
+  BalancedDict(new_root, compare)
+}
+
+pub fn filter(
+  in dict: BalancedDict(k, v),
+  keeping predicate: fn(k, v) -> Bool,
+) -> BalancedDict(k, v) {
+  let BalancedDict(root, compare) = dict
+  let new_root = tree.filter(root, predicate)
+  BalancedDict(new_root, compare)
 }
 
 pub fn fold(
@@ -97,6 +113,16 @@ pub fn get_and_upsert(
   #(old_value, BalancedDict(new_root, compare))
 }
 
+pub fn get_min(from dict: BalancedDict(k, v)) -> Result(#(k, v), Nil) {
+  let BalancedDict(root, _) = dict
+  tree.get_min(root)
+}
+
+pub fn get_max(from dict: BalancedDict(k, v)) -> Result(#(k, v), Nil) {
+  let BalancedDict(root, _) = dict
+  tree.get_max(root)
+}
+
 pub fn has_key(from dict: BalancedDict(k, v), get key: k) -> Bool {
   case get(dict, key) {
     Ok(_) -> True
@@ -134,6 +160,21 @@ pub fn size(dict: BalancedDict(k, v)) -> Int {
   tree.size(root)
 }
 
+pub fn take(
+  from dict: BalancedDict(k, v),
+  keeping desired_keys: List(k),
+) -> BalancedDict(k, v) {
+  case desired_keys {
+    [] -> clear(dict)
+    _ -> {
+      let BalancedDict(root, compare) = dict
+      let keys_set = set.from_list(desired_keys)
+      let new_root = tree.filter(root, fn(k, _) { set.contains(keys_set, k) })
+      BalancedDict(new_root, compare)
+    }
+  }
+}
+
 pub fn to_asc_list(dict: BalancedDict(k, v)) -> List(#(k, v)) {
   let BalancedDict(root, _) = dict
   tree.to_asc_list(root)
@@ -150,4 +191,26 @@ pub fn upsert(
   with fun: fn(Option(v)) -> v,
 ) -> BalancedDict(k, v) {
   get_and_upsert(dict, key, fun).1
+}
+
+pub fn view_min(
+  from dict: BalancedDict(k, v),
+) -> Result(#(#(k, v), BalancedDict(k, v)), Nil) {
+  let BalancedDict(root, compare) = dict
+  tree.view_min(root)
+  |> result.map(fn(res) {
+    let #(kvp, new_root) = res
+    #(kvp, BalancedDict(new_root, compare))
+  })
+}
+
+pub fn view_max(
+  from dict: BalancedDict(k, v),
+) -> Result(#(#(k, v), BalancedDict(k, v)), Nil) {
+  let BalancedDict(root, compare) = dict
+  tree.view_max(root)
+  |> result.map(fn(res) {
+    let #(kvp, new_root) = res
+    #(kvp, BalancedDict(new_root, compare))
+  })
 }

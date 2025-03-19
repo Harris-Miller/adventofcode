@@ -238,8 +238,24 @@ pub fn is_subset_test() {
   |> should.be_false()
   balanced_set.is_subset(a, c)
   |> should.be_true()
-  // balanced_set.is_subset(b, c)
-  // |> should.be_true()
+  balanced_set.is_subset(b, c)
+  |> should.be_true()
+}
+
+pub fn symmetric_difference_test() {
+  let a = balanced_set.from_list(list.range(1, 10), int.compare)
+  let b = balanced_set.from_list(list.range(11, 20), int.compare)
+  let c = balanced_set.from_list(list.range(1, 20), int.compare)
+
+  balanced_set.symmetric_difference(a, b)
+  |> balanced_set.to_asc_list()
+  |> should.equal(c |> balanced_set.to_asc_list())
+  balanced_set.symmetric_difference(a, c)
+  |> balanced_set.to_asc_list()
+  |> should.equal(b |> balanced_set.to_asc_list())
+  balanced_set.symmetric_difference(b, c)
+  |> balanced_set.to_asc_list()
+  |> should.equal(a |> balanced_set.to_asc_list())
 }
 
 pub fn union_test() {

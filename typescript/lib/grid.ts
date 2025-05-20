@@ -57,6 +57,17 @@ export const getNeighbors4 = ([r, c]: Point): Point[] => [
   [r, c - 1],
 ];
 
+export const getNeighbors8 = ([r, c]: Point): Point[] => [
+  [r - 1, c - 1],
+  [r - 1, c],
+  [r - 1, c + 1],
+  [r, c - 1],
+  [r, c + 1],
+  [r + 1, c - 1],
+  [r + 1, c],
+  [r + 1, c + 1],
+];
+
 export const createIsInRangeFunc =
   (rLen: number, cLen: number) =>
   ([r, c]: Point) =>

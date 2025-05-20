@@ -1,7 +1,6 @@
 import common/result as resultc
 import gleam/int
 import gleam/list.{index_map}
-import gleam/option.{type Option}
 import gleam/result
 
 /// Return list without last value
@@ -98,10 +97,10 @@ pub fn remove_(list: List(a), at index: Int) -> List(a) {
   )
 }
 
-pub fn uncons(list: List(a)) -> Option(#(a, List(a))) {
+pub fn uncons(list: List(a)) -> Result(#(a, List(a)), Nil) {
   case list {
-    [head, ..tail] -> option.Some(#(head, tail))
-    [] -> option.None
+    [head, ..tail] -> Ok(#(head, tail))
+    [] -> Error(Nil)
   }
 }
 

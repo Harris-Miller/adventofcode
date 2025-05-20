@@ -4,6 +4,40 @@ import gleam/result
 import gleam/set.{type Set}
 import search_algorithms/internal/search_container.{type SearchContainer}
 
+// -- | The @SearchContainer@ class abstracts the idea of a container to be used in
+// -- @generalizedSearch@
+// class SearchContainer container where
+//   type Elem container
+//   pop :: container -> Maybe (Elem container, container)
+//   push :: container -> Elem container -> container
+
+// instance SearchContainer (Seq.Seq a) where
+//   type Elem (Seq.Seq a) = a
+//   pop s =
+//     case Seq.viewl s of
+//       Seq.EmptyL -> Nothing
+//       (x Seq.:< xs) -> Just (x, xs)
+//   push s a = s Seq.|> a
+
+// instance SearchContainer [a] where
+//   type Elem [a] = a
+//   pop list =
+//     case list of
+//       [] -> Nothing
+//       (x : xs) -> Just (x, xs)
+//   push list a = a : list
+
+// instance Ord k => SearchContainer (LIFOHeap k a) where
+//   type Elem (LIFOHeap k a) = (k, a)
+//   pop (LIFOHeap inner)
+//     | Map.null inner = Nothing
+//     | otherwise = case Map.findMin inner of
+//       (k, [a]) -> Just ((k, a), LIFOHeap $ Map.deleteMin inner)
+//       (k, a : _) -> Just ((k, a), LIFOHeap $ Map.updateMin (Just . tail) inner)
+//       (_, []) -> pop (LIFOHeap $ Map.deleteMin inner)
+//                  -- Logically, this should never happen
+//   push (LIFOHeap inner) (k, a) = LIFOHeap $ Map.insertWith (++) k [a] inner
+
 pub type SearchState(state_key, state) {
   SearchState(
     current: state,

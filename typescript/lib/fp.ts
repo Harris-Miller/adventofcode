@@ -75,3 +75,36 @@ export const chunksOf = <T>(n: number, arr: T[]): T[][] => divvy(n, n, arr);
 
 export const fst = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[0];
 export const snd = <T>(tuple: [T, unknown, unknown] | [T, unknown]) => tuple[1];
+
+export const permutations = <T>(array: T[]): T[][] => {
+  const result: T[][] = [];
+
+  const permute = (arr: T[], m: T[] = []) => {
+    if (arr.length === 0) {
+      result.push(m);
+    } else {
+      for (let i = 0; i < arr.length; i++) {
+        const curr = arr.slice();
+        const next = curr.splice(i, 1);
+        permute(curr.slice(), m.concat(next));
+      }
+    }
+  };
+
+  permute(array);
+
+  return result;
+};
+
+/**
+ * in: [1, 2, 3, 4]
+ * out: [[1, 2], [2, 3], [3, 4]]
+ */
+export const pairs = <T>(arr: T[]): [T, T][] => {
+  const result: [T, T][] = [];
+  const len = arr.length - 1;
+  for (let i = 0; i < len; ++i) {
+    result.push([arr[i], arr[i + 1]]);
+  }
+  return result;
+};

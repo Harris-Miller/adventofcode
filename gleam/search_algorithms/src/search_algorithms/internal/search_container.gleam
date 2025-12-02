@@ -1,6 +1,7 @@
 import data_structures/balanced_map.{type BalancedMap}
 import gleam/deque.{type Deque}
-import gleam/list
+
+// import gleam/list
 import gleam/result
 
 pub type Type(a) {

@@ -1,6 +1,5 @@
 import common/result as resultc
 import gleam/dict.{type Dict}
-import gleam/io
 import gleam/list
 import gleam/order.{Gt, Lt}
 import gleam/result
@@ -11,7 +10,7 @@ fn create_path_loop(came_from: Dict(a, a), state: a, acc: List(a)) {
   case dict.get(came_from, state) {
     Error(_) -> list.reverse(acc)
     Ok(prev) -> {
-      io.debug(prev)
+      echo prev
       create_path_loop(came_from, prev, [prev, ..acc])
     }
   }
@@ -64,11 +63,11 @@ pub fn a_star_assoc_yielder(
 
     let assert Ok(cost) = dict.get(g, state)
 
-    io.debug(state)
+    echo state
     let to_yield = #(cost, create_path(came_from, state))
 
     let next_states = next(state)
-    io.debug(next_states)
+    echo next_states
 
     let next_search_state =
       list.fold(

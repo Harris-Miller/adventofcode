@@ -1,6 +1,5 @@
 import common/result as resultc
 import gleam/dict.{type Dict}
-import gleam/io
 import gleam/list
 import gleam/result
 import gleam/set.{type Set}
@@ -119,7 +118,7 @@ pub fn generalized_search(
     let steps =
       dict.get(search_st.paths, make_key(search_st.current))
       |> resultc.unwrap_assert()
-    io.debug(steps)
+    echo steps
     steps
   }
 

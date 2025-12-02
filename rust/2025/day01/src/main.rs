@@ -7,7 +7,7 @@ fn main() {
 fn part_one(input: &str) {
     let lines = input.lines();
 
-    let mut zeros: u32 = 0;
+    let mut zeros: i32 = 0;
 
     lines
         .map(|line| line.split_at(1))
@@ -20,17 +20,26 @@ fn part_one(input: &str) {
                 dial + rotate
             };
 
+            // special case, I don't like this, come up with something better
+            if next_dial == 100 || next_dial == -100 {
+                zeros += 1;
+                next_dial = 0;
+                return next_dial;
+            }
+
+            zeros += (next_dial / 100).abs();
             next_dial = next_dial % 100;
+            if next_dial == 0 || (next_dial < 0 && dial > 0) || (next_dial > 0 && dial < 0) {
+                zeros += 1
+            }
+
             if next_dial < 0 {
-                next_dial = next_dial + 100;
+                next_dial += 100;
             }
 
-            if next_dial == 0 {
-                zeros = zeros + 1;
-            }
-            println!("{next_dial}");
+            println!("Dial: {:?}, Num zeros: {:?}", next_dial, zeros);
 
-            next_dial
+            return next_dial;
         });
 
     println!("Num zeros: {:?}", zeros);

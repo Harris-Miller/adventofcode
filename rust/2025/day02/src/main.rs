@@ -1,5 +1,7 @@
+use std::ops::RangeInclusive;
+
 fn main() {
-    let input = include_str!("../../../../inputs/2025/Day2/sample.txt");
+    let input = include_str!("../../../../inputs/2025/Day2/input.txt");
 
     part_one(input);
 }
@@ -7,14 +9,24 @@ fn main() {
 fn part_one(input: &str) {
     let ranges = input.trim().split(",").map(|p| {
         let (s, e) = p.split_once("-").unwrap();
-        (s.parse::<u32>().unwrap(), e.parse::<u32>().unwrap())
+        (s.parse::<u64>().unwrap(), e.parse::<u64>().unwrap())
     });
 
-    let vectors = ranges.map(|(start, end)| {
-        let what = start..=end;
-        let things: Vec<u32> = what.collect();
-        things
-    });
+    let vectors = ranges.map(|(start, end)| start..=end);
+    let results = vectors.flat_map(process_one);
+    let total: u64 = results.sum();
+    println!("{:?}", total);
+}
 
-    println!("{:?}", vectors.collect::<Vec<Vec<u32>>>());
+fn process_one(range: RangeInclusive<u64>) -> Vec<u64> {
+    range
+        .map(|val| val.to_string())
+        .filter(|val| val.len() % 2 == 0)
+        .filter(|val| {
+            let mid = val.len() / 2;
+            let (first, second) = val.split_at(mid);
+            first == second
+        })
+        .map(|val| val.parse::<u64>().unwrap())
+        .collect()
 }

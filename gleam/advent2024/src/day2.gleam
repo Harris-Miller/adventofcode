@@ -1,4 +1,3 @@
-import common/function as functionc
 import common/list as listc
 import common/result as resultc
 import gleam/function
@@ -12,13 +11,13 @@ import simplifile
 fn all_are_increasing(list: List(Int)) -> Bool {
   list
   |> listc.pairs_()
-  |> list.all(functionc.uncurry2(fn(l, r) { l + 1 <= r && l + 3 >= r }))
+  |> list.all(fn(#(l, r)) { l + 1 <= r && l + 3 >= r })
 }
 
 fn all_are_decreasing(list: List(Int)) -> Bool {
   list
   |> listc.pairs_()
-  |> list.all(functionc.uncurry2(fn(l, r) { l - 1 >= r && l - 3 <= r }))
+  |> list.all(fn(#(l, r)) { l - 1 >= r && l - 3 <= r })
 }
 
 // const tryAgainRemovingOneAtATime = (ref: number[]) =>

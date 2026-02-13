@@ -1,5 +1,6 @@
 import common/list as listc
 import gleam/dict.{type Dict}
+import gleam/int
 import gleam/io
 import gleam/list
 import gleam/pair
@@ -13,8 +14,8 @@ pub type Grid(a) =
   Dict(Point, a)
 
 pub fn make_empty(num_rows: Int, num_cols: Int, fill: a) -> Grid(a) {
-  let rows = list.range(0, num_rows - 1)
-  let cols = list.range(0, num_cols - 1)
+  let rows = int.range(0, num_rows, [], list.prepend) |> list.reverse()
+  let cols = int.range(0, num_cols - 1, [], list.prepend) |> list.reverse()
 
   list.flat_map(rows, fn(row) {
     list.map(cols, fn(col) { #(#(row, col), fill) })
@@ -62,8 +63,8 @@ pub fn get_neighbors8(point: Point) {
 
 pub fn to_string(from grid: Grid(a), using fun: fn(a) -> String) -> String {
   let #(row_max, col_max) = get_maxes(grid)
-  let rows = list.range(0, row_max)
-  let cols = list.range(0, col_max)
+  let rows = int.range(0, row_max, [], list.prepend) |> list.reverse()
+  let cols = int.range(0, col_max, [], list.prepend) |> list.reverse()
 
   list.map(rows, fn(row) {
     list.fold(cols, string_tree.new(), fn(sb, col) {
@@ -86,8 +87,8 @@ pub fn debug(grid: Grid(a), using fun: fn(a) -> String) {
 pub fn square_from_points(btm_left: #(Int, Int), top_right: #(Int, Int)) {
   let #(r1, c1) = btm_left
   let #(r2, c2) = top_right
-  let rows = list.range(r1, r2)
-  let cols = list.range(c1, c2)
+  let rows = int.range(r1, r2, [], list.prepend) |> list.reverse()
+  let cols = int.range(c1, c2, [], list.prepend) |> list.reverse()
   list.flat_map(rows, fn(row) { list.map(cols, fn(col) { #(row, col) }) })
 }
 

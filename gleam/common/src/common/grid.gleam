@@ -7,6 +7,7 @@ import gleam/pair
 import gleam/string
 import gleam/string_tree
 
+/// #(row, col)
 pub type Point =
   #(Int, Int)
 
@@ -63,8 +64,8 @@ pub fn get_neighbors8(point: Point) {
 
 pub fn to_string(from grid: Grid(a), using fun: fn(a) -> String) -> String {
   let #(row_max, col_max) = get_maxes(grid)
-  let rows = int.range(0, row_max, [], list.prepend) |> list.reverse()
-  let cols = int.range(0, col_max, [], list.prepend) |> list.reverse()
+  let rows = int.range(0, row_max + 1, [], list.prepend) |> list.reverse()
+  let cols = int.range(0, col_max + 1, [], list.prepend) |> list.reverse()
 
   list.map(rows, fn(row) {
     list.fold(cols, string_tree.new(), fn(sb, col) {

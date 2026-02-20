@@ -3,6 +3,10 @@ import gleam/int
 import gleam/list.{index_map}
 import gleam/result
 
+pub fn debug(list: List(a)) -> Nil {
+  list.each(list, fn(v) { echo v })
+}
+
 /// Return list without last value
 pub fn init(list: List(a)) -> Result(List(a), Nil) {
   list
